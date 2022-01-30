@@ -16,11 +16,11 @@ public extension K1.PublicKey {
     
     func isValidSignature<D: Digest>(
         _ signature: ECDSASignature,
-        for digest: D
+        for digest: D,
+        mode: SignatureValidationMode = .default
     ) throws -> Bool {
         try Bridge.toC { bridge in
             
-            var signatureBridgedToC = secp256k1_ecdsa_signature()
             var publicKeyBridgedToC = secp256k1_pubkey()
 
             try bridge.call(ifFailThrow: .failedToSerializePublicKeyIntoBytes) { context in
@@ -33,29 +33,75 @@ public extension K1.PublicKey {
                 )
             }
             
-            withUnsafeMutableBytes(of: &signatureBridgedToC.data) { pointer in
+            var signatureBridgedToCPotentiallyMalleable = secp256k1_ecdsa_signature()
+            withUnsafeMutableBytes(of: &signatureBridgedToCPotentiallyMalleable.data) { pointer in
                 pointer.copyBytes(
                     from: signature.rawRepresentation.prefix(pointer.count)
                 )
             }
             
-            try bridge.call(ifFailThrow: .failedToUpdateContextRandomization) { context in
+            var signatureBridgedToCNonMalleable = secp256k1_ecdsa_signature()
+
+            let codeForSignatureWasMalleable = 1
+            let signatureWasMalleableResult = bridge.callWithResultCode { context in
+                secp256k1_ecdsa_signature_normalize(
+                   context,
+                   &signatureBridgedToCNonMalleable, // out
+                   &signatureBridgedToCPotentiallyMalleable // in
+               )
+           }
+           
+            let signatureWasMalleable = signatureWasMalleableResult == codeForSignatureWasMalleable
+     
+            let codeForValidSignature = 1
+            let validationResult = bridge.callWithResultCode { context in
                 secp256k1_ecdsa_verify(
                     context,
-                    &signatureBridgedToC,
+                    &signatureBridgedToCNonMalleable,
                     Array(digest),
                     &publicKeyBridgedToC
                 )
             }
             
-            return true // valid signature
+            let isSignatureValid = validationResult == codeForValidSignature
+            let acceptMalleableSignatures = mode == .acceptSignatureMalleability
+            
+            switch (isSignatureValid, signatureWasMalleable, acceptMalleableSignatures) {
+            case (true, false, _):
+//                print("💡 Signature is valid.")
+                return true
+            case (true, true, true):
+//                print("💡 Signature was valid but malleable, since you specified to accept malleability => considering signature valid.")
+                return true
+            case (true, true, false):
+//                print("💡 Signature was valid, but not normalized which was required => considering signature invalid.")
+                return false
+            case (false, _, _):
+//                print("💡 Signature invalid.")
+                return false
+            }
         }
     }
 
     func isValidSignature<D: DataProtocol>(
         _ signature: ECDSASignature,
-        for data: D
+        for data: D,
+        mode: SignatureValidationMode = .default
     ) throws -> Bool {
-        try isValidSignature(signature, for: SHA256.hash(data: data))
+        try isValidSignature(signature, for: SHA256.hash(data: data), mode: mode)
     }
- }
+}
+
+
+/// Validation mode controls whether or not signature malleability should
+/// is forbidden or allowed. Read more about it [here][more]
+///
+/// [more]: https://github.com/bitcoin-core/secp256k1/blob/2e5e4b67dfb67950563c5f0ab2a62e25eb1f35c5/include/secp256k1.h#L510-L550
+public enum SignatureValidationMode {
+    case preventSignatureMalleability
+    case acceptSignatureMalleability
+}
+
+public extension SignatureValidationMode {
+    static let `default`: Self = .acceptSignatureMalleability
+}

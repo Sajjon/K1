@@ -88,6 +88,9 @@ let package = Package(
             name: "K1Tests",
             dependencies: [
                 "K1"
+            ],
+            resources: [
+                .process("Resources/"),
             ]
         ),
     ]

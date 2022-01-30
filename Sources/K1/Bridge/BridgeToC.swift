@@ -39,14 +39,19 @@ extension Bridge {
         return try closure(bridge)
     }
     
+    func callWithResultCode(
+        _ method: (OpaquePointer) -> Int32
+    ) -> Int {
+        let result = method(context)
+        return Int(result)
+    }
+    
     func call(
         ifFailThrow error: K1.Error,
         _ method: (OpaquePointer) -> Int32
     ) throws {
-        let result = method(context)
-        
-        let successCode: Int32 = 1
-        
+      let result = callWithResultCode(method)
+        let successCode = 1
         guard result == successCode else {
             throw error
         }

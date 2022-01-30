@@ -2,7 +2,7 @@ import XCTest
 import K1
 
 final class K1Tests: XCTestCase {
-
+    
     func testSecp256k1Vector1() throws {
         try verifyRFC6979WithSignature(
             key: "CCA9FBCC1B41E5A95D369EAA6DDCFF73B61A4EFAA279CFC6567E8DAA39CBAF50",
