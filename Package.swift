@@ -23,7 +23,8 @@ let package = Package(
 
     dependencies: [
         .package(url: "https://github.com/apple/swift-crypto.git", "2.0.0" ..< "3.0.0"),
-        .package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0")
+        .package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0"),
+        .package(url: "https://github.com/filom/ASN1Decoder", .branch("master"))
     ],
 
     targets: [
@@ -51,6 +52,7 @@ let package = Package(
                 "libsecp256k1/autogen.sh",
                 "libsecp256k1/libsecp256k1.pc.in",
                 "libsecp256k1/doc",
+                "libsecp256k1/contrib",
                 "libsecp256k1/ci",
                 "libsecp256k1/sage",
                 "libsecp256k1/build-aux",
@@ -59,19 +61,21 @@ let package = Package(
                 "libsecp256k1/COPYING",
                 "libsecp256k1/SECURITY.md"
             ],
+            sources: ["src", "libsecp256k1/src"],
             cSettings: [
-                .headerSearchPath("secp256k1"),
+                .headerSearchPath("secp256k1/include/"),
                 // Basic config values that are universal and require no dependencies.
                 // https://github.com/bitcoin-core/secp256k1/blob/master/src/basic-config.h#L12-L13
                 .define("ECMULT_WINDOW_SIZE", to: "15"),
                 .define("ECMULT_GEN_PREC_BITS", to: "4"),
-                // Enabling additional secp256k1 modules.
-                .define("SECP256K1_ECDH_H"),
-                .define("SECP256K1_MODULE_ECDH_MAIN_H"),
-                .define("SECP256K1_EXTRAKEYS_H"),
-                .define("SECP256K1_MODULE_EXTRAKEYS_MAIN_H"),
-                .define("SECP256K1_SCHNORRSIG_H"),
-                .define("SECP256K1_MODULE_SCHNORRSIG_MAIN_H"),
+
+                // Enable modules in secp256k1.
+                // See bottom of: Sources/secp256k1/libsecp256k1/src/secp256k1.c
+                // For list
+                .define("ENABLE_MODULE_ECDH"),
+                .define("ENABLE_MODULE_RECOVERY"),
+                .define("ENABLE_MODULE_SCHNORRSIG"),
+                .define("ENABLE_MODULE_EXTRAKEYS"),
             ]
         ),
 
@@ -87,7 +91,9 @@ let package = Package(
         .testTarget(
             name: "K1Tests",
             dependencies: [
-                "K1"
+                "K1",
+//                "ASN1Swift"
+                "ASN1Decoder"
             ],
             resources: [
                 .process("Resources/"),

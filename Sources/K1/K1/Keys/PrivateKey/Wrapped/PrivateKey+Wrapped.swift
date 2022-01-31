@@ -67,7 +67,7 @@ internal extension K1.PrivateKey.Wrapped {
         
         var attempt = 0
         
-        while attempt < 10_000 {
+        while attempt < 100 {
             defer { attempt += 1 }
             do {
                 let secureBytes = SecureBytes(count: Self.byteCount)
@@ -81,7 +81,7 @@ internal extension K1.PrivateKey.Wrapped {
         
         // Probability of this happening is:
         // n = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
-        // (n / 2^256) ^ 10_000 = lim 0
+        // (n / 2^256) ^ 100 = lim 0
         // I.e. will not happen.
         fatalError("""
             Failed to generate private key after #\(attempt) attempts.

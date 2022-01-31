@@ -29,6 +29,7 @@ public extension K1 {
         case failedToSerializeCompactSignature
         case failedToSerializeDERSignature
         case failedToSignDigest
+        case failedToPerformDiffieHellmanKeyExchange
     }
 
 }
