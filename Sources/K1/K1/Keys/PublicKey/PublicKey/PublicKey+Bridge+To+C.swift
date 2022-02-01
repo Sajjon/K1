@@ -9,17 +9,63 @@ import Foundation
 
 // Bridge to C
 import secp256k1
+import Crypto
 
 // MARK: - Validate (Verify)
 // MARK: -
-public extension K1.PublicKey {
+internal extension K1.PublicKey {
     
-    func isValidSignature<D: Digest>(
+    func isValidSchnorrSignature<D: DataProtocol>(
+        _ signature: SchnorrSignature,
+        hashed messageData: D
+    ) throws -> Bool {
+        let message = [UInt8](messageData)
+        guard message.count == K1.Curve.Field.byteCount else {
+            throw K1.Error.incorrectByteCountOfMessageToValidate
+        }
+        return try Bridge.toC { bridge -> Bool in
+            let schnorrBytes = [UInt8](signature.rawRepresentation)
+            
+            var publicKeyBridgedToC = secp256k1_pubkey()
+
+            try bridge.call(ifFailThrow: .failedToSerializePublicKeyIntoBytes) { context in
+                secp256k1_ec_pubkey_parse(
+                    context,
+                    &publicKeyBridgedToC,
+                    uncompressedRaw,
+                    uncompressedRaw.count
+                )
+            }
+
+            var publicKeyX = secp256k1_xonly_pubkey()
+
+            try bridge.call(ifFailThrow: .failedToSchnorrVerifyGettingXFromPubKey) { context in
+                secp256k1_xonly_pubkey_from_pubkey(context, &publicKeyX, nil, &publicKeyBridgedToC)
+            }
+    
+            return bridge.validate { context in
+                secp256k1_schnorrsig_verify(
+                    context,
+                    schnorrBytes,
+                    message,
+                    message.count,
+                    &publicKeyX
+                )
+            }
+        }
+    }
+    
+    func isValidECDSASignature<D: DataProtocol>(
         _ signature: ECDSASignature,
-        for digest: D,
+        hashed messageData: D,
         mode: SignatureValidationMode = .default
     ) throws -> Bool {
-        try Bridge.toC { bridge in
+        let message = [UInt8](messageData)
+        guard message.count == K1.Curve.Field.byteCount else {
+            throw K1.Error.incorrectByteCountOfMessageToValidate
+        }
+        
+        return try Bridge.toC { bridge -> Bool in
             
             var publicKeyBridgedToC = secp256k1_pubkey()
 
@@ -53,45 +99,78 @@ public extension K1.PublicKey {
            
             let signatureWasMalleable = signatureWasMalleableResult == codeForSignatureWasMalleable
      
-            let codeForValidSignature = 1
-            let validationResult = bridge.callWithResultCode { context in
+            let isSignatureValid = bridge.validate { context in
                 secp256k1_ecdsa_verify(
                     context,
                     &signatureBridgedToCNonMalleable,
-                    Array(digest),
+                    message,
                     &publicKeyBridgedToC
                 )
             }
             
-            let isSignatureValid = validationResult == codeForValidSignature
             let acceptMalleableSignatures = mode == .acceptSignatureMalleability
             
             switch (isSignatureValid, signatureWasMalleable, acceptMalleableSignatures) {
             case (true, false, _):
-//                print("💡 Signature is valid.")
+                // Signature is valid
                 return true
             case (true, true, true):
-//                print("💡 Signature was valid but malleable, since you specified to accept malleability => considering signature valid.")
+                // Signature was valid but malleable, since you specified to
+                // accept malleability => considering signature valid.
                 return true
             case (true, true, false):
-//                print("💡 Signature was valid, but not normalized which was required => considering signature invalid.")
+                // Signature was valid, but not normalized which was required =>
+                // considering signature invalid.
                 return false
             case (false, _, _):
-//                print("💡 Signature invalid.")
+                // Signature is invalid.
                 return false
             }
         }
     }
+}
 
-    func isValidSignature<D: DataProtocol>(
+//public enum Schnorr: SignatureScheme {}
+
+// MARK: - Validate ECDSA (Verify)
+// MARK: -
+public extension K1.PublicKey {
+    
+    func isValidECDSASignature<D: Digest>(
         _ signature: ECDSASignature,
-        for data: D,
+        digest: D,
         mode: SignatureValidationMode = .default
     ) throws -> Bool {
-        try isValidSignature(signature, for: SHA256.hash(data: data), mode: mode)
+        try isValidECDSASignature(signature, hashed: Data(digest), mode: mode)
+    }
+    
+    func isValidECDSASignature<M: DataProtocol>(
+        _ signature: ECDSASignature,
+        unhashed: M,
+        mode: SignatureValidationMode = .default
+    ) throws -> Bool {
+        try isValidECDSASignature(signature, digest: SHA256.hash(data: unhashed), mode: mode)
     }
 }
 
+// MARK: - Validate Schnorr (Verify)
+// MARK: -
+public extension K1.PublicKey {
+    
+    func isValidSchnorrSignature<D: Digest>(
+        _ signature: SchnorrSignature,
+        digest: D
+    ) throws -> Bool {
+        try isValidSchnorrSignature(signature, hashed: Data(digest))
+    }
+    
+    func isValidSchnorrSignature<M: DataProtocol>(
+        _ signature: SchnorrSignature,
+        unhashed: M
+    ) throws -> Bool {
+        try isValidSchnorrSignature(signature, digest: SHA256.hash(data: unhashed))
+    }
+}
 
 /// Validation mode controls whether or not signature malleability should
 /// is forbidden or allowed. Read more about it [here][more]
@@ -104,4 +183,87 @@ public enum SignatureValidationMode {
 
 public extension SignatureValidationMode {
     static let `default`: Self = .acceptSignatureMalleability
+}
+
+public protocol ECSignature {
+    associatedtype ValidationMode
+    func compactRepresentation() throws -> Data
+    func derRepresentation() throws -> Data
+    func by<D: Digest>(
+        _ signer: K1.PublicKey,
+        of digest: D,
+        mode: ValidationMode
+    ) throws -> Bool
+}
+
+public extension ECSignature where ValidationMode == Void {
+    
+    func by<D: Digest>(
+        _ signer: K1.PublicKey,
+        of digest: D
+    ) throws -> Bool {
+        try by(signer, of: digest, mode: ())
+    }
+}
+
+extension ECDSASignature: ECSignature {}
+
+public extension ECDSASignature {
+    
+    typealias ValidationMode = SignatureValidationMode
+    
+    func by<D: Digest>(
+        _ signer: K1.PublicKey,
+        of digest: D,
+        mode: SignatureValidationMode = .default
+    ) throws -> Bool {
+        
+        try signer.isValidECDSASignature(
+            self,
+            digest: digest,
+            mode: mode
+        )
+    }
+}
+
+public protocol SignatureScheme {
+    associatedtype Signature: ECSignature
+}
+
+public enum ECDSA: SignatureScheme {
+    public typealias Signature = ECDSASignature
+}
+
+
+public struct SchnorrSignature: ECSignature, Equatable {
+    
+    internal let rawRepresentation: Data
+    
+    public init<D: DataProtocol>(rawRepresentation: D) throws {
+        guard
+            rawRepresentation.count == 2 * K1.Curve.Field.byteCount
+        else {
+            throw K1.Error.incorrectByteCountOfRawSignature
+        }
+        
+        self.rawRepresentation = Data(rawRepresentation)
+    }
+}
+public extension SchnorrSignature {
+    typealias ValidationMode = Void
+    
+    func compactRepresentation() throws -> Data {
+        try Bridge.compactRepresentationOfSignature(rawRepresentation: rawRepresentation)
+    }
+    func derRepresentation() throws -> Data {
+        try Bridge.derRepresentationOfSignature(rawRepresentation: rawRepresentation)
+    }
+    
+    func by<D: Digest>(
+        _ signer: K1.PublicKey,
+        of digest: D,
+        mode _: Void
+    ) throws -> Bool {
+        try signer.isValidSchnorrSignature(self, digest: digest)
+    }
 }

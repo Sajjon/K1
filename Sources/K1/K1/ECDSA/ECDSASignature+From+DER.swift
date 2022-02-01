@@ -10,9 +10,9 @@ import Foundation
 // Bridge to C
 import secp256k1
 
-public extension ECDSASignature {
+extension Bridge {
     /// Initializes ECDSASignature from the DER representation.
-    static func `import`<D: DataProtocol>(fromDER derRepresentation: D) throws -> Self {
+    static func importECDSASignature<D: DataProtocol>(fromDER derRepresentation: D) throws -> Data {
         let derSignatureBytes = Array(derRepresentation)
         var signatureBridgedToC = secp256k1_ecdsa_signature()
         
@@ -30,14 +30,10 @@ public extension ECDSASignature {
             count: MemoryLayout.size(ofValue: signatureBridgedToC.data)
         )
         
-        return try Self(signatureData)
+        return signatureData
     }
     
-}
-
-public extension ECDSASignature {
-    
-    func compactRepresentation() throws -> Data {
+    static func compactRepresentationOfSignature(rawRepresentation: Data) throws -> Data {
         
         let compactSignatureLength = 64
         var signatureBridgedToC = secp256k1_ecdsa_signature()
@@ -52,11 +48,10 @@ public extension ECDSASignature {
             
         }
         
-        
         return Data(bytes: &compactSignature, count: compactSignatureLength)
     }
     
-    func derRepresentation() throws -> Data {
+    static func derRepresentationOfSignature(rawRepresentation: Data) throws -> Data {
         
         var signatureBridgedToC = secp256k1_ecdsa_signature()
         var derMaxLength = 75 // in fact max is 73, but we can have some margin.
@@ -76,6 +71,25 @@ public extension ECDSASignature {
         }
         
         return Data(bytes: &derSignature, count: derMaxLength)
+    }
+}
+
+public extension ECDSASignature {
+    /// Initializes ECDSASignature from the DER representation.
+    static func `import`<D: DataProtocol>(fromDER derRepresentation: D) throws -> Self {
+        let signatureData = try Bridge.importECDSASignature(fromDER: derRepresentation)
+        return try Self(rawRepresentation: signatureData)
+    }
+}
+
+public extension ECDSASignature {
+    
+    func compactRepresentation() throws -> Data {
+        try Bridge.compactRepresentationOfSignature(rawRepresentation: rawRepresentation)
+    }
+    
+    func derRepresentation() throws -> Data {
+        try Bridge.derRepresentationOfSignature(rawRepresentation: rawRepresentation)
     }
 }
 

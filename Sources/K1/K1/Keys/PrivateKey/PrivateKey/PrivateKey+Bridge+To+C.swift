@@ -11,9 +11,12 @@ import secp256k1
 extension Bridge {
     
     static func ecdsaSign(
-        digest: [UInt8],
+        message: [UInt8],
         privateKey: SecureBytes
     ) throws -> Data {
+        guard message.count == K1.Curve.Field.byteCount else {
+            throw K1.Error.incorrectByteCountOfMessageToECDSASign
+        }
         var signatureBridgedToC = secp256k1_ecdsa_signature()
         
         try Self.call(
@@ -22,7 +25,7 @@ extension Bridge {
             secp256k1_ecdsa_sign(
                 context,
                 &signatureBridgedToC,
-                digest,
+                message,
                 privateKey.backing.bytes,
                 nil,
                 nil
@@ -36,56 +39,55 @@ extension Bridge {
     }
     
     static func schnorrSign(
-        digest: [UInt8],
+        message: [UInt8],
         privateKey: SecureBytes,
-        nonce: [UInt8]?
+        input: SchnorrInput?
     ) throws -> Data {
-        var signatureOut = [UInt8].init(repeating: 0, count: 64)
+        guard message.count == K1.Curve.Field.byteCount else {
+            throw K1.Error.failedToSchnorrSignMessageInvalidLength
+        }
+        var signatureOut = [UInt8](repeating: 0, count: 64)
         
         var keyPair = secp256k1_keypair()
-        
-        if let nonce = nonce {
-            guard nonce.count == 32 else {
-                throw K1.Error.failedToSchnorrSignDigestProvidedRandomnessInvalidLength
-            }
-        }
-        
+
         try Self.call(
             ifFailThrow: .failedToInitializeKeyPairForSchnorrSigning
         ) { context in
             secp256k1_keypair_create(context, &keyPair, privateKey.backing.bytes)
         }
         
+        var auxilaryRandomBytes: [UInt8]? = nil
+        if let auxilaryRandomData = input?.auxilaryRandomData {
+            guard auxilaryRandomData.count == K1.Curve.Field.byteCount else {
+                throw K1.Error.failedToSchnorrSignDigestProvidedRandomnessInvalidLength
+            }
+            auxilaryRandomBytes = [UInt8](auxilaryRandomData)
+        }
+        
         try Self.call(
             ifFailThrow: .failedToSchnorrSignDigest
         ) { context in
-            /*
-             *  Does _not_ strictly follow BIP-340 because it does not verify the resulting
-             *  signature. Instead, you can manually use secp256k1_schnorrsig_verify and
-             *  abort if it fails.
-             
-             `aux_rand32`: 32 bytes of fresh randomness. While recommended to provide
-          *                this, it is only supplemental to security and can be NULL. A
-          *                NULL argument is treated the same as an all-zero one. See
-          *                BIP-340 "Default Signing" for a full explanation of this
-          *                argument and for guidance if randomness is expensive.
-             */
-            
-            secp256k1_schnorrsig_sign(context, &signatureOut, digest, &keyPair, nonce)
+            secp256k1_schnorrsig_sign(
+                context,
+                &signatureOut,
+                message,
+                &keyPair,
+                auxilaryRandomBytes
+            )
         }
-        
+
         var publicKey = secp256k1_xonly_pubkey()
-        
+
         try Self.call(
             ifFailThrow: .failedToSchnorrSignErrorGettingPubKeyFromKeyPair
         ) { context in
             secp256k1_keypair_xonly_pub(context, &publicKey, nil, &keyPair)
         }
-        
+
         try Self.call(
             ifFailThrow: .failedToSchnorrSignDigestDidNotPassVerification
         ) { context in
-            secp256k1_schnorrsig_verify(context, &signatureOut, digest, digest.count, &publicKey)
+            secp256k1_schnorrsig_verify(context, &signatureOut, message, message.count, &publicKey)
         }
 
         return Data(signatureOut)
@@ -134,49 +136,71 @@ extension Bridge {
 public extension K1 {
     enum SignatureScheme {
         case ecdsa
-        case schnorr(nonce: [UInt8]?)
+        case schnorr(SchnorrInput?)
     }
 }
 
+public struct SchnorrInput {
+    public let auxilaryRandomData: Data
+}
+
 internal extension K1.PrivateKey {
-    
-    func signature<D: DataProtocol>(
-        alreadyHashed digest: D,
-        scheme: K1.SignatureScheme = .ecdsa
+
+    func ecdsaSign<D: DataProtocol>(
+        hashed message: D
     ) throws -> ECDSASignature {
-        let digestBytes = [UInt8](digest)
-        precondition(digestBytes.count == K1.Curve.Field.byteCount)
+        let messageBytes = [UInt8](message)
         let signatureData = try withSecureBytes { (secureBytes: SecureBytes) -> Data in
-            switch scheme {
-            case .ecdsa:
-                return try Bridge.ecdsaSign(digest: digestBytes, privateKey: secureBytes)
-            case .schnorr(let maybeNonce):
-                return try Bridge.schnorrSign(digest: digestBytes, privateKey: secureBytes, nonce: maybeNonce)
-            }
-          
+            try Bridge.ecdsaSign(message: messageBytes, privateKey: secureBytes)
         }
-        
+
         return try ECDSASignature(
-            signatureData
+            rawRepresentation: signatureData
+        )
+    }
+    
+    func schnorrSign<D: DataProtocol>(
+        hashed: D,
+        input maybeInput: SchnorrInput? = nil
+    ) throws -> SchnorrSignature {
+        let message = [UInt8](hashed)
+        let signatureData = try withSecureBytes { (secureBytes: SecureBytes) -> Data in
+            try Bridge.schnorrSign(message: message, privateKey: secureBytes, input: maybeInput)
+        }
+
+        return try SchnorrSignature(
+            rawRepresentation: signatureData
         )
     }
 }
 
 public extension K1.PrivateKey {
 
-    func signature<D: Digest>(
-        for digestBytes: D,
-        scheme: K1.SignatureScheme = .ecdsa
+    func ecdsaSign<D: Digest>(
+        digest: D
     ) throws -> ECDSASignature {
-        try signature(alreadyHashed: Array(digestBytes))
+        try ecdsaSign(hashed: Array(digest))
+    }
+    
+    func ecdsaSign<D: DataProtocol>(
+        unhashed data: D
+    ) throws -> ECDSASignature {
+        try ecdsaSign(digest: SHA256.hash(data: data))
     }
     
     
-    func signature<D: DataProtocol>(
-        for data: D,
-        scheme: K1.SignatureScheme = .ecdsa
-    ) throws -> ECDSASignature {
-        try self.signature(for: SHA256.hash(data: data), scheme: scheme)
+    func schnorrSign<D: Digest>(
+        digest: D,
+        input maybeInput: SchnorrInput? = nil
+    ) throws -> SchnorrSignature {
+        try schnorrSign(hashed: Array(digest), input: maybeInput)
+    }
+    
+    func schnorrSign<D: DataProtocol>(
+        unhashed data: D,
+        input maybeInput: SchnorrInput? = nil
+    ) throws -> SchnorrSignature {
+        try schnorrSign(digest: SHA256.hash(data: data), input: maybeInput)
     }
 
     

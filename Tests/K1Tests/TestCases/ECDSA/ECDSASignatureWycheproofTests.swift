@@ -16,31 +16,10 @@
 //===----------------------------------------------------------------------===//
 import Foundation
 import XCTest
-
 import Crypto
 @testable import K1
 
-struct ECDSATestGroup: Codable {
-    let tests: [SignatureTestVector]
-    let key: ECDSAKey
-}
-
-struct ECDSAKey: Codable {
-    let uncompressed: String
-    let curve: String
-}
-
-struct SignatureTestVector: Codable {
-    let comment: String
-    let msg: String
-    let sig: String
-    let result: String
-    let flags: [String]
-    let tcId: Int
-}
-
-
-final class ECDSASignatureTests: XCTestCase {
+final class ECDSASignatureWycheproofTests: XCTestCase {
     let data = "Testing Signatures".data(using: String.Encoding.utf8)!
     
     override func setUp() {
@@ -67,24 +46,7 @@ final class ECDSASignatureTests: XCTestCase {
     }
 }
 
-typealias PublicKey = K1.PublicKey
-extension PublicKey {
-    init(x963Representation: [UInt8]) throws {
-        self = try Self.import(from: x963Representation)
-    }
-}
-typealias PrivateKey = K1.PrivateKey
-
-struct ResultOfTestGroup {
-    let numberOfTestsRun: Int
-    let idsOmittedTests: [Int]
-}
-
-struct ECDSASignatureTestError: Swift.Error, CustomStringConvertible {
-    let description: String
-}
-
-private extension ECDSASignatureTests {
+private extension ECDSASignatureWycheproofTests {
     
     func doTestGroup<HF: HashFunction>(
         group: ECDSATestGroup,
@@ -114,9 +76,9 @@ private extension ECDSASignatureTests {
                 let msg = try Data(hexString: testVector.msg)
                 let digest = HF.hash(data: msg)
                 let signature = try ECDSASignature.import(fromDER: derData)
-                isValid = try key.isValidSignature(
+                isValid = try key.isValidECDSASignature(
                     signature,
-                    for: digest,
+                    digest: digest,
                     mode: .acceptSignatureMalleability
                 )
             } catch {
@@ -139,4 +101,39 @@ private extension ECDSASignatureTests {
         }
         return .init(numberOfTestsRun: numberOfTestsRun, idsOmittedTests: idsOfOmittedTests)
     }
+}
+
+struct ECDSATestGroup: Codable {
+    let tests: [SignatureTestVector]
+    let key: ECDSAKey
+}
+
+struct ECDSAKey: Codable {
+    let uncompressed: String
+    let curve: String
+}
+
+struct SignatureTestVector: Codable {
+    let comment: String
+    let msg: String
+    let sig: String
+    let result: String
+    let flags: [String]
+    let tcId: Int
+}
+typealias PublicKey = K1.PublicKey
+extension PublicKey {
+    init(x963Representation: [UInt8]) throws {
+        self = try Self.import(from: x963Representation)
+    }
+}
+typealias PrivateKey = K1.PrivateKey
+
+struct ResultOfTestGroup {
+    let numberOfTestsRun: Int
+    let idsOmittedTests: [Int]
+}
+
+struct ECDSASignatureTestError: Swift.Error, CustomStringConvertible {
+    let description: String
 }

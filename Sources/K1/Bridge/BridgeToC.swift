@@ -39,6 +39,13 @@ extension Bridge {
         return try closure(bridge)
     }
     
+    /// Returns `true` iff result code is `1`
+    func validate(
+        _ method: (OpaquePointer) -> Int32
+    ) -> Bool {
+        method(context) == 1
+    }
+    
     func callWithResultCode(
         _ method: (OpaquePointer) -> Int32
     ) -> Int {

@@ -6,3 +6,4 @@
 #include "../libsecp256k1/include/secp256k1.h"
 
 #include "../src/ecdh_no_hashfp.h"
+#include "../src/schnorr_init_extraparams.h"

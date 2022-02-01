@@ -24,6 +24,7 @@ public extension K1 {
         case failedToUpdateContextRandomization
         case failedToComputePublicKeyFromPrivateKey
         case failedToSerializePublicKeyIntoBytes
+        case incorrectByteCountOfMessageToValidate
         case failedToCompressPublicKey
         case failedToUncompressPublicKey
         
@@ -31,12 +32,16 @@ public extension K1 {
         case failedToSerializeCompactSignature
         case failedToSerializeDERSignature
         case failedToECDSASignDigest
+        case failedToSchnorrSignMessageInvalidLength
         case failedToInitializeKeyPairForSchnorrSigning
         case failedToSchnorrSignDigest
         case failedToSchnorrSignDigestProvidedRandomnessInvalidLength
         case failedToSchnorrSignErrorGettingPubKeyFromKeyPair
+        case failedToSchnorrVerifyGettingXFromPubKey
         case failedToSchnorrSignDigestDidNotPassVerification
         case failedToPerformDiffieHellmanKeyExchange
+        case incorrectByteCountOfAuxilaryDataForSchnorr
+        case incorrectByteCountOfMessageToECDSASign
     }
 
 }

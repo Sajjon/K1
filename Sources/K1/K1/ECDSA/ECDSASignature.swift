@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct ECDSASignature: ContiguousBytes {
+public struct ECDSASignature: ContiguousBytes, Equatable {
 
     public var rawRepresentation: Data
     
@@ -21,14 +21,6 @@ public struct ECDSASignature: ContiguousBytes {
         self.rawRepresentation = Data(rawRepresentation)
     }
 }
-
-internal extension ECDSASignature {
-    init(_ dataRepresentation: Data) throws {
-        try self.init(rawRepresentation: dataRepresentation.bytes)
-    }
-    
-}
-
 
 public extension ECDSASignature {
     
