@@ -1,7 +1,30 @@
 import XCTest
-import K1
+@testable import K1
 
 final class K1Tests: XCTestCase {
+    
+    func testSchnorr() throws {
+        let messageHex = "89D68815DDB9E5F8D7FD53B6EC096616A773B9421F6704CED36EF4E484BA0C6C5A4855C71C33A54AC82BE803E5CFD175779FC444B7E6AA9001EEFABEBC0CF99754887C7B0A27AFDDC415F8A02C5AF1EFEA26AD1E5D92B1E2"
+        let privateKeyHex = "EDA7AFB6E3CEC979CC37BA87A09E63CAA864D0202A6BA7DF7966C012B1D92F7E"
+        let pubHex = "024C34E2D3921D05102BF3D4EE806E188395AFD033F39D090A46A369D709797FC3"
+//        let kHex = "63C6C74C9FD5F31B5576E47873994BB6C8724FA31EEAB7669DB915EDFDB1A23C"
+        let rHex = "4B31EA76A9E890D533A753BEB0EE9DE1072CA5508B0DA5D45B1AA9487FA491FE"
+        let sHex = "CC92A532CCB5172C1199178E832EA770B4BFA696034471BDC1CE23215276B109"
+        
+        
+        let privateKey = try K1.PrivateKey.import(rawRepresentation: Data(hex: privateKeyHex))
+        let publicKeyImported = try K1.PublicKey.import(from: Data(hex: pubHex))
+
+        
+        XCTAssertEqual(privateKey.publicKey.uncompressedRaw.hexString, publicKeyImported.uncompressedRaw.hexString)
+
+        let message = try Data(hex: messageHex)
+        let signatureFromMessage = try privateKey.signature(for: message, scheme: .schnorr(nonce: nil))
+        
+        let sigHex = try signatureFromMessage.compactRepresentation().toHexString()
+        XCTAssertEqual(rHex + sHex, sigHex)
+        
+    }
     
     func testSecp256k1Vector1() throws {
         try verifyRFC6979WithSignature(
@@ -109,10 +132,10 @@ extension XCTestCase {
             return
         }
 
-        let privateKey = try K1.PrivateKey.import(rawRepresentation: Data.init(hex: privateKeyHex))
+        let privateKey = try K1.PrivateKey.import(rawRepresentation: Data(hex: privateKeyHex))
         let publicKey = privateKey.publicKey
         let message = messageToHash.data(using: .utf8)!
-        let signatureFromMessage = try privateKey.signature(for: message)  //AnyKeySigner<ECDSA<C>>.sign(message, using: keyPair)
+        let signatureFromMessage = try privateKey.signature(for: message)
         XCTAssertTrue(try publicKey.isValidSignature(signatureFromMessage, for: message))
 
         if let expectedRHex = expected.r,  let expectedSHex = expected.s  {

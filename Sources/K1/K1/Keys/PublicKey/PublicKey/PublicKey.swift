@@ -9,13 +9,19 @@ import Foundation
 
 public extension K1 {
     
-    struct PublicKey {
+    struct PublicKey: Equatable {
         
         private let wrapped: Wrapped
 
         internal init(wrapped: Wrapped) {
             self.wrapped = wrapped
         }
+    }
+}
+
+internal extension K1.PublicKey {
+    var uncompressedRaw: [UInt8] {
+        wrapped.uncompressedRaw
     }
 }
 
@@ -34,13 +40,11 @@ public extension K1.PublicKey {
 }
 
 public extension K1.PublicKey {
-
-    var rawRepresentation: [UInt8] {
-        wrapped.rawRepresentation
+    
+    func rawRepresentation(format: K1.Format) throws -> [UInt8] {
+        try wrapped.rawRepresentation(format: format)
     }
+    
 
-    var format: K1.Format {
-        wrapped.format
-    }
 }
 

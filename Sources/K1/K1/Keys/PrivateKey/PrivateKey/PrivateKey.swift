@@ -54,15 +54,6 @@ public extension K1.PrivateKey {
     }
 }
 
-// MARK: - Sign
-// MARK: -
-public extension K1.PrivateKey {
-
-    func signature<D: DataProtocol>(for data: D) throws -> ECDSASignature {
-        try self.signature(for: SHA256.hash(data: data))
-    }
-}
-
 // MARK: - Equatable
 // MARK: -
 public extension K1.PrivateKey {

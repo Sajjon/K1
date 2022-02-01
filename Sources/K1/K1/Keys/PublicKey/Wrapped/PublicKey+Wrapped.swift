@@ -10,24 +10,30 @@ import Foundation
 internal extension K1.PublicKey {
     
     @usableFromInline
-    struct Wrapped {
+    struct Wrapped: Equatable {
         
-        @usableFromInline
-        let rawRepresentation: [UInt8]
-        
-        @usableFromInline
-        let format: K1.Format
+        internal let uncompressedRaw: [UInt8]
     
         internal init(
-            publicKeyRaw: [UInt8]
+            uncompressedRaw: [UInt8]
         ) throws {
-            self.rawRepresentation = publicKeyRaw
-            self.format = try K1.Format(byteCount: publicKeyRaw.count)
+            guard uncompressedRaw.count == K1.Format.uncompressed.length else {
+                throw K1.Error.incorrectByteCountOfPublicKey
+            }
+            self.uncompressedRaw = uncompressedRaw
         }
     }
 }
 
-extension K1.PublicKey.Wrapped {
+internal extension K1.PublicKey.Wrapped {
+    
+    @usableFromInline
+    func rawRepresentation(format: K1.Format) throws -> [UInt8] {
+        switch format {
+        case .uncompressed: return uncompressedRaw
+        case .compressed: return try Array(Bridge.compress(publicKey: self))
+        }
+    }
     
     static func `import`<D: ContiguousBytes>(
         from raw: D)
@@ -35,4 +41,8 @@ extension K1.PublicKey.Wrapped {
         try .import(from: raw.bytes)
     }
     
+    @usableFromInline
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.uncompressedRaw == rhs.uncompressedRaw
+    }
 }

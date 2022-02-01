@@ -15,7 +15,7 @@ extension Bridge {
         raw: [UInt8]
     ) throws -> Data {
         
-        var publicKeyBytes = raw
+        var publicKeyBytesMaybeCompressed = raw
         var publicKeyBridgedToC = secp256k1_pubkey()
         
         try Self.call(
@@ -25,8 +25,71 @@ extension Bridge {
             secp256k1_ec_pubkey_parse(
                 context,
                 &publicKeyBridgedToC,
-                &publicKeyBytes,
+                &publicKeyBytesMaybeCompressed,
                 raw.count
+            )
+        }
+
+        if publicKeyBytesMaybeCompressed.count == K1.Format.uncompressed.length {
+            return Data(publicKeyBytesMaybeCompressed)
+        }
+        
+        // Was compressed, need to uncompress
+        
+        var publicKeyBytesUncompressedLength = K1.Format.uncompressed.length
+        var publicKeyBytesUncompressed = [UInt8].init(repeating: 0, count: publicKeyBytesUncompressedLength)
+        
+        try Self.call(
+            ifFailThrow: .failedToUncompressPublicKey
+        ) { context in
+            /* "Serialize a pubkey object into a serialized byte sequence." */
+            secp256k1_ec_pubkey_serialize(
+                context,
+                &publicKeyBytesUncompressed,
+                &publicKeyBytesUncompressedLength,
+                &publicKeyBridgedToC,
+                K1.Format.uncompressed.rawValue
+            )
+        }
+        
+        return Data(publicKeyBytesUncompressed)
+        
+    }
+    
+    static func compress(
+        publicKey: K1.PublicKey.Wrapped
+    ) throws -> Data {
+        
+        var publicKeyBridgedToC = secp256k1_pubkey()
+
+        try Self.call(ifFailThrow: .failedToSerializePublicKeyIntoBytes) { context in
+            /* "Serialize a pubkey object into a serialized byte sequence." */
+            secp256k1_ec_pubkey_parse(
+                context,
+                &publicKeyBridgedToC,
+                publicKey.uncompressedRaw,
+                publicKey.uncompressedRaw.count
+            )
+        }
+ 
+        let publicKeyFormat = K1.Format.compressed
+        
+        var publicKeyCompressedByteCount = publicKeyFormat.length
+        var publicKeyBytes = [UInt8](
+            repeating: 0,
+            count: publicKeyCompressedByteCount
+        )
+        
+        try Self.call(
+            ifFailThrow: .failedToCompressPublicKey
+        ) { context in
+            /* "Serialize a pubkey object into a serialized byte sequence." */
+            secp256k1_ec_pubkey_serialize(
+                context,
+                &publicKeyBytes,
+                &publicKeyCompressedByteCount,
+                &publicKeyBridgedToC,
+                publicKeyFormat.rawValue
             )
         }
         
@@ -91,13 +154,14 @@ internal extension K1.PublicKey.Wrapped {
     
     static func `import`(from raw: [UInt8]) throws -> Self {
         let publicKeyBytes = try Bridge.publicKeyParse(raw: raw)
-        return try Self(publicKeyRaw: publicKeyBytes.bytes)
+        return try Self(uncompressedRaw: publicKeyBytes.bytes)
     }
     
     static func derive(
         privateKeyBytes: [UInt8]
     ) throws -> Self {
         let publicKeyRaw = try Bridge.publicKeyCreate(privateKeyBytes: privateKeyBytes)
-        return try Self(publicKeyRaw: publicKeyRaw.bytes)
+        return try Self(uncompressedRaw: publicKeyRaw.bytes)
     }
+
 }

@@ -28,8 +28,8 @@ public extension K1.PublicKey {
                 secp256k1_ec_pubkey_parse(
                     context,
                     &publicKeyBridgedToC,
-                    rawRepresentation,
-                    rawRepresentation.count
+                    uncompressedRaw,
+                    uncompressedRaw.count
                 )
             }
             

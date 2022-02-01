@@ -24,11 +24,18 @@ public extension K1 {
         case failedToUpdateContextRandomization
         case failedToComputePublicKeyFromPrivateKey
         case failedToSerializePublicKeyIntoBytes
+        case failedToCompressPublicKey
+        case failedToUncompressPublicKey
         
         case failedToParseDERSignature
         case failedToSerializeCompactSignature
         case failedToSerializeDERSignature
-        case failedToSignDigest
+        case failedToECDSASignDigest
+        case failedToInitializeKeyPairForSchnorrSigning
+        case failedToSchnorrSignDigest
+        case failedToSchnorrSignDigestProvidedRandomnessInvalidLength
+        case failedToSchnorrSignErrorGettingPubKeyFromKeyPair
+        case failedToSchnorrSignDigestDidNotPassVerification
         case failedToPerformDiffieHellmanKeyExchange
     }
 
