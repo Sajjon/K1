@@ -39,11 +39,11 @@ assert(ab == ba, "Alice and Bob should be able to agree on the same secret")
 
 # Alternatives
 
-[GigaBitcoin/secp256k1.swift](https://github.com/GigaBitcoin/secp256k1.swift) (also using `libsecp256k1`, ❌ No Schnorr)
-[KevinVitale/WalletKit](https://github.com/KevinVitale/WalletKit/) (also using `libsecp256k1`, ❌ No Schnorr)
-[yenom/BitcoinKit](https://github.com/yenom/BitcoinKit) (💀 Discontinued, also using `libsecp256k1`, ❌ No Schnorr)
-[oleganza/CoreBitcoin](https://github.com/oleganza/CoreBitcoin) (ObjC + Swift, ❌ No Schnorr)
-[Sajjon/EllipticCurveKit](https://github.com/Sajjon/EllipticCurveKit) (mine, ☣️ unsafe, ✅ Schnorr support)
+- [GigaBitcoin/secp256k1.swift](https://github.com/GigaBitcoin/secp256k1.swift) (also using `libsecp256k1`, ❌ No Schnorr)  
+- [KevinVitale/WalletKit](https://github.com/KevinVitale/WalletKit/) (also using `libsecp256k1`, ❌ No Schnorr)  
+- [yenom/BitcoinKit](https://github.com/yenom/BitcoinKit) (💀 Discontinued, also using `libsecp256k1`, ❌ No Schnorr)  
+- [oleganza/CoreBitcoin](https://github.com/oleganza/CoreBitcoin) (ObjC + Swift, ❌ No Schnorr)  
+- [Sajjon/EllipticCurveKit](https://github.com/Sajjon/EllipticCurveKit) (mine, ☣️ unsafe, ✅ Schnorr support)  
 
 ## Non-Swift but SPM support
 [greymass/secp256k1](https://github.com/greymass/secp256k1) (Fork of `libsecp256k1`)
