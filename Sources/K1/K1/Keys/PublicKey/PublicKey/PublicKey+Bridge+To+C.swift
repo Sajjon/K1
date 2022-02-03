@@ -185,58 +185,132 @@ public extension SignatureValidationMode {
     static let `default`: Self = .acceptSignatureMalleability
 }
 
-public protocol ECSignature {
-    associatedtype ValidationMode
+public protocol ECSignatureBase {
+    static var scheme: Scheme { get }
     func compactRepresentation() throws -> Data
     func derRepresentation() throws -> Data
-    func by<D: Digest>(
-        _ signer: K1.PublicKey,
-        of digest: D,
+    
+    func wasSigned<D: Digest>(
+        by signer: K1.PublicKey,
+        for digest: D
+    ) throws -> Bool
+}
+
+public protocol ECSignature: ECSignatureBase {
+    associatedtype ValidationMode
+    associatedtype SigningMode
+    
+    
+    func wasSigned<D: Digest>(
+        by signer: K1.PublicKey,
+        for digest: D,
         mode: ValidationMode
     ) throws -> Bool
+    
+    static func by<D: DataProtocol>(
+        signing hashed: D,
+        with privateKey: K1.PrivateKey,
+        mode: SigningMode
+    ) throws -> Self
 }
 
 public extension ECSignature where ValidationMode == Void {
     
-    func by<D: Digest>(
-        _ signer: K1.PublicKey,
-        of digest: D
+    func wasSigned<D: Digest>(
+        by signer: K1.PublicKey,
+        for digest: D
     ) throws -> Bool {
-        try by(signer, of: digest, mode: ())
+        try wasSigned(by: signer, for: digest, mode: ())
     }
 }
 
-extension ECDSASignature: ECSignature {}
+public extension ECSignature {
+      
+    static func bySigning<D: Digest>(
+        digest: D,
+        with privateKey: K1.PrivateKey,
+        mode: SigningMode
+    ) throws -> Self {
+        try by(signing: Array(digest), with: privateKey, mode: mode)
+    }
+    
+    static func bySigning<D: DataProtocol>(
+        unhashed data: D,
+        with privateKey: K1.PrivateKey,
+        mode: SigningMode
+    ) throws -> Self {
+        try bySigning(digest: SHA256.hash(data: data), with: privateKey, mode: mode)
+    }
+}
 
 public extension ECDSASignature {
     
     typealias ValidationMode = SignatureValidationMode
+
+    struct SigningMode {
+        public let nonceFunctionArbitraryData: Data?
+        public init(nonceFunctionArbitraryData: Data? = nil) {
+            self.nonceFunctionArbitraryData = nonceFunctionArbitraryData
+        }
+    }
     
-    func by<D: Digest>(
-        _ signer: K1.PublicKey,
-        of digest: D,
-        mode: SignatureValidationMode = .default
+    static func by<D: DataProtocol>(
+        signing hashed: D,
+        with privateKey: K1.PrivateKey,
+        mode: SigningMode
+    ) throws -> Self {
+        try privateKey.ecdsaSign(hashed: hashed, mode: mode)
+    }
+    
+    func wasSigned<D: Digest>(
+        by signer: K1.PublicKey,
+        for digest: D,
+        mode: ValidationMode = .default
     ) throws -> Bool {
-        
         try signer.isValidECDSASignature(
             self,
             digest: digest,
             mode: mode
         )
     }
+    
+    func wasSigned<D: Digest>(
+        by signer: K1.PublicKey,
+        for digest: D
+    ) throws -> Bool {
+        try wasSigned(by: signer, for: digest, mode: .default)
+    }
+}
+
+public extension ECDSASignature.SigningMode {
+    static let `default`: Self = .init()
 }
 
 public protocol SignatureScheme {
     associatedtype Signature: ECSignature
+    static var scheme: Scheme { get }
+}
+
+public extension SignatureScheme {
+    static var scheme: Scheme { Signature.scheme }
 }
 
 public enum ECDSA: SignatureScheme {
     public typealias Signature = ECDSASignature
 }
 
+public enum Schnorr: SignatureScheme {
+    public typealias Signature = SchnorrSignature
+}
+
+public enum Scheme {
+    case schnorr
+    case ecdsa
+}
+
 
 public struct SchnorrSignature: ECSignature, Equatable {
-    
+
     internal let rawRepresentation: Data
     
     public init<D: DataProtocol>(rawRepresentation: D) throws {
@@ -249,7 +323,9 @@ public struct SchnorrSignature: ECSignature, Equatable {
         self.rawRepresentation = Data(rawRepresentation)
     }
 }
+
 public extension SchnorrSignature {
+    static let scheme: Scheme = .schnorr
     typealias ValidationMode = Void
     
     func compactRepresentation() throws -> Data {
@@ -259,11 +335,22 @@ public extension SchnorrSignature {
         try Bridge.derRepresentationOfSignature(rawRepresentation: rawRepresentation)
     }
     
-    func by<D: Digest>(
-        _ signer: K1.PublicKey,
-        of digest: D,
+    func wasSigned<D: Digest>(
+        by signer: K1.PublicKey,
+        for digest: D,
         mode _: Void
     ) throws -> Bool {
         try signer.isValidSchnorrSignature(self, digest: digest)
     }
+    
+    typealias SigningMode = SchnorrInput
+    
+    static func by<D: DataProtocol>(
+        signing hashed: D,
+        with privateKey: K1.PrivateKey,
+        mode: SigningMode
+    ) throws -> Self {
+        try privateKey.schnorrSign(hashed: hashed, input: mode)
+    }
+    
 }

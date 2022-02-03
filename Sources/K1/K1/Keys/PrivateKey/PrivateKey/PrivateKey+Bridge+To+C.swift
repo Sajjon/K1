@@ -12,11 +12,28 @@ extension Bridge {
     
     static func ecdsaSign(
         message: [UInt8],
-        privateKey: SecureBytes
+        privateKey: SecureBytes,
+        mode: ECDSASignature.SigningMode
     ) throws -> Data {
+        
         guard message.count == K1.Curve.Field.byteCount else {
             throw K1.Error.incorrectByteCountOfMessageToECDSASign
         }
+        
+        if let nonceFunctionArbitraryData = mode.nonceFunctionArbitraryData {
+            guard nonceFunctionArbitraryData.count == 32 else {
+                throw K1.Error.incorrectByteCountOfArbitraryDataForNonceFunction
+            }
+        }
+        
+        var nonceFunctionArbitraryBytes: [UInt8]? = nil
+        if let nonceFunctionArbitraryData = mode.nonceFunctionArbitraryData {
+            guard nonceFunctionArbitraryData.count == K1.Curve.Field.byteCount else {
+                throw K1.Error.incorrectByteCountOfArbitraryDataForNonceFunction
+            }
+            nonceFunctionArbitraryBytes = [UInt8](nonceFunctionArbitraryData)
+        }
+                
         var signatureBridgedToC = secp256k1_ecdsa_signature()
         
         try Self.call(
@@ -27,11 +44,11 @@ extension Bridge {
                 &signatureBridgedToC,
                 message,
                 privateKey.backing.bytes,
-                nil,
-                nil
+                secp256k1_nonce_function_rfc6979,
+                nonceFunctionArbitraryBytes
             )
         }
-        
+
         return Data(
             bytes: &signatureBridgedToC.data,
             count: MemoryLayout.size(ofValue: signatureBridgedToC.data)
@@ -133,12 +150,6 @@ extension Bridge {
     }
 }
 
-public extension K1 {
-    enum SignatureScheme {
-        case ecdsa
-        case schnorr(SchnorrInput?)
-    }
-}
 
 public struct SchnorrInput {
     public let auxilaryRandomData: Data
@@ -147,11 +158,12 @@ public struct SchnorrInput {
 internal extension K1.PrivateKey {
 
     func ecdsaSign<D: DataProtocol>(
-        hashed message: D
+        hashed message: D,
+        mode: ECDSASignature.SigningMode = .default
     ) throws -> ECDSASignature {
         let messageBytes = [UInt8](message)
         let signatureData = try withSecureBytes { (secureBytes: SecureBytes) -> Data in
-            try Bridge.ecdsaSign(message: messageBytes, privateKey: secureBytes)
+            try Bridge.ecdsaSign(message: messageBytes, privateKey: secureBytes, mode: mode)
         }
 
         return try ECDSASignature(
@@ -177,15 +189,17 @@ internal extension K1.PrivateKey {
 public extension K1.PrivateKey {
 
     func ecdsaSign<D: Digest>(
-        digest: D
+        digest: D,
+        mode: ECDSASignature.SigningMode = .default
     ) throws -> ECDSASignature {
-        try ecdsaSign(hashed: Array(digest))
+        try ecdsaSign(hashed: Array(digest), mode: mode)
     }
     
     func ecdsaSign<D: DataProtocol>(
-        unhashed data: D
+        unhashed data: D,
+        mode: ECDSASignature.SigningMode = .default
     ) throws -> ECDSASignature {
-        try ecdsaSign(digest: SHA256.hash(data: data))
+        try ecdsaSign(digest: SHA256.hash(data: data), mode: mode)
     }
     
     
@@ -202,7 +216,15 @@ public extension K1.PrivateKey {
     ) throws -> SchnorrSignature {
         try schnorrSign(digest: SHA256.hash(data: data), input: maybeInput)
     }
-
+    
+  
+    func sign<S: SignatureScheme, D: DataProtocol>(
+        hashed: D,
+        scheme: S.Type,
+        mode: S.Signature.SigningMode
+    ) throws -> S.Signature {
+        try S.Signature.by(signing: hashed, with: self, mode: mode)
+    }
     
     /// Performs a key agreement with provided public key share.
     ///

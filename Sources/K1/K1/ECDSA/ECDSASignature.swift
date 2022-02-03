@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct ECDSASignature: ContiguousBytes, Equatable {
+public struct ECDSASignature: ContiguousBytes, Equatable, ECSignature {
 
     public var rawRepresentation: Data
     
@@ -23,7 +23,7 @@ public struct ECDSASignature: ContiguousBytes, Equatable {
 }
 
 public extension ECDSASignature {
-    
+    static let scheme: Scheme = .ecdsa
     func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
         try self.rawRepresentation.withUnsafeBytes(body)
     }

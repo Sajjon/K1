@@ -16,7 +16,7 @@
 //===----------------------------------------------------------------------===//
 import XCTest
 
-struct WycheproofTest<T: Codable>: Codable {
+struct TestSuite<T: Codable>: Codable {
     let algorithm: String
     let numberOfTests: UInt32
     let testGroups: [T]
@@ -32,7 +32,7 @@ struct TestResult {
 }
 
 extension XCTestCase {
-    func wycheproofTest<T: Codable>(
+    func testSuite<T: Codable>(
         jsonName: String,
         file: StaticString = #file,
         line: UInt = #line,
@@ -42,7 +42,7 @@ extension XCTestCase {
         let data = try Data(contentsOf: fileURL!)
 
         let decoder = JSONDecoder()
-        let wpTest = try decoder.decode(WycheproofTest<T>.self, from: data)
+        let wpTest = try decoder.decode(TestSuite<T>.self, from: data)
         var numberOfTestsRun = 0
         var idsOfOmittedTests = Array<Int>()
         for group in wpTest.testGroups {
@@ -56,4 +56,5 @@ extension XCTestCase {
             idsOfOmittedTests: idsOfOmittedTests
         )
     }
+    
 }

@@ -18,16 +18,11 @@ import Foundation
 import XCTest
 @testable import K1
 
-enum ECDHTestErrors: Error {
-    case PublicKeyFailure
-    case ParseSPKIFailure
-}
-
-final class ECDHTests: XCTestCase {
+final class ECDHWychoproofTests: XCTestCase {
 
     func testWycheproof() throws {
         let result = try orFail {
-            try wycheproofTest(
+            try testSuite(
                 jsonName: "ecdh_secp256k1_test",
                 testFunction: { (group: ECDHTestGroup) in
                     testGroup(group: group)
@@ -35,7 +30,9 @@ final class ECDHTests: XCTestCase {
         }
         print("☑️ \(String(describing: result))")
     }
-    
+}
+
+private extension ECDHWychoproofTests {
     func testGroup(
         group: ECDHTestGroup,
         skipIfContainsAnyFlag flagsForUnsupportedTestVectors: [String] = ["InvalidAsn", "CompressedPoint", "InvalidPublic", "UnnamedCurve"],

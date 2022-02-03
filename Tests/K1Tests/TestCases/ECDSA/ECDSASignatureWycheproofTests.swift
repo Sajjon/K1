@@ -20,16 +20,10 @@ import Crypto
 @testable import K1
 
 final class ECDSASignatureWycheproofTests: XCTestCase {
-    let data = "Testing Signatures".data(using: String.Encoding.utf8)!
-    
-    override func setUp() {
-        super.setUp()
-        continueAfterFailure = false
-    }
     
     func testWycheProofSecp256k1() throws {
         let result: TestResult = try orFail {
-            try wycheproofTest(
+            try testSuite(
                 /* https://github.com/google/wycheproof/blob/master/testvectors/ecdsa_secp256k1_sha256_test.json */
                 jsonName: "ecdsa_secp256k1_sha256_test",
                 testFunction: { (group: ECDSATestGroup) in

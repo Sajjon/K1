@@ -68,7 +68,7 @@ extension PublicKey {
     
 
     static func `import`(der: Data) throws -> Self {
-        let publicKeyData = try! importPublicKeyDataFromASN1Object(der: der)
+        let publicKeyData = try importPublicKeyDataFromASN1Object(der: der)
         return try Self.import(from: publicKeyData)
     }
 }

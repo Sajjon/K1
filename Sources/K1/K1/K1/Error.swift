@@ -9,7 +9,7 @@ import Foundation
 
 public extension K1 {
     
-    enum Error: Swift.Error {
+    enum Error: Swift.Error, Equatable {
         
         /// The private key scalar was either 0 or larger then the order of the
         /// curve.
@@ -32,6 +32,7 @@ public extension K1 {
         case failedToSerializeCompactSignature
         case failedToSerializeDERSignature
         case failedToECDSASignDigest
+        case failedToNormalizeECDSASignature
         case failedToSchnorrSignMessageInvalidLength
         case failedToInitializeKeyPairForSchnorrSigning
         case failedToSchnorrSignDigest
@@ -42,6 +43,7 @@ public extension K1 {
         case failedToPerformDiffieHellmanKeyExchange
         case incorrectByteCountOfAuxilaryDataForSchnorr
         case incorrectByteCountOfMessageToECDSASign
+        case incorrectByteCountOfArbitraryDataForNonceFunction
     }
 
 }
