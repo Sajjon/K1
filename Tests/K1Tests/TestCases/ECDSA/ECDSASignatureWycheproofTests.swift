@@ -66,13 +66,11 @@ private extension ECDSASignatureWycheproofTests {
             numberOfTestsRun += 1
             var isValid = false
             do {
-                let derData = try Data(hexString: testVector.sig)
-                let msg = try Data(hexString: testVector.msg)
-                let digest = HF.hash(data: msg)
-                let signature = try ECDSASignature.import(fromDER: derData)
+                let signature = try testVector.expectedSignature()
+                let messageDigest = try testVector.messageDigest()
                 isValid = try key.isValidECDSASignature(
                     signature,
-                    digest: digest,
+                    digest: messageDigest,
                     mode: .acceptSignatureMalleability
                 )
             } catch {
@@ -97,24 +95,46 @@ private extension ECDSASignatureWycheproofTests {
     }
 }
 
-struct ECDSATestGroup: Codable {
-    let tests: [SignatureTestVector]
+private struct ECDSATestGroup: Codable {
+    let tests: [SignatureWycheproofTestVector]
     let key: ECDSAKey
 }
 
-struct ECDSAKey: Codable {
+private struct ECDSAKey: Codable {
     let uncompressed: String
     let curve: String
 }
 
-struct SignatureTestVector: Codable {
+protocol SignatureTestVector: Codable {
+    associatedtype MessageDigest: Digest
+    associatedtype Signature: ECSignature
+    func messageDigest() throws -> MessageDigest
+    func expectedSignature() throws -> Signature
+}
+
+private struct SignatureWycheproofTestVector: SignatureTestVector {
+    
+    typealias MessageDigest = SHA256.Digest
+    typealias Signature = ECDSASignature
+    
     let comment: String
     let msg: String
     let sig: String
     let result: String
     let flags: [String]
     let tcId: Int
+    
+    func messageDigest() throws -> MessageDigest {
+        let msg = try Data(hexString: msg)
+        return SHA256.hash(data: msg)
+    }
+    func expectedSignature() throws -> Signature {
+        let derData = try Data(hexString: sig)
+        return try ECDSASignature.import(fromDER: derData)
+    }
+    
 }
+
 typealias PublicKey = K1.PublicKey
 extension PublicKey {
     init(x963Representation: [UInt8]) throws {

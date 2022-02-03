@@ -200,7 +200,6 @@ public protocol ECSignature: ECSignatureBase {
     associatedtype ValidationMode
     associatedtype SigningMode
     
-    
     func wasSigned<D: Digest>(
         by signer: K1.PublicKey,
         for digest: D,
@@ -287,19 +286,29 @@ public extension ECDSASignature.SigningMode {
 }
 
 public protocol SignatureScheme {
+    associatedtype Hasher: HashFunction
     associatedtype Signature: ECSignature
     static var scheme: Scheme { get }
 }
+public extension SignatureScheme {
+    typealias HashDigest = Hasher.Digest
+    static func hash<D: DataProtocol>(unhashed: D) throws -> HashDigest {
+        Hasher.hash(data: unhashed)
+    }
+}
+
 
 public extension SignatureScheme {
     static var scheme: Scheme { Signature.scheme }
 }
 
 public enum ECDSA: SignatureScheme {
+    public typealias Hasher = SHA256
     public typealias Signature = ECDSASignature
 }
 
 public enum Schnorr: SignatureScheme {
+    public typealias Hasher = SHA256
     public typealias Signature = SchnorrSignature
 }
 

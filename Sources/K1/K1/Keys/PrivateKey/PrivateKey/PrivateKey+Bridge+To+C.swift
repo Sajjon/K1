@@ -226,6 +226,26 @@ public extension K1.PrivateKey {
         try S.Signature.by(signing: hashed, with: self, mode: mode)
     }
     
+    func sign<S: SignatureScheme>(
+        digest: S.HashDigest,
+        scheme: S.Type,
+        mode: S.Signature.SigningMode
+    ) throws -> S.Signature {
+        try S.Signature.by(signing: Array(digest), with: self, mode: mode)
+    }
+    
+      func sign<S: SignatureScheme, D: DataProtocol>(
+          unhashed: D,
+          scheme: S.Type,
+          mode: S.Signature.SigningMode
+      ) throws -> S.Signature {
+          try sign(
+            hashed: Data(S.hash(unhashed: unhashed)),
+            scheme: scheme,
+            mode: mode
+          )
+      }
+    
     /// Performs a key agreement with provided public key share.
     ///
     /// - Parameter publicKeyShare: The public key to perform the ECDH with.
