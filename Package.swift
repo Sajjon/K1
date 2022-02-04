@@ -97,7 +97,7 @@ let package = Package(
                 "ASN1Decoder"
             ],
             resources: [
-                .process("Resources/"),
+                .process("TestVectors/"),
             ]
         ),
     ]
