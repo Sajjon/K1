@@ -10,22 +10,6 @@ import Foundation
 @testable import K1
 import XCTest
 
-extension XCTestCase {
-    func assert<T, E: Swift.Error & Equatable>(
-        _ fn: @autoclosure () throws -> T,
-        throws expectedError: E,
-        file: StaticString = #file, line: UInt = #line
-    ) {
-        XCTAssertThrowsError(try fn()) { anyError in
-            guard let error = anyError as? E else {
-                XCTFail("Incorrect type of error, got '\(type(of: anyError))' but expected: \(E.self)")
-                return
-            }
-            XCTAssertEqual(error, expectedError)
-        }
-    }
-}
-
 final class PrivateKeyImportTests: XCTestCase {
 
     func testAssertImportingPrivateKeyWithTooFewBytesThrowsError() throws {
@@ -67,4 +51,14 @@ final class PrivateKeyImportTests: XCTestCase {
             throws: K1.Error.invalidPrivateKeyMustBeSmallerThanCurveOrder
         )
     }
+    
+    func testAssertPublicKeyOfImportedPrivateKey1() throws {
+        let privateKeyRaw = try Data(hex: "0000000000000000000000000000000000000000000000000000000000000001")
+        let privateKey = try K1.PrivateKey.import(rawRepresentation: privateKeyRaw)
+        // Easily verified by: https://bitaddress.org/
+        // Pretty well known key pair
+        let expectedPublicKey = try K1.PublicKey.import(from: Data(hex: "0479be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"))
+        XCTAssertEqual(privateKey.publicKey, expectedPublicKey)
+    }
+    
 }
