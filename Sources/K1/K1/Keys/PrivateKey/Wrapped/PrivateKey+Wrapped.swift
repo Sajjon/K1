@@ -23,7 +23,11 @@ internal extension K1.PrivateKey {
             secureBytes: SecureBytes
         ) throws {
             guard case 1..<K1.Curve.order = BigUInt(Data(secureBytes)) else {
-                throw K1.Error.invalidPrivateKeyNotWithinBounds
+                if secureBytes.backing.bytes[0] == 0x00 {
+                    throw K1.Error.invalidPrivateKeyMustNotBeZero
+                } else {
+                    throw K1.Error.invalidPrivateKeyMustBeSmallerThanCurveOrder
+                }
             }
             self.secureBytes = secureBytes
         }

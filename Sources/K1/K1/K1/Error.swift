@@ -12,7 +12,8 @@ public extension K1 {
         
         /// The private key scalar was either 0 or larger then the order of the
         /// curve.
-        case invalidPrivateKeyNotWithinBounds
+        case invalidPrivateKeyMustNotBeZero
+        case invalidPrivateKeyMustBeSmallerThan(order: Data)
 
         case incorrectByteCountOfPrivateKey(got: Int, expected: Int)
         case incorrectByteCountOfPublicKey
@@ -51,4 +52,8 @@ extension K1.Error {
     static func invalidSizeOfPrivateKey(providedByteCount: Int) -> Self {
         .incorrectByteCountOfPrivateKey(got: providedByteCount, expected: K1.Curve.Field.byteCount)
     }
+    static let invalidPrivateKeyMustBeSmallerThanCurveOrder: Self =
+        .invalidPrivateKeyMustBeSmallerThan(order: K1.Curve.order.serialize())
+    
+    
 }

@@ -28,7 +28,7 @@ extension XCTestCase {
 
 final class PrivateKeyImportTests: XCTestCase {
 
-    func testImportTooFewBytesThrowsError() throws {
+    func testAssertImportingPrivateKeyWithTooFewBytesThrowsError() throws {
         let raw = try Data(hex: "deadbeef")
         assert(
             try PrivateKey.import(rawRepresentation: raw),
@@ -36,4 +36,35 @@ final class PrivateKeyImportTests: XCTestCase {
         )
     }
     
+    func testAssertImportingPrivateKeyWithTooManyBytesThrowsError() throws {
+        let raw = Data(repeating: 0xba, count: 33)
+        assert(
+            try PrivateKey.import(rawRepresentation: raw),
+            throws: K1.Error.invalidSizeOfPrivateKey(providedByteCount: raw.count)
+        )
+    }
+    
+    func testAssertImportingPrivateKeyZeroThrowsError() throws {
+        let raw = Data(repeating: 0x00, count: 32)
+        assert(
+            try PrivateKey.import(rawRepresentation: raw),
+            throws: K1.Error.invalidPrivateKeyMustNotBeZero
+        )
+    }
+    
+    func testAssertImportingPrivateKeyCurveOrderThrowsError() throws {
+        let raw = try Data(hex: "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141")
+        assert(
+            try PrivateKey.import(rawRepresentation: raw),
+            throws: K1.Error.invalidPrivateKeyMustBeSmallerThanCurveOrder
+        )
+    }
+    
+    func testAssertImportingPrivateKeyLargerThanCurveOrderThrowsError() throws {
+        let raw = Data(repeating: 0xff, count: 32)
+        assert(
+            try PrivateKey.import(rawRepresentation: raw),
+            throws: K1.Error.invalidPrivateKeyMustBeSmallerThanCurveOrder
+        )
+    }
 }
