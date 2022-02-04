@@ -1,5 +1,6 @@
 // From: https://github.com/apple/swift-crypto/blob/main/Tests/CryptoTests/Utils/BytesUtil.swift
 // Commit: 22fd38919566816705c57d5f4dd5a97a4edcf25e
+// Editing: changed Array<UInt8>(hex:) init a bit (pun not intended)
 
 //===----------------------------------------------------------------------===//
 //
@@ -39,16 +40,20 @@ private func htoi(_ value: UInt8) throws -> UInt8 {
 }
 
 extension Array where Element == UInt8 {
-    init(hexString: String) throws {
+    init(hex: String) throws {
+        var hex = hex.lowercased()
+        if hex.starts(with: "0x") {
+            hex = String(hex.dropFirst(2))
+        }
         self.init()
         
-        guard hexString.count.isMultiple(of: 2), !hexString.isEmpty else {
+        guard hex.count.isMultiple(of: 2), !hex.isEmpty else {
             throw ByteHexEncodingErrors.incorrectString
         }
 
-        let stringBytes: [UInt8] = Array(hexString.data(using: String.Encoding.utf8)!)
+        let stringBytes: [UInt8] = Array(hex.data(using: String.Encoding.utf8)!)
 
-        for i in 0...((hexString.count / 2) - 1) {
+        for i in 0...((hex.count / 2) - 1) {
             let char1 = stringBytes[2 * i]
             let char2 = stringBytes[2 * i + 1]
 
@@ -59,7 +64,7 @@ extension Array where Element == UInt8 {
 }
 
 extension DataProtocol {
-    var hexString: String {
+    var hex: String {
         get {
             let hexLen = self.count * 2
             let ptr = UnsafeMutablePointer<UInt8>.allocate(capacity: hexLen)
@@ -79,16 +84,16 @@ extension DataProtocol {
 }
 
 extension Data {
-    init(hexString: String) throws {
+    init(hex: String) throws {
         self.init()
 
-        if hexString.count % 2 != 0 || hexString.count == 0 {
+        if hex.count % 2 != 0 || hex.count == 0 {
             throw ByteHexEncodingErrors.incorrectString
         }
 
-        let stringBytes: [UInt8] = Array(hexString.lowercased().data(using: String.Encoding.utf8)!)
+        let stringBytes: [UInt8] = Array(hex.lowercased().data(using: String.Encoding.utf8)!)
 
-        for i in 0...((hexString.count / 2) - 1) {
+        for i in 0...((hex.count / 2) - 1) {
             let char1 = stringBytes[2 * i]
             let char2 = stringBytes[2 * i + 1]
 

@@ -53,7 +53,7 @@ private extension ECDSASignatureWycheproofTests {
             let errorMessage = "Key in test group is on wrong EC curve: \(group.key.curve), expected 'secp256k1'"
             throw ECDSASignatureTestError(description: errorMessage)
         }
-        let keyBytes = try orFail(file: file, line: line) { try Array(hexString: group.key.uncompressed) }
+        let keyBytes = try orFail(file: file, line: line) { try Array(hex: group.key.uncompressed) }
         let key = try orFail(file: file, line: line) { try PublicKey(x963Representation: keyBytes) }
         var numberOfTestsRun = 0
         var idsOfOmittedTests = Array<Int>()
@@ -125,11 +125,11 @@ private struct SignatureWycheproofTestVector: SignatureTestVector {
     let tcId: Int
     
     func messageDigest() throws -> MessageDigest {
-        let msg = try Data(hexString: msg)
+        let msg = try Data(hex: msg)
         return SHA256.hash(data: msg)
     }
     func expectedSignature() throws -> Signature {
-        let derData = try Data(hexString: sig)
+        let derData = try Data(hex: sig)
         return try ECDSASignature.import(fromDER: derData)
     }
     

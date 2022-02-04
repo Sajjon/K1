@@ -49,8 +49,8 @@ private extension ECDHWychoproofTests {
             let curveSize = K1.Curve.Field.byteCount
             var privateBytes = [UInt8](repeating: 0, count: curveSize)
 
-            let hexStringFromVector = (vector.count % 2 == 0) ? vector : "0\(vector)"
-            let privateKeyVector = try! Array(hexString: hexStringFromVector)
+            let hexFromVector = (vector.count % 2 == 0) ? vector : "0\(vector)"
+            let privateKeyVector = try! Array(hex: hexFromVector)
 
             // Input is too long (i.e. we have leading zeros)
             if privateKeyVector.count > curveSize {
@@ -75,7 +75,7 @@ private extension ECDHWychoproofTests {
             }
             numberOfTestsRun += 1
             do {
-                let publicKey = try PublicKey.import(der: Data(hexString: testVector.publicKey))
+                let publicKey = try PublicKey.import(der: Data(hex: testVector.publicKey))
                 var privateBytes = [UInt8]()
                 privateBytes = try padKeyIfNecessary(vector: testVector.privateKey)
                 let privateKey = try PrivateKey.import(rawRepresentation: privateBytes)

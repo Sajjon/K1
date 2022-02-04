@@ -104,8 +104,8 @@ private extension SchnorrSignatureBitcoinCoreTests {
         XCTAssertEqual(publicKey, expectedPublicKey)
 
         XCTAssertEqual(
-            try! publicKey.rawRepresentation(format: .compressed).hexString.lowercased(),
-            try! expectedPublicKey.rawRepresentation(format: .compressed).hexString.lowercased()
+            try! publicKey.rawRepresentation(format: .compressed).hex.lowercased(),
+            try! expectedPublicKey.rawRepresentation(format: .compressed).hex.lowercased()
             )
 
         let message = try Data(hex: vector.messageHex)

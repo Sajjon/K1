@@ -15,7 +15,7 @@
             [
                 {
                     "tcId": 1,
-                    "privateKey": "CCA9FBCC1B41E5A95D369EAA6DDCFF73B61A4EFAA279CFC6567E8DAA39CBAF50",
+                    "privateKey": "cca9fbcc1b41e5a95d369eaa6ddcff73b61a4efaa279cfc6567e8daa39cbaf50",
                     "msg": "sample",
                     "expected":
                     {

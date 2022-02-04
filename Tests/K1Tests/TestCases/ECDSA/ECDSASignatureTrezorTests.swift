@@ -77,7 +77,7 @@ private struct SignatureTrezorTestVector: SignatureTestVector {
         return SHA256.hash(data: messageToHash)
     }
     func expectedSignature() throws -> Signature {
-        let derData = try Data(hexString: expected.der)
+        let derData = try Data(hex: expected.der)
         return try ECDSASignature.import(fromDER: derData)
     }
     
