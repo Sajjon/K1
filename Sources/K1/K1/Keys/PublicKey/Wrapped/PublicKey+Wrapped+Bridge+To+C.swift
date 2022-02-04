@@ -101,7 +101,7 @@ extension Bridge {
         guard
             privateKeyBytes.count == K1.PrivateKey.Wrapped.byteCount
         else {
-            throw K1.Error.incorrectByteCountOfPrivateKey
+            throw K1.Error.invalidSizeOfPrivateKey(providedByteCount: privateKeyBytes.count)
         }
         
         let publicKeyFormat = K1.Format.uncompressed

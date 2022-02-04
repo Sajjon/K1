@@ -14,7 +14,7 @@ public extension K1 {
         /// curve.
         case invalidPrivateKeyNotWithinBounds
 
-        case incorrectByteCountOfPrivateKey
+        case incorrectByteCountOfPrivateKey(got: Int, expected: Int)
         case incorrectByteCountOfPublicKey
         
         case incorrectByteCountOfRawSignature
@@ -45,4 +45,10 @@ public extension K1 {
         case incorrectByteCountOfArbitraryDataForNonceFunction
     }
 
+}
+
+extension K1.Error {
+    static func invalidSizeOfPrivateKey(providedByteCount: Int) -> Self {
+        .incorrectByteCountOfPrivateKey(got: providedByteCount, expected: K1.Curve.Field.byteCount)
+    }
 }

@@ -49,7 +49,13 @@ internal extension K1.PrivateKey.Wrapped {
     static func `import`(
         from privateKeyBytes: [UInt8]
     ) throws -> Self {
-        try .init(secureBytes: SecureBytes(privateKeyBytes))
+        
+        guard
+            privateKeyBytes.count == K1.PrivateKey.Wrapped.byteCount
+        else {
+            throw K1.Error.invalidSizeOfPrivateKey(providedByteCount: privateKeyBytes.count)
+        }
+        return try .init(secureBytes: SecureBytes(privateKeyBytes))
     }
     
     static func `import`<D: ContiguousBytes>(
