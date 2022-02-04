@@ -24,6 +24,8 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/apple/swift-crypto.git", "2.0.0" ..< "3.0.0"),
         .package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0"),
+        
+        // Only used by tests
         .package(url: "https://github.com/filom/ASN1Decoder", .branch("master"))
     ],
 
@@ -92,7 +94,6 @@ let package = Package(
             name: "K1Tests",
             dependencies: [
                 "K1",
-//                "ASN1Swift"
                 "ASN1Decoder"
             ],
             resources: [

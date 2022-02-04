@@ -5,7 +5,6 @@
 //  Created by Alexander Cyon on 2022-01-28.
 //
 
-import Foundation
 
 import Crypto // swift-crypto
 import secp256k1

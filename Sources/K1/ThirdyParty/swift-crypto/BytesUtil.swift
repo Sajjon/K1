@@ -1,7 +1,6 @@
 // From: https://github.com/apple/swift-crypto/blob/main/Tests/CryptoTests/Utils/BytesUtil.swift
 // Commit: 22fd38919566816705c57d5f4dd5a97a4edcf25e
 
-
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the SwiftCrypto open source project
@@ -15,7 +14,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 //===----------------------------------------------------------------------===//
-import Foundation
 
 enum ByteHexEncodingErrors: Error {
     case incorrectHexValue

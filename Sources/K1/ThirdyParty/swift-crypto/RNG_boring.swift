@@ -1,7 +1,6 @@
 // from: https://github.com/apple/swift-crypto/blob/64a1a98e47e6643e6d43d30b87a244483b51d8ad/Sources/Crypto/Util/BoringSSL/RNG_boring.swift
 // commit: 64a1a98e47e6643e6d43d30b87a244483b51d8ad
 
-
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the SwiftCrypto open source project
@@ -15,9 +14,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 //===----------------------------------------------------------------------===//
-#if (os(macOS) || os(iOS) || os(watchOS) || os(tvOS)) && CRYPTO_IN_SWIFTPM && !CRYPTO_IN_SWIFTPM_FORCE_BUILD_API
-@_exported import CryptoKit
-#else
 
 extension UnsafeMutableRawBufferPointer {
     func initializeWithRandomBytes(count: Int) {
@@ -45,5 +41,3 @@ extension UnsafeMutableRawBufferPointer {
         }
     }
 }
-
-#endif // (os(macOS) || os(iOS) || os(watchOS) || os(tvOS)) && CRYPTO_IN_SWIFTPM && !CRYPTO_IN_SWIFTPM_FORCE_BUILD_API

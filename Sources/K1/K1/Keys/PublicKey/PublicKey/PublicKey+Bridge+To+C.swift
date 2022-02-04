@@ -5,7 +5,6 @@
 //  Created by Alexander Cyon on 2022-01-28.
 //
 
-import Foundation
 
 // Bridge to C
 import secp256k1
