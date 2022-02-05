@@ -14,7 +14,6 @@ let package = Package(
     products: [
         .library(
             name: "K1",
-            type: .static,
             targets: [
                 "K1"
             ]
