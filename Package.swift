@@ -22,7 +22,11 @@ let package = Package(
     ],
 
     dependencies: [
+        // Primarily used for SHA256 digests.
         .package(url: "https://github.com/apple/swift-crypto.git", "2.0.0" ..< "3.0.0"),
+        
+        // Used once in source, to check if imported private key is in bounds: [1, Curve.order]
+        // seems prudent to use BigInt rather than implement `Comparable` for `Data`.
         .package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0"),
         
         // Only used by tests
@@ -30,7 +34,8 @@ let package = Package(
     ],
 
     targets: [
-
+        
+        // Target `libsecp256k1` https://github.com/bitcoin-core/secp256k1
         .target(
             name: "secp256k1",
             exclude: [
@@ -82,8 +87,14 @@ let package = Package(
         .target(
             name: "K1",
             dependencies: [
+                
+                // ECDSA, Schnorr, ECDH etc.
                 "secp256k1",
+
+                // Curve.order bounds check for private key
                 "BigInt",
+
+                // SHA256 digests
                 .product(name: "Crypto", package: "swift-crypto"),
             ]
         ),
@@ -92,6 +103,8 @@ let package = Package(
             name: "K1Tests",
             dependencies: [
                 "K1",
+                
+                // DER decoding of public keys from test vectors
                 "ASN1Decoder"
             ],
             resources: [
