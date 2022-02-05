@@ -9,7 +9,7 @@
 public extension K1 {
     
     /// Bridging type for: `secp256k1_ec_pubkey_serialize`
-    enum Format: UInt32 {
+    enum Format: UInt32, CaseIterable {
         case compressed, uncompressed
     }
 }
@@ -29,7 +29,7 @@ public extension K1.Format {
         } else if byteCount == Self.compressed.length {
             self = .compressed
         } else {
-            throw K1.Error.incorrectByteCountOfPublicKey
+            throw K1.Error.incorrectByteCountOfPublicKey(providedByteCount: byteCount)
         }
     }
 }

@@ -116,8 +116,8 @@ extension Bridge {
 
         var publicKeyBridgedToC = secp256k1_pubkey()
 
-        try Self.call(ifFailThrow: .failedToSerializePublicKeyIntoBytes) { context in
-            /* "Serialize a pubkey object into a serialized byte sequence." */
+        try Self.call(ifFailThrow: .incorrectByteCountOfPublicKey(providedByteCount: publicKeyBytes.count)) { context in
+            /* Parse a variable-length public key into the pubkey object. */
             secp256k1_ec_pubkey_parse(
                 context,
                 &publicKeyBridgedToC,

@@ -16,18 +16,18 @@ public extension K1 {
         case invalidPrivateKeyMustBeSmallerThan(order: Data)
 
         case incorrectByteCountOfPrivateKey(got: Int, expected: Int)
-        case incorrectByteCountOfPublicKey
         
         case incorrectByteCountOfRawSignature
         
         case failedToCreateContextForSecp256k1
         case failedToUpdateContextRandomization
         case failedToComputePublicKeyFromPrivateKey
-        case failedToSerializePublicKeyIntoBytes
         case incorrectByteCountOfMessageToValidate
         case failedToCompressPublicKey
         case failedToUncompressPublicKey
         
+        case incorrectByteCountOfPublicKey(got: Int, acceptableLengths: [Int])
+        case failedToParsePublicKeyFromBytes
         case failedToParseDERSignature
         case failedToSerializeCompactSignature
         case failedToSerializeDERSignature
@@ -44,6 +44,7 @@ public extension K1 {
         case incorrectByteCountOfAuxilaryDataForSchnorr
         case incorrectByteCountOfMessageToECDSASign
         case incorrectByteCountOfArbitraryDataForNonceFunction
+        case failedToSerializePublicKeyIntoBytes
     }
 
 }
@@ -55,5 +56,7 @@ extension K1.Error {
     static let invalidPrivateKeyMustBeSmallerThanCurveOrder: Self =
         .invalidPrivateKeyMustBeSmallerThan(order: K1.Curve.order.serialize())
     
-    
+    static func incorrectByteCountOfPublicKey(providedByteCount: Int) -> Self {
+        .incorrectByteCountOfPublicKey(got: providedByteCount, acceptableLengths: K1.Format.allCases.map(\.length))
+    }
 }

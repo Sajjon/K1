@@ -17,7 +17,8 @@ internal extension K1.PublicKey {
             uncompressedRaw: [UInt8]
         ) throws {
             guard uncompressedRaw.count == K1.Format.uncompressed.length else {
-                throw K1.Error.incorrectByteCountOfPublicKey
+                // Only accept uncompressed public key here.
+                throw K1.Error.incorrectByteCountOfPublicKey(got: uncompressedRaw.count, acceptableLengths: [K1.Format.uncompressed.length])
             }
             self.uncompressedRaw = uncompressedRaw
         }

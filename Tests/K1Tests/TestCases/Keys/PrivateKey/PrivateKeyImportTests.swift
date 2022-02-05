@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Foundation
 @testable import K1
 import XCTest
 

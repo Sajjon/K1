@@ -14,13 +14,17 @@ extension Bridge {
         raw: [UInt8]
     ) throws -> Data {
         
+        guard K1.Format.allCases.map(\.length).contains(raw.count) else {
+            throw K1.Error.incorrectByteCountOfPublicKey(providedByteCount: raw.count)
+        }
+        
         var publicKeyBytesMaybeCompressed = raw
         var publicKeyBridgedToC = secp256k1_pubkey()
         
         try Self.call(
-            ifFailThrow: .failedToSerializePublicKeyIntoBytes
+            ifFailThrow: .failedToParsePublicKeyFromBytes
         ) { context in
-            /* "Serialize a pubkey object into a serialized byte sequence." */
+            /* Parse a variable-length public key into the pubkey object. */
             secp256k1_ec_pubkey_parse(
                 context,
                 &publicKeyBridgedToC,
@@ -61,8 +65,8 @@ extension Bridge {
         
         var publicKeyBridgedToC = secp256k1_pubkey()
 
-        try Self.call(ifFailThrow: .failedToSerializePublicKeyIntoBytes) { context in
-            /* "Serialize a pubkey object into a serialized byte sequence." */
+        try Self.call(ifFailThrow: .failedToParsePublicKeyFromBytes) { context in
+            /* Parse a variable-length public key into the pubkey object. */
             secp256k1_ec_pubkey_parse(
                 context,
                 &publicKeyBridgedToC,
