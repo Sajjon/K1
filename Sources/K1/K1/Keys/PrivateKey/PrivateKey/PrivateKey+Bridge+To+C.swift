@@ -214,7 +214,7 @@ public extension K1.PrivateKey {
     }
     
   
-    func sign<S: SignatureScheme, D: DataProtocol>(
+    func sign<S: ECSignatureScheme, D: DataProtocol>(
         hashed: D,
         scheme: S.Type,
         mode: S.Signature.SigningMode
@@ -222,7 +222,7 @@ public extension K1.PrivateKey {
         try S.Signature.by(signing: hashed, with: self, mode: mode)
     }
     
-    func sign<S: SignatureScheme>(
+    func sign<S: ECSignatureScheme>(
         digest: S.HashDigest,
         scheme: S.Type,
         mode: S.Signature.SigningMode
@@ -230,7 +230,7 @@ public extension K1.PrivateKey {
         try S.Signature.by(signing: Array(digest), with: self, mode: mode)
     }
     
-      func sign<S: SignatureScheme, D: DataProtocol>(
+      func sign<S: ECSignatureScheme, D: DataProtocol>(
           unhashed: D,
           scheme: S.Type,
           mode: S.Signature.SigningMode

@@ -186,7 +186,7 @@ public extension SignatureValidationMode {
 }
 
 public protocol ECSignatureBase {
-    static var scheme: Scheme { get }
+    static var scheme: SigningScheme { get }
     func compactRepresentation() throws -> Data
     func derRepresentation() throws -> Data
     
@@ -196,7 +196,8 @@ public protocol ECSignatureBase {
     ) throws -> Bool
 }
 
-public protocol ECSignature: ECSignatureBase {
+public protocol ECSignature: ECSignatureBase where Scheme.Signature == Self {
+    associatedtype Scheme: ECSignatureScheme
     associatedtype ValidationMode
     associatedtype SigningMode
     
@@ -285,12 +286,12 @@ public extension ECDSASignature.SigningMode {
     static let `default`: Self = .init()
 }
 
-public protocol SignatureScheme {
+public protocol ECSignatureScheme where Signature.Scheme == Self {
     associatedtype Hasher: HashFunction
     associatedtype Signature: ECSignature
-    static var scheme: Scheme { get }
+    static var scheme: SigningScheme { get }
 }
-public extension SignatureScheme {
+public extension ECSignatureScheme {
     typealias HashDigest = Hasher.Digest
     static func hash<D: DataProtocol>(unhashed: D) throws -> HashDigest {
         Hasher.hash(data: unhashed)
@@ -298,28 +299,27 @@ public extension SignatureScheme {
 }
 
 
-public extension SignatureScheme {
-    static var scheme: Scheme { Signature.scheme }
+public extension ECSignatureScheme {
+    static var scheme: SigningScheme { Signature.scheme }
 }
 
-public enum ECDSA: SignatureScheme {
+public enum ECDSA: ECSignatureScheme {
     public typealias Hasher = SHA256
     public typealias Signature = ECDSASignature
 }
 
-public enum Schnorr: SignatureScheme {
+public enum Schnorr: ECSignatureScheme {
     public typealias Hasher = SHA256
     public typealias Signature = SchnorrSignature
 }
 
-public enum Scheme {
+public enum SigningScheme {
     case schnorr
     case ecdsa
 }
 
-
 public struct SchnorrSignature: ECSignature, Equatable {
-
+    public typealias Scheme = Schnorr
     internal let rawRepresentation: Data
     
     public init<D: DataProtocol>(rawRepresentation: D) throws {
@@ -334,7 +334,7 @@ public struct SchnorrSignature: ECSignature, Equatable {
 }
 
 public extension SchnorrSignature {
-    static let scheme: Scheme = .schnorr
+    static let scheme: SigningScheme = .schnorr
     typealias ValidationMode = Void
     
     func compactRepresentation() throws -> Data {
