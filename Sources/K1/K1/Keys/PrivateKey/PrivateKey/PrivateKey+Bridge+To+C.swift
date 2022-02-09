@@ -154,7 +154,7 @@ public struct SchnorrInput {
     public let auxilaryRandomData: Data
 }
 
-internal extension K1.PrivateKey {
+public extension K1.PrivateKey {
 
     func ecdsaSign<D: DataProtocol>(
         hashed message: D,
@@ -183,9 +183,6 @@ internal extension K1.PrivateKey {
             rawRepresentation: signatureData
         )
     }
-}
-
-public extension K1.PrivateKey {
 
     func ecdsaSign<D: Digest>(
         digest: D,
