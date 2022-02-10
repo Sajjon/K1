@@ -45,6 +45,7 @@ public extension K1 {
         case incorrectByteCountOfMessageToECDSASign
         case incorrectByteCountOfArbitraryDataForNonceFunction
         case failedToSerializePublicKeyIntoBytes
+        case failedToRecognizeSignatureType(onlySupportedSchemesAre: [SigningScheme])
     }
 
 }

@@ -9,6 +9,7 @@
 // Bridge to C
 import secp256k1
 import Crypto
+import Foundation
 
 // MARK: - Validate (Verify)
 // MARK: -
@@ -144,6 +145,30 @@ public extension K1.PublicKey {
         try isValidECDSASignature(signature, hashed: Data(digest), mode: mode)
     }
     
+    func isValid<D: Digest>(signature: ECSignatureBase, for digest: D) throws -> Bool {
+        if let schnorrSignature = signature as? SchnorrSignature {
+            return try isValidSchnorrSignature(schnorrSignature, digest: digest)
+        } else if let ecdsaSignature = signature as? ECDSASignature {
+            return try isValidECDSASignature(ecdsaSignature, digest: digest)
+        } else {
+            throw K1.Error.failedToRecognizeSignatureType(onlySupportedSchemesAre: SigningScheme.allCases)
+        }
+    }
+    
+    func isValid<D: DataProtocol>(signature: ECSignatureBase, hashed: D) throws -> Bool {
+        if let schnorrSignature = signature as? SchnorrSignature {
+            return try isValidSchnorrSignature(schnorrSignature, hashed: hashed)
+        } else if let ecdsaSignature = signature as? ECDSASignature {
+            return try isValidECDSASignature(ecdsaSignature, hashed: hashed)
+        } else {
+            throw K1.Error.failedToRecognizeSignatureType(onlySupportedSchemesAre: SigningScheme.allCases)
+        }
+    }
+    
+    func isValid<M: DataProtocol>(signature: ECSignatureBase, unhashed: M) throws -> Bool {
+       try isValid(signature: signature, for: SHA256.hash(data: unhashed))
+    }
+    
     func isValidECDSASignature<M: DataProtocol>(
         _ signature: ECDSASignature,
         unhashed: M,
@@ -207,6 +232,12 @@ public protocol ECSignature: ECSignatureBase where Scheme.Signature == Self {
         mode: ValidationMode
     ) throws -> Bool
     
+    func wasSigned<D: DataProtocol>(
+        by signer: K1.PublicKey,
+        hashedMessage: D,
+        mode: ValidationMode
+    ) throws -> Bool
+    
     static func by<D: DataProtocol>(
         signing hashed: D,
         with privateKey: K1.PrivateKey,
@@ -262,6 +293,18 @@ public extension ECDSASignature {
         try privateKey.ecdsaSign(hashed: hashed, mode: mode)
     }
     
+    func wasSigned<D: DataProtocol>(
+        by signer: K1.PublicKey,
+        hashedMessage: D,
+        mode: ValidationMode = .default
+    ) throws -> Bool {
+        try signer.isValidECDSASignature(self, hashed: hashedMessage, mode: mode)
+    }
+    
+    func wasSigned<D: Digest>(by signer: K1.PublicKey, for digest: D) throws -> Bool {
+        try wasSigned(by: signer, for: digest, mode: .default)
+    }
+    
     func wasSigned<D: Digest>(
         by signer: K1.PublicKey,
         for digest: D,
@@ -272,13 +315,6 @@ public extension ECDSASignature {
             digest: digest,
             mode: mode
         )
-    }
-    
-    func wasSigned<D: Digest>(
-        by signer: K1.PublicKey,
-        for digest: D
-    ) throws -> Bool {
-        try wasSigned(by: signer, for: digest, mode: .default)
     }
 }
 
@@ -313,7 +349,7 @@ public enum Schnorr: ECSignatureScheme {
     public typealias Signature = SchnorrSignature
 }
 
-public enum SigningScheme {
+public enum SigningScheme: String, Equatable, CaseIterable {
     case schnorr
     case ecdsa
 }
@@ -350,6 +386,15 @@ public extension SchnorrSignature {
         mode _: Void
     ) throws -> Bool {
         try signer.isValidSchnorrSignature(self, digest: digest)
+    }
+    
+    
+    func wasSigned<D: DataProtocol>(
+        by signer: K1.PublicKey,
+        hashedMessage: D,
+        mode: ValidationMode
+    ) throws -> Bool {
+        try signer.isValidSchnorrSignature(self, hashed: hashedMessage)
     }
     
     typealias SigningMode = SchnorrInput
