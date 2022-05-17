@@ -15,7 +15,7 @@ public extension K1 {
     struct PrivateKey: Equatable {
         
         private let wrapped: Wrapped
-        
+		
         public let publicKey: PublicKey
             
         internal init(wrapped: Wrapped) {
@@ -23,6 +23,14 @@ public extension K1 {
             self.publicKey = PublicKey(wrapped: wrapped.publicKey)
         }
     }
+}
+
+public extension K1.PrivateKey {
+	/// WARNING only use this if you really know what you are doing. This
+	/// exposes the private key in raw form. Potentially devastatingly dangerous.
+	var rawRepresentation: Data {
+		withSecureBytes { Data($0) }
+	}
 }
 
 internal extension K1.PrivateKey {
