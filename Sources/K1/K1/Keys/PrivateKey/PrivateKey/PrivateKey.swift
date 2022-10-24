@@ -12,7 +12,7 @@ import Crypto // swift-crypto
 
 public extension K1 {
     
-    struct PrivateKey: Equatable {
+    struct PrivateKey: Sendable, Hashable {
         
         private let wrapped: Wrapped
 		
@@ -24,7 +24,6 @@ public extension K1 {
         }
     }
 }
-
 public extension K1.PrivateKey {
 	/// WARNING only use this if you really know what you are doing. This
 	/// exposes the private key in raw form. Potentially devastatingly dangerous.
@@ -64,13 +63,17 @@ public extension K1.PrivateKey {
 // MARK: - Equatable
 // MARK: -
 public extension K1.PrivateKey {
+    /// Two PrivateKey are considered equal if their PublicKeys are equal
     static func == (lhs: Self, rhs: Self) -> Bool {
-        var equals = false
-        lhs.withSecureBytes { lhsSecureBytes in
-            rhs.withSecureBytes { rhsSecureBytes in
-                equals = lhsSecureBytes == rhsSecureBytes
-            }
-        }
-        return equals
+        lhs.publicKey == rhs.publicKey
+    }
+}
+
+// MARK: - Hashable
+// MARK: -
+public extension K1.PrivateKey {
+    /// We use the public key of the private key as input to hash
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(self.publicKey)
     }
 }

@@ -8,7 +8,7 @@
 
 public extension K1 {
     
-    struct PublicKey: Equatable {
+    struct PublicKey: Sendable, Hashable {
         
         private let wrapped: Wrapped
 

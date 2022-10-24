@@ -354,9 +354,12 @@ public enum SigningScheme: String, Equatable, CaseIterable {
     case ecdsa
 }
 
-public struct SchnorrSignature: ECSignature, Equatable {
+public struct SchnorrSignature: ECSignature, Sendable, Hashable {
     public typealias Scheme = Schnorr
-    internal let rawRepresentation: Data
+    private let _rawRepresentation: [UInt8]
+    public var rawRepresentation: Data {
+        Data(_rawRepresentation)
+    }
     
     public init<D: DataProtocol>(rawRepresentation: D) throws {
         guard
@@ -365,7 +368,7 @@ public struct SchnorrSignature: ECSignature, Equatable {
             throw K1.Error.incorrectByteCountOfRawSignature
         }
         
-        self.rawRepresentation = Data(rawRepresentation)
+        self._rawRepresentation = [UInt8](rawRepresentation)
     }
 }
 

@@ -1,7 +1,7 @@
 # K1 🏔
 > Safer than K2
 
-_K1_ is Swift wrapper around [libsecp256k1 (bitcoin-core/secp256k1)](https://github.com/bitcoin-core/secp256k1), offering ECDSA, Schnorr ([BIP340][bip340]) and ECDH features.
+_K1_ is Swift wrapper around [libsecp256k1 (bitcoin-core/secp256k1)][lib], offering ECDSA, Schnorr ([BIP340][bip340]) and ECDH features.
 
 # Features
 
@@ -57,4 +57,16 @@ assert(ab == ba, "Alice and Bob should be able to agree on the same secret")
 ## Non-Swift but SPM support
 [greymass/secp256k1](https://github.com/greymass/secp256k1) (Fork of `libsecp256k1`)
 
+# Development
+
+Stand in root and run
+
+```sh
+git submodule init
+git submodule update
+```
+
+To clone the dependency [libsecp256k1][lib]
+
 [BIP340]: https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
+[lib]

@@ -10,7 +10,7 @@ import BigInt
 internal extension K1.PrivateKey {
     
     @usableFromInline
-    struct Wrapped {
+    struct Wrapped: @unchecked Sendable {
         
         private let secureBytes: SecureBytes
         

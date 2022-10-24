@@ -9,7 +9,7 @@
 internal extension K1.PublicKey {
     
     @usableFromInline
-    struct Wrapped: Equatable {
+    struct Wrapped: Sendable, Hashable {
         
         internal let uncompressedRaw: [UInt8]
     
@@ -43,6 +43,9 @@ internal extension K1.PublicKey.Wrapped {
     
     @usableFromInline
     static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.uncompressedRaw == rhs.uncompressedRaw
+        /// We use constant time comparision to not leak any information about
+        /// the private key, because `PrivateKey` is `Equatable` and checks
+        /// equality using its publicKey.
+        safeCompare(lhs.uncompressedRaw, rhs.uncompressedRaw)
     }
 }

@@ -6,9 +6,13 @@
 //
 
 
-public struct ECDSASignature: ContiguousBytes, Equatable, ECSignature {
+
+public struct ECDSASignature: ContiguousBytes, Sendable, Hashable, ECSignature {
     public typealias Scheme = ECDSA
-    public var rawRepresentation: Data
+    private let _rawRepresentation: [UInt8]
+    public var rawRepresentation: Data {
+        Data(_rawRepresentation)
+    }
     
     public init<D: DataProtocol>(rawRepresentation: D) throws {
         guard
@@ -17,7 +21,7 @@ public struct ECDSASignature: ContiguousBytes, Equatable, ECSignature {
             throw K1.Error.incorrectByteCountOfRawSignature
         }
         
-        self.rawRepresentation = Data(rawRepresentation)
+        self._rawRepresentation = [UInt8](rawRepresentation)
     }
 }
 
