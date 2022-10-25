@@ -212,8 +212,6 @@ public extension SignatureValidationMode {
 
 public protocol ECSignatureBase {
     static var scheme: SigningScheme { get }
-    func compactRepresentation() throws -> Data
-    func derRepresentation() throws -> Data
     
     func wasSigned<D: Digest>(
         by signer: K1.PublicKey,
@@ -221,7 +219,7 @@ public protocol ECSignatureBase {
     ) throws -> Bool
 }
 
-public protocol ECSignature: ECSignatureBase where Scheme.Signature == Self {
+public protocol ECSignature: ECSignatureBase {
     associatedtype Scheme: ECSignatureScheme
     associatedtype ValidationMode
     associatedtype SigningMode
@@ -290,7 +288,7 @@ public extension ECDSASignature {
         with privateKey: K1.PrivateKey,
         mode: SigningMode
     ) throws -> Self {
-        try privateKey.ecdsaSign(hashed: hashed, mode: mode)
+        try privateKey.ecdsaSignNonRecoverable(hashed: hashed, mode: mode)
     }
     
     func wasSigned<D: DataProtocol>(

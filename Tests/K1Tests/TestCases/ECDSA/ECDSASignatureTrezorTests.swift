@@ -44,7 +44,7 @@ private extension XCTestCase {
             let messageDigest = try vector.messageDigest()
             XCTAssertTrue(try publicKey.isValidECDSASignature(expectedSignature, digest: messageDigest))
             
-            let signatureFromMessage = try privateKey.ecdsaSign(digest: messageDigest)
+            let signatureFromMessage = try privateKey.ecdsaSignNonRecoverable(digest: messageDigest)
             XCTAssertEqual(signatureFromMessage, expectedSignature)
             numberOfTestsRun += 1
         }

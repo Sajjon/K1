@@ -18,6 +18,7 @@ public extension K1 {
         case incorrectByteCountOfPrivateKey(got: Int, expected: Int)
         
         case incorrectByteCountOfRawSignature
+        case incorrectByteCountOfSignatureNotRecoverable
         
         case failedToCreateContextForSecp256k1
         case failedToUpdateContextRandomization
@@ -32,6 +33,10 @@ public extension K1 {
         case failedToSerializeCompactSignature
         case failedToSerializeDERSignature
         case failedToECDSASignDigest
+        case recoverPublicKeyDiscrepancyReceivedSignatureContainingRecoveryIDButFunctionSpecifiesANonMatchingOne
+        case failedToParseRecoverableSignatureFromECDSASignature
+        case failedToConvertRecoverableSignatureToNonRecoverable
+        case failedToRecoverPublicKeyFromSignature
         case failedToNormalizeECDSASignature
         case failedToSchnorrSignMessageInvalidLength
         case failedToInitializeKeyPairForSchnorrSigning
@@ -45,6 +50,7 @@ public extension K1 {
         case incorrectByteCountOfMessageToECDSASign
         case incorrectByteCountOfArbitraryDataForNonceFunction
         case failedToSerializePublicKeyIntoBytes
+        case expectedPublicKeyToBeValidForSignatureAndMessage
         case failedToRecognizeSignatureType(onlySupportedSchemesAre: [SigningScheme])
     }
 
