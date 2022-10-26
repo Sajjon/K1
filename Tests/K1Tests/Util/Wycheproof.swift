@@ -16,7 +16,7 @@
 //===----------------------------------------------------------------------===//
 import XCTest
 
-struct TestSuite<T: Codable>: Codable {
+struct TestSuite<T: Decodable>: Decodable {
     let algorithm: String
     let numberOfTests: UInt32
     let testGroups: [T]
@@ -32,7 +32,7 @@ struct TestResult {
 }
 
 extension XCTestCase {
-    func testSuite<T: Codable>(
+    func testSuite<T: Decodable>(
         jsonName: String,
         file: StaticString = #file,
         line: UInt = #line,
