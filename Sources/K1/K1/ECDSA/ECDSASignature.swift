@@ -40,7 +40,7 @@ public extension ECDSASignatureRecoverable {
     }
     
     /// aka Signature `v`, aka `recid`
-    var recoveryID: Int32 { Int32(bytes[64]) }
+    var recoveryID: Int { Int(bytes[64]) }
 
     
     typealias Scheme = ECDSA

@@ -207,7 +207,7 @@ extension Bridge {
                 context,
                 &recoverableBridgedToC,
                 ecdsaSignature.rs,
-                ecdsaSignature.recoveryID
+                Int32(ecdsaSignature.recoveryID)
             )
         }
         
@@ -251,7 +251,7 @@ extension Bridge {
     ) throws -> [UInt8] {
         try _recoverPublicKey(
             rs: ecdsaSignature.rs,
-            recoveryID: ecdsaSignature.recoveryID,
+            recoveryID: Int32(ecdsaSignature.recoveryID),
             message: message
         )
     }
@@ -274,7 +274,6 @@ extension Bridge {
                 recoveryID
             )
         }
-        
         
         var publicKeyBridgedToC = secp256k1_pubkey()
         try Self.call(
@@ -326,8 +325,7 @@ public extension ECDSASignatureRecoverable {
     
     /// `recoverID` is optional since `self` can contain the recoveryID already.
     func recoverPublicKey<D: DataProtocol>(
-        messageThatWasSigned: D,
-        validateAgainstMessageAndThisSignature: Bool = true
+        messageThatWasSigned: D
     ) throws -> K1.PublicKey {
         let uncompressedPublicKeyBytes = try Bridge.recoverPublicKey(
             ecdsaSignature: self,
@@ -337,10 +335,30 @@ public extension ECDSASignatureRecoverable {
             wrapped: .init(uncompressedRaw: uncompressedPublicKeyBytes)
         )
         
-//        guard validateAgainstMessageAndThisSignature else {
-//            return publicKey
-//        }
-//        
+        guard try publicKey.isValid(signature: self.nonRecoverable(), hashed: messageThatWasSigned) else {
+            throw K1.Error.expectedPublicKeyToBeValidForSignatureAndMessage
+        }
+        
+        return publicKey
+    }
+}
+
+public extension ECDSASignatureNonRecoverable {
+    
+    /// `recoverID` is optional since `self` can contain the recoveryID already.
+    func recoverPublicKey<D: DataProtocol>(
+        recoveryID: Int,
+        messageThatWasSigned: D
+    ) throws -> K1.PublicKey {
+        let uncompressedPublicKeyBytes = try Bridge.recoverPublicKey(
+            ecdsaSignature: self,
+            recoveryID: Int32(recoveryID),
+            message: [UInt8](messageThatWasSigned)
+        )
+        let publicKey = try K1.PublicKey(
+            wrapped: .init(uncompressedRaw: uncompressedPublicKeyBytes)
+        )
+        
 //        guard try publicKey.isValid(signature: self, hashed: messageThatWasSigned) else {
 //            throw K1.Error.expectedPublicKeyToBeValidForSignatureAndMessage
 //        }

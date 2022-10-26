@@ -138,7 +138,7 @@ internal extension K1.PublicKey {
 public extension K1.PublicKey {
     
     func isValidECDSASignature<D: Digest>(
-        _ signature: ECDSASignature,
+        _ signature: ECDSASignatureNonRecoverable,
         digest: D,
         mode: SignatureValidationMode = .default
     ) throws -> Bool {
@@ -148,8 +148,10 @@ public extension K1.PublicKey {
     func isValid<D: Digest>(signature: ECSignatureBase, for digest: D) throws -> Bool {
         if let schnorrSignature = signature as? SchnorrSignature {
             return try isValidSchnorrSignature(schnorrSignature, digest: digest)
-        } else if let ecdsaSignature = signature as? ECDSASignature {
-            return try isValidECDSASignature(ecdsaSignature, digest: digest)
+        } else if let ecdsaSignatureRecoverable = signature as? ECDSASignatureRecoverable {
+            return try isValidECDSASignature(ecdsaSignatureRecoverable.nonRecoverable(), digest: digest)
+        } else if let ecdsaSignatureNonRecoverable = signature as? ECDSASignatureNonRecoverable {
+            return try isValidECDSASignature(ecdsaSignatureNonRecoverable, digest: digest)
         } else {
             throw K1.Error.failedToRecognizeSignatureType(onlySupportedSchemesAre: SigningScheme.allCases)
         }
@@ -158,8 +160,10 @@ public extension K1.PublicKey {
     func isValid<D: DataProtocol>(signature: ECSignatureBase, hashed: D) throws -> Bool {
         if let schnorrSignature = signature as? SchnorrSignature {
             return try isValidSchnorrSignature(schnorrSignature, hashed: hashed)
-        } else if let ecdsaSignature = signature as? ECDSASignature {
-            return try isValidECDSASignature(ecdsaSignature, hashed: hashed)
+        } else if let ecdsaSignatureRecoverable = signature as? ECDSASignatureRecoverable {
+            return try isValidECDSASignature(ecdsaSignatureRecoverable.nonRecoverable(), hashed: hashed)
+        } else if let ecdsaSignatureNonRecoverable = signature as? ECDSASignatureNonRecoverable {
+            return try isValidECDSASignature(ecdsaSignatureNonRecoverable, hashed: hashed)
         } else {
             throw K1.Error.failedToRecognizeSignatureType(onlySupportedSchemesAre: SigningScheme.allCases)
         }
@@ -170,11 +174,19 @@ public extension K1.PublicKey {
     }
     
     func isValidECDSASignature<M: DataProtocol>(
-        _ signature: ECDSASignature,
+        _ signature: ECDSASignatureNonRecoverable,
         unhashed: M,
         mode: SignatureValidationMode = .default
     ) throws -> Bool {
         try isValidECDSASignature(signature, digest: SHA256.hash(data: unhashed), mode: mode)
+    }
+    
+    func isValidECDSASignature<M: DataProtocol>(
+        _ signature: ECDSASignatureRecoverable,
+        unhashed: M,
+        mode: SignatureValidationMode = .default
+    ) throws -> Bool {
+        try isValidECDSASignature(signature.nonRecoverable(), unhashed: unhashed, mode: mode)
     }
 }
 

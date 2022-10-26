@@ -21,7 +21,8 @@ final class ECDSASignatureTrezorsTests: XCTestCase {
                             group: group
                         )
                     }
-                })
+                }
+			)
         }
         print("☑️ Test result: \(String(describing: result))")
     }
