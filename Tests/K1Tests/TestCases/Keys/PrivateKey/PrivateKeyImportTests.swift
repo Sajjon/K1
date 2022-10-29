@@ -39,7 +39,7 @@ final class PrivateKeyImportTests: XCTestCase {
         let raw = try Data(hex: "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141")
         assert(
             try PrivateKey.import(rawRepresentation: raw),
-            throws: K1.Error.invalidPrivateKeyMustBeSmallerThanCurveOrder
+            throws: K1.Error.invalidPrivateKeyMustBeSmallerThanOrder
         )
     }
     
@@ -47,7 +47,7 @@ final class PrivateKeyImportTests: XCTestCase {
         let raw = Data(repeating: 0xff, count: 32)
         assert(
             try PrivateKey.import(rawRepresentation: raw),
-            throws: K1.Error.invalidPrivateKeyMustBeSmallerThanCurveOrder
+            throws: K1.Error.invalidPrivateKeyMustBeSmallerThanOrder
         )
     }
     

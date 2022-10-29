@@ -8,7 +8,7 @@
 
 // Bridge to C
 import secp256k1
-import Crypto
+import CryptoKit
 import Foundation
 
 // MARK: - Validate (Verify)

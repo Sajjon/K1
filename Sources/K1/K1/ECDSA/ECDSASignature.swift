@@ -5,7 +5,8 @@
 //  Created by Alexander Cyon on 2022-01-27.
 //
 
-
+import Foundation
+import CryptoKit
 
 public struct ECDSASignatureRecoverable: ContiguousBytes, Sendable, Hashable, ECSignature {
     

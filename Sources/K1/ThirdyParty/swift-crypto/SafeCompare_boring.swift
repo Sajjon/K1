@@ -1,6 +1,8 @@
 // from: https://github.com/apple/swift-crypto/blob/eefb07cc5924023468861187234f6e3ea717e9d2/Sources/Crypto/Util/BoringSSL/SafeCompare_boring.swift
 // commit: eefb07cc5924023468861187234f6e3ea717e9d2
 
+import Foundation
+
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the SwiftCrypto open source project

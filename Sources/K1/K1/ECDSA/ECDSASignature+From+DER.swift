@@ -8,6 +8,7 @@
 
 // Bridge to C
 import secp256k1
+import Foundation
 
 extension Bridge {
     /// Initializes ECDSASignature from the DER representation.

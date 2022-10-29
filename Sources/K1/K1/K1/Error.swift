@@ -5,6 +5,7 @@
 //  Created by Alexander Cyon on 2022-01-27.
 //
 
+import Foundation
 
 public extension K1 {
     
@@ -13,8 +14,8 @@ public extension K1 {
         /// The private key scalar was either 0 or larger then the order of the
         /// curve.
         case invalidPrivateKeyMustNotBeZero
-        case invalidPrivateKeyMustBeSmallerThan(order: Data)
-
+        case invalidPrivateKeyMustBeSmallerThanOrder
+        
         case incorrectByteCountOfPrivateKey(got: Int, expected: Int)
         
         case incorrectByteCountOfRawSignature
@@ -60,9 +61,7 @@ extension K1.Error {
     static func invalidSizeOfPrivateKey(providedByteCount: Int) -> Self {
         .incorrectByteCountOfPrivateKey(got: providedByteCount, expected: K1.Curve.Field.byteCount)
     }
-    static let invalidPrivateKeyMustBeSmallerThanCurveOrder: Self =
-        .invalidPrivateKeyMustBeSmallerThan(order: K1.Curve.order.serialize())
-    
+  
     static func incorrectByteCountOfPublicKey(providedByteCount: Int) -> Self {
         .incorrectByteCountOfPublicKey(got: providedByteCount, acceptableLengths: K1.Format.allCases.map(\.length))
     }

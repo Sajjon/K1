@@ -5,6 +5,7 @@
 //  Created by Alexander Cyon on 2022-01-27.
 //
 
+import Foundation
 
 internal extension K1.PublicKey {
     

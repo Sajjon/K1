@@ -5,6 +5,8 @@
 //  Created by Alexander Cyon on 2022-01-28.
 //
 
+import Foundation
+
 // https://forums.swift.org/t/proposal-property-behaviors/594
 internal final class MemoizationBox<T> {
     private let lock = NSLock()

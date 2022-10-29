@@ -15,6 +15,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+import Foundation
+
 struct SecureBytes {
     @usableFromInline
     var backing: Backing

@@ -5,8 +5,8 @@
 //  Created by Alexander Cyon on 2022-01-27.
 //
 
-
 import secp256k1
+import Foundation
 
 extension Bridge {
     
