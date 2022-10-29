@@ -5,7 +5,8 @@
 //  Created by Alexander Cyon on 2022-01-27.
 //
 
-import Crypto // swift-crypto
+import CryptoKit
+import Foundation
 
 // MARK: - PrivateKey
 // MARK: -

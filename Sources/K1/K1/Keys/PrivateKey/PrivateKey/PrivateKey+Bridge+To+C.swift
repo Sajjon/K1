@@ -6,7 +6,8 @@
 //
 
 import secp256k1
-
+import CryptoKit
+import Foundation
 
 extension Bridge {
     

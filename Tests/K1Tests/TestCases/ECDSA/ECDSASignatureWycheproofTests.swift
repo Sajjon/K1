@@ -16,7 +16,7 @@
 //===----------------------------------------------------------------------===//
 import Foundation
 import XCTest
-import Crypto
+import CryptoKit
 @testable import K1
 
 final class ECDSASignatureWycheproofTests: XCTestCase {

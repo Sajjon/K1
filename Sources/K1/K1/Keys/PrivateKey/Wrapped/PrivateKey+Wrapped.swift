@@ -5,7 +5,8 @@
 //  Created by Alexander Cyon on 2022-01-27.
 //
 
-import BigInt
+import Foundation
+
 
 internal extension K1.PrivateKey {
     
@@ -22,14 +23,19 @@ internal extension K1.PrivateKey {
         private init(
             secureBytes: SecureBytes
         ) throws {
-            guard case 1..<K1.Curve.order = BigUInt(Data(secureBytes)) else {
-                if secureBytes.backing.bytes[0] == 0x00 {
+            do {
+                let _ = try K1.PublicKey.Wrapped.derive(privateKeyBytes: secureBytes.bytes)
+                self.secureBytes = secureBytes
+                
+            } catch {
+                if secureBytes.first == 0x00 {
                     throw K1.Error.invalidPrivateKeyMustNotBeZero
                 } else {
-                    throw K1.Error.invalidPrivateKeyMustBeSmallerThanCurveOrder
+                    throw K1.Error.invalidPrivateKeyMustBeSmallerThanOrder
                 }
             }
-            self.secureBytes = secureBytes
+            
+            
         }
     }
     

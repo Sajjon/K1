@@ -16,6 +16,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+import Foundation
+
 enum ByteHexEncodingErrors: Error {
     case incorrectHexValue
     case incorrectString

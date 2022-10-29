@@ -1,4 +1,5 @@
 import XCTest
+import CryptoKit
 @testable import K1
 
 /// Test vectors from [trezor][trezor], signature data from [oleganza][oleganza]

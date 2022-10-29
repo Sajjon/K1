@@ -16,7 +16,9 @@
 //
 //===----------------------------------------------------------------------===//
 
+import Foundation
 
 internal func safeCompare<LHS: ContiguousBytes, RHS: ContiguousBytes>(_ lhs: LHS, _ rhs: RHS) -> Bool {
     return openSSLSafeCompare(lhs, rhs)
 }
+

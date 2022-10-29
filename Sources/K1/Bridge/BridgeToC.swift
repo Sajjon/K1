@@ -6,7 +6,7 @@
 //
 
 
-import Crypto // swift-crypto
+import CryptoKit
 import secp256k1
 
 internal final class Bridge {

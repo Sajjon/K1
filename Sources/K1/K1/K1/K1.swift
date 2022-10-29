@@ -1,4 +1,4 @@
-import BigInt
+import Foundation
 
 // MARK: - `K1` (secp256k1)
 // MARK: -
@@ -12,13 +12,6 @@ internal extension K1 {
     
     /// Details about the elliptic curve `secp256k1`.
     enum Curve {}
-}
-
-internal extension K1.Curve {
-    
-    /// The order of the secp256k1 curve, i.e. how many elements that exist in
-    /// this group.
-    static let order = BigUInt("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", radix: 16)!
 }
 
 // MARK: - FiniteField
