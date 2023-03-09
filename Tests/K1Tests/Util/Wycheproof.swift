@@ -71,8 +71,10 @@ extension XCTestCase {
     
     func doTestGroup<HF: HashFunction, TV: WycheproofTestVector>(
         group: ECDSAWycheTestGroup<TV>,
+        signatureValidationMode: SignatureValidationMode,
         hashFunction: HF.Type,
-        skipIfContainsFlags: [String],
+        skipIfContainsFlags: [String] = [],
+        skipIfContainsComment: [String] = [],
         file: StaticString = #file,
         line: UInt = #line
     ) throws -> ResultOfTestGroup {
@@ -84,40 +86,49 @@ extension XCTestCase {
         let key = try PublicKey(x963Representation: keyBytes)
         var numberOfTestsRun = 0
         var idsOfOmittedTests = Array<Int>()
-        for testVector in group.tests {
-            let testVectorFlags = Set(testVector.flags)
-            if testVector.msg == "" || !testVectorFlags.isDisjoint(with: Set(skipIfContainsFlags)) {
+    outerloop: for testVector in group.tests {
+        let testVectorFlags = Set(testVector.flags)
+        if testVector.msg == "" || !testVectorFlags.isDisjoint(with: Set(skipIfContainsFlags)) {
+            idsOfOmittedTests.append(testVector.tcId)
+            continue
+        }
+        
+        for comment in skipIfContainsComment {
+            if testVector.comment.contains(comment) {
                 idsOfOmittedTests.append(testVector.tcId)
-                continue
-            }
-            numberOfTestsRun += 1
-            var isValid = false
-            do {
-                let signature = try testVector.expectedSignature()
-                let messageDigest = try testVector.messageDigest()
-                isValid = try key.isValidECDSASignature(
-                    signature,
-                    digest: messageDigest,
-                    mode: .acceptSignatureMalleability
-                )
-            } catch {
-                let expectedFailure = testVector.result == "invalid" || testVector.result == "acceptable"
-                let errorMessage = String(describing: error)
-                XCTAssert(expectedFailure, "Test ID: \(testVector.tcId) is valid, but failed \(errorMessage).", file: file, line: line)
-                continue
-            }
-
-            switch testVector.result {
-            case "valid":
-                XCTAssert(isValid, "Test vector is valid, but is rejected \(testVector.tcId)", file: file, line: line)
-            case "acceptable":
-                XCTAssert(isValid, file: file, line: line)
-            case "invalid":
-                XCTAssert(!isValid, "Test ID: \(testVector.tcId) is valid, but failed.", file: file, line: line)
-            default:
-                XCTFail("Unhandled test vector", file: file, line: line)
+                continue outerloop
             }
         }
+        
+        numberOfTestsRun += 1
+        var isValid = false
+        do {
+            let signature = try testVector.expectedSignature()
+            let messageDigest = try testVector.messageDigest()
+            
+            isValid = try key.isValidECDSASignature(
+                signature,
+                digest: messageDigest,
+                mode: signatureValidationMode
+            )
+        } catch {
+            let expectedFailure = testVector.result == "invalid" || testVector.result == "acceptable"
+            let errorMessage = String(describing: error)
+            XCTAssert(expectedFailure, "Test ID: \(testVector.tcId) is valid, but failed \(errorMessage).", file: file, line: line)
+            continue
+        }
+        
+        switch testVector.result {
+        case "valid":
+            XCTAssert(isValid, "Test vector is valid, but is rejected \(testVector.tcId)", file: file, line: line)
+        case "acceptable":
+            XCTAssert(isValid, file: file, line: line)
+        case "invalid":
+            XCTAssert(!isValid, "Test ID: \(testVector.tcId) is valid (we expected 'invalid'), but failed.", file: file, line: line)
+        default:
+            XCTFail("Unhandled test vector", file: file, line: line)
+        }
+    }
         return .init(numberOfTestsRun: numberOfTestsRun, idsOmittedTests: idsOfOmittedTests)
     }
 }
@@ -151,6 +162,7 @@ protocol WycheproofTestVector: SignatureTestVector where Signature == ECDSASigna
     var tcId: Int { get }
     var result: String { get }
     var msg: String { get }
+    var comment: String { get }
 }
 
 

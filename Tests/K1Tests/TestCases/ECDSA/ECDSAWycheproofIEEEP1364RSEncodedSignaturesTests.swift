@@ -5,7 +5,7 @@ import CryptoKit
 
 final class ECDSA_Wycheproof_IEEE_P1364_RS_EncodedSignaturesTests: XCTestCase {
     
-    func omit_testWycheProofSecp256k1_P1364_RS() throws {
+    func testWycheProofSecp256k1_P1364_RS() throws {
         let result: TestResult =
         try testSuite(
             /* https://github.com/google/wycheproof/blob/master/testvectors/ecdsa_secp256k1_sha256_test.json */
@@ -13,8 +13,10 @@ final class ECDSA_Wycheproof_IEEE_P1364_RS_EncodedSignaturesTests: XCTestCase {
             testFunction: { (group: ECDSAWycheTestGroup<SignatureWycheproofP1364TestVector>) in
                 try doTestGroup(
                     group: group,
+                    signatureValidationMode: .acceptSignatureMalleability,
                     hashFunction: SHA256.self,
                     skipIfContainsFlags: .init(["MissingZero", "BER"])
+                    , skipIfContainsComment: ["r too large"]
                 )
             })
         
