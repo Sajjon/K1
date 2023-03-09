@@ -9,8 +9,11 @@ import secp256k1
 import CryptoKit
 import Foundation
 
-internal func swapSignatureByteOrder<D>(_ data: D) -> Data where D: DataProtocol {
-    precondition(data.count >= 64, "Expected 64 bytes, but only got: \(data.count)")
+struct IncorrectByteCount: Swift.Error {}
+public func swapSignatureByteOrder<D>(_ data: D) throws -> Data where D: DataProtocol {
+    guard data.count == 64 || data.count == 65 else {
+        throw IncorrectByteCount()
+    }
     let invalidByteOrder = Data(data)
     let r = Data(invalidByteOrder[0 ..< 32].reversed())
     let s = Data(invalidByteOrder[32 ..< 64].reversed())

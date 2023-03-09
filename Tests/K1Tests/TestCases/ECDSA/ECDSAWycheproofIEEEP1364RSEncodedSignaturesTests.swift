@@ -23,7 +23,7 @@ final class ECDSA_Wycheproof_IEEE_P1364_RS_EncodedSignaturesTests: XCTestCase {
         print("☑️ Test result: \(String(describing: result))")
     }
 }
-
+ 
 
 
 private struct SignatureWycheproofP1364TestVector: WycheproofTestVector {
@@ -48,7 +48,8 @@ private struct SignatureWycheproofP1364TestVector: WycheproofTestVector {
             struct TooFewBytes: Swift.Error {}
             throw TooFewBytes()
         }
-        return try .init(rawRepresentation: swapSignatureByteOrder(raw))
+        let signature = try Signature(rawRepresentation: swapSignatureByteOrder(raw))
+        return signature
     }
     
 }
