@@ -9,6 +9,20 @@ import secp256k1
 import CryptoKit
 import Foundation
 
+internal func swapSignatureByteOrder<D>(_ data: D) -> Data where D: DataProtocol {
+    precondition(data.count >= 64, "Expected 64 bytes, but only got: \(data.count)")
+    let invalidByteOrder = Data(data)
+    let r = Data(invalidByteOrder[0 ..< 32].reversed())
+    let s = Data(invalidByteOrder[32 ..< 64].reversed())
+    
+    var vDataOrEmpty = Data()
+    if data.count > 64 {
+        vDataOrEmpty = Data([invalidByteOrder[64]])
+    }
+
+    return vDataOrEmpty + r + s
+}
+
 extension Bridge {
     
     /// Produces a **recoverable** ECDSA signature.

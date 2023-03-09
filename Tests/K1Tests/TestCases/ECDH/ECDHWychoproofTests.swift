@@ -19,15 +19,14 @@ import XCTest
 @testable import K1
 
 final class ECDHWychoproofTests: XCTestCase {
-
+    
     func testWycheproof() throws {
-        let result = try orFail {
-            try testSuite(
-                jsonName: "ecdh_secp256k1_test",
-                testFunction: { (group: ECDHTestGroup) in
-                    testGroup(group: group)
-                })
-        }
+        let result =  try testSuite(
+            jsonName: "ecdh_secp256k1_test",
+            testFunction: { (group: ECDHTestGroup) in
+                testGroup(group: group)
+            })
+        
         print("☑️ \(String(describing: result))")
     }
 }

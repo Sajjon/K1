@@ -17,20 +17,17 @@ final class ECDASignaturePublicKeyRecoveryTests: XCTestCase {
         super.setUp()
         continueAfterFailure = false
     }
-	
-	func test_recovery_test_vectors() throws {
-		let result: TestResult = try orFail {
-			try testSuite(
-				jsonName: "publickey_recovery",
-				testFunction: { (group: RecoveryTestGroup) in
-					try orFail {
-						try doTestGroup(group: group)
-					}
-				}
-			)
-		}
-		print("☑️ Test result: \(String(describing: result))")
-	}
+    
+    func test_recovery_test_vectors() throws {
+        let result: TestResult = try testSuite(
+            jsonName: "publickey_recovery",
+            testFunction: { (group: RecoveryTestGroup) in
+                try doTestGroup(group: group)
+            }
+        )
+        
+        print("☑️ Test result: \(String(describing: result))")
+    }
 }
 
 private extension ECDASignaturePublicKeyRecoveryTests {

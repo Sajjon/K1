@@ -19,31 +19,29 @@ import XCTest
 import CryptoKit
 @testable import K1
 
-final class ECDSASignatureWycheproofTests: XCTestCase {
+final class ECDSA_Wycheproof_ASN_DER_EncodedSignaturesTests: XCTestCase {
     
-    func testWycheProofSecp256k1() throws {
-        let result: TestResult = try orFail {
-            try testSuite(
-                /* https://github.com/google/wycheproof/blob/master/testvectors/ecdsa_secp256k1_sha256_test.json */
-                jsonName: "ecdsa_secp256k1_sha256_test",
-                testFunction: { (group: ECDSATestGroup) in
-                    try orFail {
-                        try doTestGroup(
-                            group: group,
-                            hashFunction: SHA256.self,
-                            skipIfContainsFlags: .init(["MissingZero", "BER"])
-                        )
-                    }
-                })
-        }
+    func testWycheProofSecp256k1_DER() throws {
+        let result: TestResult = try testSuite(
+            /* https://github.com/google/wycheproof/blob/master/testvectors/ecdsa_secp256k1_sha256_test.json */
+            jsonName: "ecdsa_secp256k1_sha256_der_test",
+            testFunction: { (group: ECDSAWycheTestGroup<SignatureWycheproofDERTestVector>) in
+                
+                try doTestGroup(
+                    group: group,
+                    hashFunction: SHA256.self,
+                    skipIfContainsFlags: .init(["MissingZero", "BER"])
+                )
+                
+            })
         print("☑️ Test result: \(String(describing: result))")
     }
 }
 
-private extension ECDSASignatureWycheproofTests {
+extension XCTestCase {
     
-    func doTestGroup<HF: HashFunction>(
-        group: ECDSATestGroup,
+    func doTestGroup<HF: HashFunction, TV: WycheproofTestVector>(
+        group: ECDSAWycheTestGroup<TV>,
         hashFunction: HF.Type,
         skipIfContainsFlags: [String],
         file: StaticString = #file,
@@ -53,8 +51,8 @@ private extension ECDSASignatureWycheproofTests {
             let errorMessage = "Key in test group is on wrong EC curve: \(group.key.curve), expected 'secp256k1'"
             throw ECDSASignatureTestError(description: errorMessage)
         }
-        let keyBytes = try orFail(file: file, line: line) { try Array(hex: group.key.uncompressed) }
-        let key = try orFail(file: file, line: line) { try PublicKey(x963Representation: keyBytes) }
+        let keyBytes = try Array(hex: group.key.uncompressed)
+        let key = try PublicKey(x963Representation: keyBytes)
         var numberOfTestsRun = 0
         var idsOfOmittedTests = Array<Int>()
         for testVector in group.tests {
@@ -95,12 +93,18 @@ private extension ECDSASignatureWycheproofTests {
     }
 }
 
-private struct ECDSATestGroup: Codable {
-    let tests: [SignatureWycheproofTestVector]
+struct ECDSATestGroup<TV: SignatureTestVector>: Codable {
+    let tests: [TV]
+}
+
+
+struct ECDSAWycheTestGroup<TV: WycheproofTestVector>: Codable {
+    let tests: [TV]
     let key: ECDSAKey
 }
 
-private struct ECDSAKey: Codable {
+
+struct ECDSAKey: Codable {
     let uncompressed: String
     let curve: String
 }
@@ -111,8 +115,14 @@ protocol SignatureTestVector: Codable {
     func messageDigest() throws -> MessageDigest
     func expectedSignature() throws -> Signature
 }
+protocol WycheproofTestVector: SignatureTestVector where Signature == ECDSASignature {
+    var flags: [String] { get }
+    var tcId: Int { get }
+    var result: String { get }
+    var msg: String { get }
+}
 
-private struct SignatureWycheproofTestVector: SignatureTestVector {
+private struct SignatureWycheproofDERTestVector: WycheproofTestVector {
     
     typealias MessageDigest = SHA256.Digest
     typealias Signature = ECDSASignature
@@ -143,10 +153,6 @@ extension PublicKey {
 }
 typealias PrivateKey = K1.PrivateKey
 
-struct ResultOfTestGroup {
-    let numberOfTestsRun: Int
-    let idsOmittedTests: [Int]
-}
 
 struct ECDSASignatureTestError: Swift.Error, CustomStringConvertible {
     let description: String

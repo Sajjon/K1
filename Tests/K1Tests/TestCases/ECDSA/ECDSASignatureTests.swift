@@ -17,4 +17,5 @@ final class ECDSASignatureTests: XCTestCase {
         let isSignatureValid = try alice.publicKey.isValidECDSASignature(signature, unhashed: message)
         XCTAssertTrue(isSignatureValid, "Signature should be valid.")
     }
+
 }

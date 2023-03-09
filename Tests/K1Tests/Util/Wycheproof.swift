@@ -58,3 +58,7 @@ extension XCTestCase {
     }
     
 }
+struct ResultOfTestGroup {
+    let numberOfTestsRun: Int
+    let idsOmittedTests: [Int]
+}
