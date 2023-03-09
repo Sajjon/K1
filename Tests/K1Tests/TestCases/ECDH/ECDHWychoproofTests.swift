@@ -20,7 +20,7 @@ import XCTest
 
 final class ECDHWychoproofTests: XCTestCase {
     
-    func testWycheproof() throws {
+    func testECDHWycheproof() throws {
         let result =  try testSuite(
             jsonName: "ecdh_secp256k1_test",
             testFunction: { (group: ECDHTestGroup) in
