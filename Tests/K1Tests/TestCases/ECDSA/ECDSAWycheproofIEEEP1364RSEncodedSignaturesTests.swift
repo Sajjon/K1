@@ -15,8 +15,8 @@ final class ECDSA_Wycheproof_IEEE_P1364_RS_EncodedSignaturesTests: XCTestCase {
                     group: group,
                     signatureValidationMode: .acceptSignatureMalleability,
                     hashFunction: SHA256.self,
-                    skipIfContainsFlags: .init(["MissingZero", "BER"])
-                    , skipIfContainsComment: ["r too large"]
+                    skipIfContainsFlags: .init(["MissingZero", "BER"]),
+                    skipIfContainsComment: ["r too large"]
                 )
             })
         
