@@ -58,36 +58,31 @@ final class SchnorrSignatureBitcoinCoreTests: XCTestCase {
     }
     
     func testSchnorrSignBitcoinVectors() throws {
-        let result: TestResult = try orFail {
-            try testSuite(
-                /* https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv */
-                jsonName: "schnorr_secp256k1_sign_sha256_test",
-                testFunction: { (group: SchnorrTestGroup<SchnorrTestSignVector>) in
-                    var numberOfTestsRun = 0
-                    try orFail {
-                        try group.tests.forEach(doTestSchnorrSign)
-                        numberOfTestsRun += 1
-                    }
-                    return .init(numberOfTestsRun: numberOfTestsRun, idsOmittedTests: [])
-                })
-        }
+        let result: TestResult = try testSuite(
+            /* https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv */
+            jsonName: "schnorr_secp256k1_sign_sha256_test",
+            testFunction: { (group: SchnorrTestGroup<SchnorrTestSignVector>) in
+                var numberOfTestsRun = 0
+                try group.tests.forEach(doTestSchnorrSign)
+                numberOfTestsRun += 1
+                return .init(numberOfTestsRun: numberOfTestsRun, idsOmittedTests: [])
+            })
+        
         print("☑️ Test result: \(String(describing: result))")
     }
     
     func testSchnorrVerifyBitcoinVectors() throws {
-        let result: TestResult = try orFail {
-            try testSuite(
-                /* https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv */
-                jsonName: "schnorr_secp256k1_verify_sha256_test",
-                testFunction: { (group: SchnorrTestGroup<SchnorrTestVerifyVector>) in
-                    var numberOfTestsRun = 0
-                    try orFail {
-                        try group.tests.forEach(doTestSchnorrVerify)
-                        numberOfTestsRun += 1
-                    }
-                    return .init(numberOfTestsRun: numberOfTestsRun, idsOmittedTests: [])
-                })
-        }
+        let result: TestResult =
+        try testSuite(
+            /* https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv */
+            jsonName: "schnorr_secp256k1_verify_sha256_test",
+            testFunction: { (group: SchnorrTestGroup<SchnorrTestVerifyVector>) in
+                var numberOfTestsRun = 0
+                try group.tests.forEach(doTestSchnorrVerify)
+                numberOfTestsRun += 1
+                return .init(numberOfTestsRun: numberOfTestsRun, idsOmittedTests: [])
+            })
+        
         print("☑️ Test result: \(String(describing: result))")
     }
 }

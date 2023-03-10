@@ -10,7 +10,7 @@ import Foundation
 
 import ASN1Decoder
 
-extension PublicKey {
+extension K1.PublicKey {
     enum WycheproofDERDecodeError: Swift.Error {
         case expectedFirstElementToBeSequence
         case expectedTopLevelObjectToHaveSeqeuenceTag

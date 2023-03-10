@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Alexander Cyon on 2022-01-27.
 //
@@ -8,10 +8,9 @@
 import Foundation
 import CryptoKit
 
-public struct ECDSASignatureRecoverable: ContiguousBytes, Sendable, Hashable, ECSignature {
+public struct ECDSASignatureRecoverable: Sendable, Hashable, ECSignature {
     
-    private let _rawRepresentation: [UInt8]
-
+    internal let _rawRepresentation: Data
     
     public init<D: DataProtocol>(rawRepresentation: D) throws {
        
@@ -21,7 +20,7 @@ public struct ECDSASignatureRecoverable: ContiguousBytes, Sendable, Hashable, EC
             throw K1.Error.incorrectByteCountOfRawSignature
         }
         
-        self._rawRepresentation = [UInt8](rawRepresentation)
+        self._rawRepresentation = Data(rawRepresentation)
     }
 }
 
@@ -32,65 +31,22 @@ private extension ECDSASignatureRecoverable {
 
 public extension ECDSASignatureRecoverable {
     
-    var rawRepresentation: Data {
-        Data(_rawRepresentation)
-    }
-    
-    var rs: [UInt8] {
-        [UInt8](bytes.prefix(64))
+    /// `R||S` without `V`
+    func rs() -> Data {
+        Data(_rawRepresentation.prefix(64))
     }
     
     /// aka Signature `v`, aka `recid`
-    var recoveryID: Int { Int(bytes[64]) }
-
+    var recoveryID: Int { Int(_rawRepresentation[64]) }
     
     typealias Scheme = ECDSA
     static let scheme: SigningScheme = .ecdsa
-    func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
-        try self.rawRepresentation.withUnsafeBytes(body)
-    }
     
     func nonRecoverable() throws -> ECDSASignatureNonRecoverable {
         try Bridge.convertToNonRecoverable(ecdsaSignature: self)
     }
     
 }
-
-public typealias ECDSASignature = ECDSASignatureNonRecoverable
-
-public struct ECDSASignatureNonRecoverable: ContiguousBytes, Sendable, Hashable, ECSignature {
-    
-    public typealias Scheme = ECDSA
-   
-    private let _rawRepresentation: [UInt8]
-    public var rawRepresentation: Data {
-        Data(_rawRepresentation)
-    }
-    
-    public init<D: DataProtocol>(rawRepresentation: D) throws {
-       
-        guard
-            rawRepresentation.count == Self.byteCount
-        else {
-            throw K1.Error.incorrectByteCountOfRawSignature
-        }
-        
-        self._rawRepresentation = [UInt8](rawRepresentation)
-    }
-}
-
-private extension ECDSASignatureNonRecoverable {
-    static let byteCount = 2 * K1.Curve.Field.byteCount
-}
-
-public extension ECDSASignatureNonRecoverable {
-    static let scheme: SigningScheme = .ecdsa
-    func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
-        try self.rawRepresentation.withUnsafeBytes(body)
-    }
-    
-}
-
 
 public extension ECDSASignatureRecoverable {
     typealias ValidationMode = ECDSASignatureNonRecoverable.ValidationMode

@@ -2,16 +2,15 @@
 //  File.swift
 //  
 //
-//  Created by Alexander Cyon on 2022-01-27.
+//  Created by Alexander Cyon on 2023-03-10.
 //
-
 
 // Bridge to C
 import secp256k1
 import Foundation
 
 extension Bridge {
-    /// Initializes ECDSASignature from the DER representation.
+    /// Initializes ECDSASignatureNonRecoverable from the DER representation.
     static func importECDSASignature<D: DataProtocol>(fromDER derRepresentation: D) throws -> Data {
         let derSignatureBytes = Array(derRepresentation)
         var signatureBridgedToC = secp256k1_ecdsa_signature()
@@ -73,23 +72,3 @@ extension Bridge {
         return Data(bytes: &derSignature, count: derMaxLength)
     }
 }
-
-public extension ECDSASignature {
-    /// Initializes ECDSASignature from the DER representation.
-    static func `import`<D: DataProtocol>(fromDER derRepresentation: D) throws -> Self {
-        let signatureData = try Bridge.importECDSASignature(fromDER: derRepresentation)
-        return try Self(rawRepresentation: signatureData)
-    }
-}
-
-public extension ECDSASignature {
-    
-    func compactRepresentation() throws -> Data {
-        try Bridge.compactRepresentationOfSignature(rawRepresentation: rawRepresentation)
-    }
-    
-    func derRepresentation() throws -> Data {
-        try Bridge.derRepresentationOfSignature(rawRepresentation: rawRepresentation)
-    }
-}
-

@@ -57,7 +57,7 @@ internal extension K1.PublicKey {
     }
     
     func isValidECDSASignature<D: DataProtocol>(
-        _ signature: ECDSASignature,
+        _ signature: ECDSASignatureNonRecoverable,
         hashed messageData: D,
         mode: SignatureValidationMode = .default
     ) throws -> Bool {
@@ -83,7 +83,7 @@ internal extension K1.PublicKey {
             var signatureBridgedToCPotentiallyMalleable = secp256k1_ecdsa_signature()
             withUnsafeMutableBytes(of: &signatureBridgedToCPotentiallyMalleable.data) { pointer in
                 pointer.copyBytes(
-                    from: signature.rawRepresentation.prefix(pointer.count)
+                    from: signature._rawRepresentation.prefix(pointer.count)
                 )
             }
             
@@ -284,7 +284,7 @@ public extension ECSignature {
     }
 }
 
-public extension ECDSASignature {
+public extension ECDSASignatureNonRecoverable {
     
     typealias ValidationMode = SignatureValidationMode
 
@@ -328,7 +328,7 @@ public extension ECDSASignature {
     }
 }
 
-public extension ECDSASignature.SigningMode {
+public extension ECDSASignatureNonRecoverable.SigningMode {
     static let `default`: Self = .init()
 }
 
@@ -351,7 +351,7 @@ public extension ECSignatureScheme {
 
 public enum ECDSA: ECSignatureScheme {
     public typealias Hasher = SHA256
-    public typealias Signature = ECDSASignature
+    public typealias Signature = ECDSASignatureNonRecoverable
 }
 
 public enum Schnorr: ECSignatureScheme {

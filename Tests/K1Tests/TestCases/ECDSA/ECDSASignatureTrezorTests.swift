@@ -11,29 +11,27 @@ import CryptoKit
 /// [bitcointalk1]: https://bitcointalk.org/index.php?topic=285142.msg3300992#msg3300992
 /// [bitcointalk2]: https://bitcointalk.org/index.php?topic=285142.msg3299061#msg3299061
 final class ECDSASignatureTrezorsTests: XCTestCase {
-
+    
     func testTrezorSecp256k1() throws {
-        let result: TestResult = try orFail {
-            try testSuite(
-                jsonName: "ecdsa_secp256k1_sha256_rfc6979_trezor_test",
-                testFunction: { (group: ECDSATestGroup) in
-                    try orFail {
-                        try doTestGroup(
-                            group: group
-                        )
-                    }
-                }
-			)
-        }
+        let result: TestResult = try testSuite(
+            jsonName: "ecdsa_secp256k1_sha256_rfc6979_trezor_test",
+            testFunction: { group in
+                try doTestGroup(
+                    group: group
+                )
+                
+            }
+        )
+        
         print("☑️ Test result: \(String(describing: result))")
     }
-
+    
 }
  
 private extension XCTestCase {
     
     func doTestGroup(
-        group: ECDSATestGroup,
+        group: ECDSATestGroup<SignatureTrezorTestVector>,
         file: StaticString = #file,
         line: UInt = #line
     ) throws -> ResultOfTestGroup {
@@ -54,14 +52,11 @@ private extension XCTestCase {
     }
 }
 
-private struct ECDSATestGroup: Codable {
-    let tests: [SignatureTrezorTestVector]
-}
 
 private struct SignatureTrezorTestVector: SignatureTestVector {
     
     typealias MessageDigest = SHA256.Digest
-    typealias Signature = ECDSASignature
+    typealias Signature = ECDSASignatureNonRecoverable
     
     let msg: String
     let privateKey: String
@@ -80,7 +75,7 @@ private struct SignatureTrezorTestVector: SignatureTestVector {
     }
     func expectedSignature() throws -> Signature {
         let derData = try Data(hex: expected.der)
-        return try ECDSASignature.import(fromDER: derData)
+        return try ECDSASignatureNonRecoverable.import(fromDER: derData)
     }
     
 }
