@@ -12,6 +12,11 @@ public struct ECDSASignatureNonRecoverable: Sendable, Hashable, ECSignature {
    
     internal let _rawRepresentation: Data
     
+    /// Accepts `R||S` format
+    public init(p1364: Data) throws {
+        try self.init(rawRepresentation: swapSignatureByteOrder(p1364))
+    }
+    
     public init<D: DataProtocol>(rawRepresentation: D) throws {
         guard
             rawRepresentation.count == Self.byteCount

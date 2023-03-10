@@ -48,7 +48,10 @@ private struct SignatureWycheproofP1364TestVector: WycheproofTestVector {
             struct TooFewBytes: Swift.Error {}
             throw TooFewBytes()
         }
-        let signature = try Signature(rawRepresentation: swapSignatureByteOrder(raw))
+        let signature = try Signature(p1364: raw)
+        if self.result == "valid" {
+            try XCTAssertEqual(sig, signature.compactRepresentation().hex)
+        }
         return signature
     }
     
