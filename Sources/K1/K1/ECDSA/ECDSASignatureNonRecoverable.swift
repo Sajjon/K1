@@ -8,17 +8,11 @@
 import Foundation
 import CryptoKit
 
-@available(*, deprecated, message: "'ECDSASignature' is a deprecated typealias for 'ECDSASignatureNonRecoverable', use 'ECDSASignatureNonRecoverable' or ECDSASignatureRecovarable' instead.")
-public typealias ECDSASignature = ECDSASignatureNonRecoverable
-
 public struct ECDSASignatureNonRecoverable: Sendable, Hashable, ECSignature {
-    
-    public typealias Scheme = ECDSA
    
     internal let _rawRepresentation: Data
     
     public init<D: DataProtocol>(rawRepresentation: D) throws {
-       
         guard
             rawRepresentation.count == Self.byteCount
         else {
@@ -29,15 +23,9 @@ public struct ECDSASignatureNonRecoverable: Sendable, Hashable, ECSignature {
     }
 }
 
-internal extension ECDSASignatureNonRecoverable {
-    static let byteCount = 2 * K1.Curve.Field.byteCount
-}
-
-public extension ECDSASignatureNonRecoverable {
-    static let scheme: SigningScheme = .ecdsa
-//    func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
-//        try self.rawRepresentation.withUnsafeBytes(body)
-//    }
-    
+extension ECDSASignatureNonRecoverable {
+    internal static let byteCount = 2 * K1.Curve.Field.byteCount
+    public typealias Scheme = ECDSA
+    public static let scheme: SigningScheme = .ecdsa
 }
 
