@@ -56,7 +56,7 @@ private extension XCTestCase {
 private struct SignatureTrezorTestVector: SignatureTestVector {
     
     typealias MessageDigest = SHA256.Digest
-    typealias Signature = ECDSASignature
+    typealias Signature = ECDSASignatureNonRecoverable
     
     let msg: String
     let privateKey: String
@@ -75,7 +75,7 @@ private struct SignatureTrezorTestVector: SignatureTestVector {
     }
     func expectedSignature() throws -> Signature {
         let derData = try Data(hex: expected.der)
-        return try ECDSASignature.import(fromDER: derData)
+        return try ECDSASignatureNonRecoverable.import(fromDER: derData)
     }
     
 }

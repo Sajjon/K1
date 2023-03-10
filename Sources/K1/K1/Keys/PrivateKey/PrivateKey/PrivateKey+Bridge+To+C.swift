@@ -32,7 +32,7 @@ extension Bridge {
     static func ecdsaSignRecoverable(
         message: [UInt8],
         privateKey: SecureBytes,
-        mode: ECDSASignature.SigningMode
+        mode: ECDSASignatureNonRecoverable.SigningMode
     ) throws -> Data {
         
         guard message.count == K1.Curve.Field.byteCount else {
@@ -78,7 +78,7 @@ extension Bridge {
     static func ecdsaSignNonRecoverable(
         message: [UInt8],
         privateKey: SecureBytes,
-        mode: ECDSASignature.SigningMode
+        mode: ECDSASignatureNonRecoverable.SigningMode
     ) throws -> Data {
         
         guard message.count == K1.Curve.Field.byteCount else {
@@ -218,13 +218,14 @@ extension Bridge {
         ecdsaSignature: ECDSASignatureRecoverable
     ) throws -> ECDSASignatureNonRecoverable {
         var recoverableBridgedToC = secp256k1_ecdsa_recoverable_signature()
+        let rs = [UInt8](ecdsaSignature.rs())
         try Self.call(
             ifFailThrow: .failedToParseRecoverableSignatureFromECDSASignature
         ) { context in
             secp256k1_ecdsa_recoverable_signature_parse_compact(
                 context,
                 &recoverableBridgedToC,
-                ecdsaSignature.rs,
+                rs,
                 Int32(ecdsaSignature.recoveryID)
             )
         }
@@ -256,7 +257,7 @@ extension Bridge {
         message: [UInt8]
     ) throws -> [UInt8] {
         try _recoverPublicKey(
-            rs: ecdsaSignature.bytes,
+            rs: ecdsaSignature.compactRepresentation(),
             recoveryID: recoveryID,
             message: message
         )
@@ -268,7 +269,7 @@ extension Bridge {
         message: [UInt8]
     ) throws -> [UInt8] {
         try _recoverPublicKey(
-            rs: ecdsaSignature.rs,
+            rs: ecdsaSignature.rs(),
             recoveryID: Int32(ecdsaSignature.recoveryID),
             message: message
         )
@@ -276,12 +277,12 @@ extension Bridge {
 
     /// Recover an ECDSA public key from a signature.
     static func _recoverPublicKey(
-        rs: [UInt8],
+        rs rsData: Data,
         recoveryID: Int32,
         message: [UInt8]
     ) throws -> [UInt8] {
         var signatureBridgedToC = secp256k1_ecdsa_recoverable_signature()
-        
+        let rs = [UInt8](rsData)
         try Self.call(
             ifFailThrow: .failedToParseRecoverableSignatureFromECDSASignature
         ) { context in
@@ -390,7 +391,7 @@ public extension K1.PrivateKey {
     /// Produces a **recoverable** ECDSA signature.
     func ecdsaSignRecoverable<D: DataProtocol>(
         hashed message: D,
-        mode: ECDSASignature.SigningMode = .default
+        mode: ECDSASignatureNonRecoverable.SigningMode = .default
     ) throws -> ECDSASignatureRecoverable {
         let messageBytes = [UInt8](message)
         let signatureData = try withSecureBytes { (secureBytes: SecureBytes) -> Data in
@@ -405,7 +406,7 @@ public extension K1.PrivateKey {
     /// Produces a **non recoverable** ECDSA signature.
     func ecdsaSignNonRecoverable<D: DataProtocol>(
         hashed message: D,
-        mode: ECDSASignature.SigningMode = .default
+        mode: ECDSASignatureNonRecoverable.SigningMode = .default
     ) throws -> ECDSASignatureNonRecoverable {
         let messageBytes = [UInt8](message)
         let signatureData = try withSecureBytes { (secureBytes: SecureBytes) -> Data in
@@ -433,28 +434,28 @@ public extension K1.PrivateKey {
 
     func ecdsaSignNonRecoverable<D: Digest>(
         digest: D,
-        mode: ECDSASignature.SigningMode = .default
+        mode: ECDSASignatureNonRecoverable.SigningMode = .default
     ) throws -> ECDSASignatureNonRecoverable {
         try ecdsaSignNonRecoverable(hashed: Array(digest), mode: mode)
     }
     
     func ecdsaSignNonRecoverable<D: DataProtocol>(
         unhashed data: D,
-        mode: ECDSASignature.SigningMode = .default
+        mode: ECDSASignatureNonRecoverable.SigningMode = .default
     ) throws -> ECDSASignatureNonRecoverable {
         try ecdsaSignNonRecoverable(digest: SHA256.hash(data: data), mode: mode)
     }
     
     func ecdsaSignRecoverable<D: Digest>(
         digest: D,
-        mode: ECDSASignature.SigningMode = .default
+        mode: ECDSASignatureNonRecoverable.SigningMode = .default
     ) throws -> ECDSASignatureRecoverable {
         try ecdsaSignRecoverable(hashed: Array(digest), mode: mode)
     }
     
     func ecdsaSignRecoverable<D: DataProtocol>(
         unhashed data: D,
-        mode: ECDSASignature.SigningMode = .default
+        mode: ECDSASignatureNonRecoverable.SigningMode = .default
     ) throws -> ECDSASignatureRecoverable {
         try ecdsaSignRecoverable(digest: SHA256.hash(data: data), mode: mode)
     }

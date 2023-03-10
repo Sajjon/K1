@@ -42,7 +42,7 @@ final class ECDSA_Wycheproof_ASN_DER_EncodedSignaturesTests: XCTestCase {
 private struct SignatureWycheproofDERTestVector: WycheproofTestVector {
     
     typealias MessageDigest = SHA256.Digest
-    typealias Signature = ECDSASignature
+    typealias Signature = ECDSASignatureNonRecoverable
     
     let comment: String
     let msg: String
@@ -57,7 +57,7 @@ private struct SignatureWycheproofDERTestVector: WycheproofTestVector {
     }
     func expectedSignature() throws -> Signature {
         let derData = try Data(hex: sig)
-        return try ECDSASignature.import(fromDER: derData)
+        return try ECDSASignatureNonRecoverable.import(fromDER: derData)
     }
     
 }

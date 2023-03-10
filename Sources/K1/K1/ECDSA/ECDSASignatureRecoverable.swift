@@ -8,10 +8,9 @@
 import Foundation
 import CryptoKit
 
-public struct ECDSASignatureRecoverable: ContiguousBytes, Sendable, Hashable, ECSignature {
+public struct ECDSASignatureRecoverable: Sendable, Hashable, ECSignature {
     
-    private let _rawRepresentation: [UInt8]
-
+    internal let _rawRepresentation: Data
     
     public init<D: DataProtocol>(rawRepresentation: D) throws {
        
@@ -21,7 +20,7 @@ public struct ECDSASignatureRecoverable: ContiguousBytes, Sendable, Hashable, EC
             throw K1.Error.incorrectByteCountOfRawSignature
         }
         
-        self._rawRepresentation = [UInt8](rawRepresentation)
+        self._rawRepresentation = Data(rawRepresentation)
     }
 }
 
@@ -32,23 +31,16 @@ private extension ECDSASignatureRecoverable {
 
 public extension ECDSASignatureRecoverable {
     
-    var rawRepresentation: Data {
-        Data(_rawRepresentation)
-    }
-    
-    var rs: [UInt8] {
-        [UInt8](bytes.prefix(64))
+    /// `R||S` without `V`
+    func rs() -> Data {
+        Data(_rawRepresentation.prefix(64))
     }
     
     /// aka Signature `v`, aka `recid`
-    var recoveryID: Int { Int(bytes[64]) }
-
+    var recoveryID: Int { Int(_rawRepresentation[64]) }
     
     typealias Scheme = ECDSA
     static let scheme: SigningScheme = .ecdsa
-    func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
-        try self.rawRepresentation.withUnsafeBytes(body)
-    }
     
     func nonRecoverable() throws -> ECDSASignatureNonRecoverable {
         try Bridge.convertToNonRecoverable(ecdsaSignature: self)
