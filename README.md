@@ -69,4 +69,4 @@ git submodule update
 To clone the dependency [libsecp256k1][lib]
 
 [BIP340]: https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
-[lib]
+[lib]: https://github.com/bitcoin-core/secp256k1
