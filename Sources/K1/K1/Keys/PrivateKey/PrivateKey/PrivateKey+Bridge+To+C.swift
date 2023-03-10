@@ -257,7 +257,7 @@ extension Bridge {
         message: [UInt8]
     ) throws -> [UInt8] {
         try _recoverPublicKey(
-            rs: ecdsaSignature.compactRepresentation(),
+            rs: ecdsaSignature.p1364(),
             recoveryID: recoveryID,
             message: message
         )

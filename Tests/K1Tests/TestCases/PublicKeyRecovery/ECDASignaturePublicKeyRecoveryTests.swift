@@ -68,23 +68,23 @@ private extension ECDASignaturePublicKeyRecoveryTests {
 			XCTAssertTrue(try recoveredPublicKey.isValid(signature: signature, hashed: hashedMessage))
 			XCTAssertTrue(try recoveredPublicKey.isValid(signature: signature.nonRecoverable(), hashed: hashedMessage))
 	
-			/*
-			 let nonRecoverable = try ECDSASignatureNonRecoverable(rawRepresentation: signatureData.dropLast(1))
-			 XCTAssertEqual(
+		
+			 let nonRecoverable = try ECDSASignatureNonRecoverable(p1364: signatureData.dropLast(1))
+			 try XCTAssertEqual(
 				 String(vector.signature.prefix(128)),
-				 nonRecoverable.bytes.hex
+				 nonRecoverable.p1364().hex
 			 )
 			 
-			 FIXME: investigate why the code below does not work
+			 //FIXME: investigate why the code below does not work
 			
 			XCTAssertTrue(try expectedPublicKey.isValid(signature: nonRecoverable, hashed: hashedMessage))
-			XCTAssertEqual(nonRecoverable.bytes.hex, try signature.nonRecoverable().bytes.hex)
+			try XCTAssertEqual(nonRecoverable.p1364().hex, try signature.nonRecoverable().p1364().hex)
 			let recoveredWithID = try nonRecoverable.recoverPublicKey(
 				recoveryID: vector.recoveryID,
 				messageThatWasSigned: hashedMessage
 			)
 			XCTAssertEqual(expectedPublicKey, recoveredWithID)
-			*/
+			
 	
 			numberOfTestsRun += 1
 		}

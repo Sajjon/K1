@@ -50,7 +50,7 @@ private struct SignatureWycheproofP1364TestVector: WycheproofTestVector {
         }
         let signature = try Signature(p1364: raw)
         if self.result == "valid" {
-            try XCTAssertEqual(sig, signature.compactRepresentation().hex)
+            try XCTAssertEqual(sig, signature.p1364().hex)
         }
         return signature
     }

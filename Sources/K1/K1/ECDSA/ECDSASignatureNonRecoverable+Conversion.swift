@@ -17,7 +17,7 @@ extension ECDSASignatureNonRecoverable {
     }
     
     /// `R||S` aka `X9.63` aka `IEEE P1363`
-    public func compactRepresentation() throws -> Data {
+    public func p1364() throws -> Data {
         try Bridge.compactRepresentationOfSignature(rawRepresentation: _rawRepresentation)
     }
     
