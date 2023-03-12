@@ -149,7 +149,7 @@ extension Bridge {
         try Self.call(
             ifFailThrow: .failedToSchnorrSignDigest
         ) { context in
-            secp256k1_schnorrsig_sign(
+            secp256k1_schnorrsig_sign32(
                 context,
                 &signatureOut,
                 message,
