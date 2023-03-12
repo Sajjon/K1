@@ -66,7 +66,7 @@ git submodule init
 git submodule update
 ```
 
-To clone the dependency [libsecp256k1][lib]
+To clone the dependency [libsecp256k1][lib], using commit [427bc3cdcfbc74778070494daab1ae5108c71368](https://github.com/bitcoin-core/secp256k1/commit/427bc3cdcfbc74778070494daab1ae5108c71368) (semver 0.3.0)
 
 [BIP340]: https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
 [lib]: https://github.com/bitcoin-core/secp256k1
