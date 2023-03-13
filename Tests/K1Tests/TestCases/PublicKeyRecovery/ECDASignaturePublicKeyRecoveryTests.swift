@@ -57,7 +57,7 @@ private extension ECDASignaturePublicKeyRecoveryTests {
             let hashedMessage = try Data(hex: vector.hashMessage)
             XCTAssertTrue(try expectedPublicKey.isValid(signature: signature, hashed: hashedMessage))
             XCTAssertTrue(try expectedPublicKey.isValid(signature: signature.nonRecoverable(), hashed: hashedMessage))
-            XCTAssertEqual(vector.recoveryID, signature.recoveryID)
+            try XCTAssertEqual(vector.recoveryID, signature.compact().recoveryID)
             
             let recoveredPublicKey = try signature.recoverPublicKey(
                 messageThatWasSigned: hashedMessage
@@ -95,7 +95,7 @@ private struct RecoveryTestGroup: Decodable {
 }
 
 struct RecoveryTestVector: Decodable, Equatable {
-    let recoveryID: Int32
+    let recoveryID: Int
     let message: String
     let hashMessage: String
     let signature: String

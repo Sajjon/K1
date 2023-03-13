@@ -36,6 +36,9 @@ public extension K1 {
         case failedToECDSASignDigest
         case recoverPublicKeyDiscrepancyReceivedSignatureContainingRecoveryIDButFunctionSpecifiesANonMatchingOne
         case failedToParseRecoverableSignatureFromECDSASignature
+        case failedToParseRecoverableSignatureFromCompactRepresentation
+        case failedToParseSignatureFromCompactRepresentation
+        case failedSignatureToConvertRecoverableSignatureToCompact
         case failedToConvertRecoverableSignatureToNonRecoverable
         case failedToRecoverPublicKeyFromSignature
         case failedToNormalizeECDSASignature

@@ -48,6 +48,13 @@ final class PublicKeyImportTests: XCTestCase {
        XCTAssertEqual(publicKey.uncompressedRaw.hex, "040202020202020202020202020202020202020202020202020202020202020202415456f0fc01d66476251cab4525d9db70bfec652b2d8130608675674cde64b2")
     }
     
+    func test_compress_pubkey() throws {
+        let raw = Data(repeating: 0x02, count: 33)
+        let publicKey = try PublicKey.import(from: raw)
+        try XCTAssertEqual(publicKey.rawRepresentation(format: .compressed).hex, "020202020202020202020202020202020202020202020202020202020202020202")
+        try XCTAssertEqual(publicKey.rawRepresentation(format: .uncompressed).hex, "040202020202020202020202020202020202020202020202020202020202020202415456f0fc01d66476251cab4525d9db70bfec652b2d8130608675674cde64b2")
+    }
+    
     func testNotOnCurve() throws {
         /// Public key from `ecdh_secp256k1_test.json` in Wycheproof
         /// Vector id: 185

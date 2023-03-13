@@ -7,24 +7,36 @@
 
 import Foundation
 import CryptoKit
+import secp256k1
 
 public struct ECDSASignatureRecoverable: Sendable, Hashable, ECSignature {
+ 
+    public let rawRepresentation: Data
     
-    /// `R||S` (64 bytes), without the recovery id
-    public let rs: Data
     
-    public let recoveryID: Int32
-    
-    public init(rs: Data, recoveryID: Int32) throws {
+    public init(compactRepresentation: Data, recoveryID: Int32) throws {
         guard
-             rs.count == ECDSASignatureNonRecoverable.byteCount
+            compactRepresentation.count == ECDSASignatureNonRecoverable.byteCount
          else {
              throw K1.Error.incorrectByteCountOfRawSignature
          }
-        self.rs = rs
-        self.recoveryID = recoveryID
+        var recoverableSignature = secp256k1_ecdsa_recoverable_signature()
+        let rs = [UInt8](compactRepresentation)
+  
+        try Bridge.call(ifFailThrow: .failedToParseRecoverableSignatureFromCompactRepresentation) { context in
+            secp256k1_ecdsa_recoverable_signature_parse_compact(
+                context,
+                &recoverableSignature,
+                rs,
+                recoveryID
+            )
+        }
+        self.rawRepresentation = Data(
+            bytes: &recoverableSignature.data,
+            count: MemoryLayout.size(ofValue: recoverableSignature.data)
+        )
     }
-    
+
     public init<D: DataProtocol>(rawRepresentation: D) throws {
 
         guard
@@ -32,9 +44,10 @@ public struct ECDSASignatureRecoverable: Sendable, Hashable, ECSignature {
         else {
             throw K1.Error.incorrectByteCountOfRawSignature
         }
-        let rsV = [UInt8](rawRepresentation)
-        try self.init(rs: Data(rsV.prefix(64)), recoveryID: Int32(rsV[64]))
+        self.rawRepresentation = Data(rawRepresentation)
     }
+    
+    
 }
 
 
@@ -56,6 +69,29 @@ public extension ECDSASignatureRecoverable {
     
     func nonRecoverable() throws -> ECDSASignatureNonRecoverable {
         try Bridge.convertToNonRecoverable(ecdsaSignature: self)
+    }
+    
+    func compact() throws -> (rs: Data, recoveryID: Int) {
+        var rsBytes = [UInt8](repeating: 0, count: 64)
+        var recoveryID: Int32 = 0
+        
+        var recoverableBridgedToC = secp256k1_ecdsa_recoverable_signature()
+        withUnsafeMutableBytes(of: &recoverableBridgedToC.data) { pointer in
+            pointer.copyBytes(
+                from: rawRepresentation.prefix(pointer.count)
+            )
+        }
+        
+        try Bridge.call(
+            ifFailThrow: .failedSignatureToConvertRecoverableSignatureToCompact) { context in
+                secp256k1_ecdsa_recoverable_signature_serialize_compact(
+                context,
+                &rsBytes,
+                &recoveryID,
+                &recoverableBridgedToC
+            )
+        }
+        return (rs: Data(rsBytes), recoveryID: Int(recoveryID))
     }
     
 }
