@@ -9,23 +9,6 @@ import secp256k1
 import CryptoKit
 import Foundation
 
-struct IncorrectByteCount: Swift.Error {}
-public func swapSignatureByteOrder<D>(_ data: D) throws -> Data where D: DataProtocol {
-    guard data.count == 64 || data.count == 65 else {
-        throw IncorrectByteCount()
-    }
-    let invalidByteOrder = Data(data)
-    let r = Data(invalidByteOrder[0 ..< 32].reversed())
-    let s = Data(invalidByteOrder[32 ..< 64].reversed())
-    
-    var vDataOrEmpty = Data()
-    if data.count > 64 {
-        vDataOrEmpty = Data([invalidByteOrder[64]])
-    }
-
-    return vDataOrEmpty + r + s
-}
-
 extension Bridge {
     
     /// Produces a **recoverable** ECDSA signature.
@@ -67,7 +50,7 @@ extension Bridge {
                 nonceFunctionArbitraryBytes
             )
         }
-
+        
         return Data(
             bytes: &signatureRecoverableBridgedToC.data,
             count: MemoryLayout.size(ofValue: signatureRecoverableBridgedToC.data)
@@ -218,15 +201,10 @@ extension Bridge {
         ecdsaSignature: ECDSASignatureRecoverable
     ) throws -> ECDSASignatureNonRecoverable {
         var recoverableBridgedToC = secp256k1_ecdsa_recoverable_signature()
-        let rs = [UInt8](ecdsaSignature.rs())
-        try Self.call(
-            ifFailThrow: .failedToParseRecoverableSignatureFromECDSASignature
-        ) { context in
-            secp256k1_ecdsa_recoverable_signature_parse_compact(
-                context,
-                &recoverableBridgedToC,
-                rs,
-                Int32(ecdsaSignature.recoveryID)
+        
+        withUnsafeMutableBytes(of: &recoverableBridgedToC.data) { pointer in
+            pointer.copyBytes(
+                from: ecdsaSignature.rawRepresentation.prefix(pointer.count)
             )
         }
         
@@ -257,7 +235,7 @@ extension Bridge {
         message: [UInt8]
     ) throws -> [UInt8] {
         try _recoverPublicKey(
-            rs: ecdsaSignature.p1364(),
+            rs: ecdsaSignature.compactRepresentation(),
             recoveryID: recoveryID,
             message: message
         )
@@ -268,9 +246,16 @@ extension Bridge {
         ecdsaSignature: ECDSASignatureRecoverable,
         message: [UInt8]
     ) throws -> [UInt8] {
-        try _recoverPublicKey(
-            rs: ecdsaSignature.rs(),
-            recoveryID: Int32(ecdsaSignature.recoveryID),
+        var recoverableBridgedToC = secp256k1_ecdsa_recoverable_signature()
+        
+        withUnsafeMutableBytes(of: &recoverableBridgedToC.data) { pointer in
+            pointer.copyBytes(
+                from: ecdsaSignature.rawRepresentation.prefix(pointer.count)
+            )
+        }
+        
+        return try __recoverPubKeyFrom(
+            signatureBridgedToC: recoverableBridgedToC,
             message: message
         )
     }
@@ -283,6 +268,7 @@ extension Bridge {
     ) throws -> [UInt8] {
         var signatureBridgedToC = secp256k1_ecdsa_recoverable_signature()
         let rs = [UInt8](rsData)
+        
         try Self.call(
             ifFailThrow: .failedToParseRecoverableSignatureFromECDSASignature
         ) { context in
@@ -294,6 +280,17 @@ extension Bridge {
             )
         }
         
+        return try __recoverPubKeyFrom(
+            signatureBridgedToC: signatureBridgedToC,
+            message: message
+        )
+    }
+    
+    static func __recoverPubKeyFrom(
+        signatureBridgedToC: secp256k1_ecdsa_recoverable_signature,
+        message: [UInt8]
+    ) throws -> [UInt8] {
+        var signatureBridgedToC = signatureBridgedToC
         var publicKeyBridgedToC = secp256k1_pubkey()
         try Self.call(
             ifFailThrow: .failedToRecoverPublicKeyFromSignature
@@ -378,9 +375,9 @@ public extension ECDSASignatureNonRecoverable {
             wrapped: .init(uncompressedRaw: uncompressedPublicKeyBytes)
         )
         
-//        guard try publicKey.isValid(signature: self, hashed: messageThatWasSigned) else {
-//            throw K1.Error.expectedPublicKeyToBeValidForSignatureAndMessage
-//        }
+        guard try publicKey.isValid(signature: self, hashed: messageThatWasSigned) else {
+            throw K1.Error.expectedPublicKeyToBeValidForSignatureAndMessage
+        }
         
         return publicKey
     }
@@ -394,13 +391,11 @@ public extension K1.PrivateKey {
         mode: ECDSASignatureNonRecoverable.SigningMode = .default
     ) throws -> ECDSASignatureRecoverable {
         let messageBytes = [UInt8](message)
-        let signatureData = try withSecureBytes { (secureBytes: SecureBytes) -> Data in
-            try Bridge.ecdsaSignRecoverable(message: messageBytes, privateKey: secureBytes, mode: mode)
+        let raw = try withSecureBytes {
+            try Bridge.ecdsaSignRecoverable(message: messageBytes, privateKey: $0, mode: mode)
         }
 
-        return try ECDSASignatureRecoverable(
-            rawRepresentation: signatureData
-        )
+        return try ECDSASignatureRecoverable.init(rawRepresentation: raw)
     }
     
     /// Produces a **non recoverable** ECDSA signature.

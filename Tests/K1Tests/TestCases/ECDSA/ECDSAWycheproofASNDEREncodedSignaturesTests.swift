@@ -57,7 +57,11 @@ private struct SignatureWycheproofDERTestVector: WycheproofTestVector {
     }
     func expectedSignature() throws -> Signature {
         let derData = try Data(hex: sig)
-        return try ECDSASignatureNonRecoverable.import(fromDER: derData)
+        let signature = try ECDSASignatureNonRecoverable.import(fromDER: derData)
+        if self.result == "valid" {
+            try XCTAssertEqual(sig, signature.derRepresentation().hex)
+        }
+        return signature
     }
     
 }

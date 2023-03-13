@@ -83,7 +83,7 @@ internal extension K1.PublicKey {
             var signatureBridgedToCPotentiallyMalleable = secp256k1_ecdsa_signature()
             withUnsafeMutableBytes(of: &signatureBridgedToCPotentiallyMalleable.data) { pointer in
                 pointer.copyBytes(
-                    from: signature._rawRepresentation.prefix(pointer.count)
+                    from: signature.rawRepresentation.prefix(pointer.count)
                 )
             }
             

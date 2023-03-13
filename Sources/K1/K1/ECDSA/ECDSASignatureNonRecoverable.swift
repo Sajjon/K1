@@ -7,15 +7,11 @@
 
 import Foundation
 import CryptoKit
+import secp256k1
 
 public struct ECDSASignatureNonRecoverable: Sendable, Hashable, ECSignature {
-   
-    internal let _rawRepresentation: Data
     
-    /// Accepts `R||S` format
-    public init(p1364: Data) throws {
-        try self.init(rawRepresentation: swapSignatureByteOrder(p1364))
-    }
+    public let rawRepresentation: Data
     
     public init<D: DataProtocol>(rawRepresentation: D) throws {
         guard
@@ -24,7 +20,24 @@ public struct ECDSASignatureNonRecoverable: Sendable, Hashable, ECSignature {
             throw K1.Error.incorrectByteCountOfRawSignature
         }
         
-        self._rawRepresentation = Data(rawRepresentation)
+        self.rawRepresentation = Data(rawRepresentation)
+    }
+    
+    public init<D: DataProtocol>(compactRepresentation: D) throws {
+        var signature = secp256k1_ecdsa_signature()
+        let compactBytes = [UInt8](compactRepresentation)
+        try Bridge.call(ifFailThrow: .failedToParseSignatureFromCompactRepresentation) { context in
+            secp256k1_ecdsa_signature_parse_compact(
+                context,
+                &signature,
+                compactBytes
+            )
+        }
+
+        try self.init(rawRepresentation: Data(
+            bytes: &signature.data,
+            count: MemoryLayout.size(ofValue: signature.data)
+        ))
     }
 }
 

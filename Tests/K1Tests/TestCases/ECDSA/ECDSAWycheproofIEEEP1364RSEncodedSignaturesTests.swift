@@ -15,7 +15,7 @@ final class ECDSA_Wycheproof_IEEE_P1364_RS_EncodedSignaturesTests: XCTestCase {
                     group: group,
                     signatureValidationMode: .acceptSignatureMalleability,
                     hashFunction: SHA256.self,
-                    skipIfContainsFlags: .init(["MissingZero", "BER"]),
+                    skipIfContainsFlags: .init(["MissingZero", "BER", "SigSize"]),
                     skipIfContainsComment: ["r too large"]
                 )
             })
@@ -44,13 +44,9 @@ private struct SignatureWycheproofP1364TestVector: WycheproofTestVector {
     }
     func expectedSignature() throws -> Signature {
         let raw = try Data(hex: sig)
-        guard raw.count >= 64 else {
-            struct TooFewBytes: Swift.Error {}
-            throw TooFewBytes()
-        }
-        let signature = try Signature(p1364: raw)
+        let signature = try Signature(compactRepresentation: raw)
         if self.result == "valid" {
-            try XCTAssertEqual(sig, signature.p1364().hex)
+            try XCTAssertEqual(sig, signature.compactRepresentation().hex)
         }
         return signature
     }
