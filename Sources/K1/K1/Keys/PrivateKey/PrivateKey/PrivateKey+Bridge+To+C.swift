@@ -375,9 +375,9 @@ public extension ECDSASignatureNonRecoverable {
             wrapped: .init(uncompressedRaw: uncompressedPublicKeyBytes)
         )
         
-//        guard try publicKey.isValid(signature: self, hashed: messageThatWasSigned) else {
-//            throw K1.Error.expectedPublicKeyToBeValidForSignatureAndMessage
-//        }
+        guard try publicKey.isValid(signature: self, hashed: messageThatWasSigned) else {
+            throw K1.Error.expectedPublicKeyToBeValidForSignatureAndMessage
+        }
         
         return publicKey
     }
