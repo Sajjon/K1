@@ -9,23 +9,6 @@ import secp256k1
 import CryptoKit
 import Foundation
 
-//struct IncorrectByteCount: Swift.Error {}
-//public func swapSignatureByteOrder<D>(_ data: D) throws -> Data where D: DataProtocol {
-//    guard data.count == 64 || data.count == 65 else {
-//        throw IncorrectByteCount()
-//    }
-//    let invalidByteOrder = Data(data)
-//    let r = Data(invalidByteOrder[0 ..< 32].reversed())
-//    let s = Data(invalidByteOrder[32 ..< 64].reversed())
-//
-//    var vDataOrEmpty = Data()
-//    if data.count > 64 {
-//        vDataOrEmpty = Data([invalidByteOrder[64]])
-//    }
-//
-//    return vDataOrEmpty + r + s
-//}
-
 extension Bridge {
     
     /// Produces a **recoverable** ECDSA signature.
@@ -114,19 +97,23 @@ extension Bridge {
             )
         }
 
-        var out64 = [UInt8](repeating: 0x00, count: 64)
-        
-        try Self.call(
-            ifFailThrow: .failedToSerializeCompactSignature
-        ) { context in
-            secp256k1_ecdsa_signature_serialize_compact(
-                context,
-                &out64,
-                &signatureBridgedToC
-            )
-        }
-
-        return Data(out64)
+//        var out64 = [UInt8](repeating: 0x00, count: 64)
+//
+//        try Self.call(
+//            ifFailThrow: .failedToSerializeCompactSignature
+//        ) { context in
+//            secp256k1_ecdsa_signature_serialize_compact(
+//                context,
+//                &out64,
+//                &signatureBridgedToC
+//            )
+//        }
+//
+//        return Data(out64)
+        return Data(
+            bytes: &signatureBridgedToC.data,
+            count: MemoryLayout.size(ofValue: signatureBridgedToC.data)
+        )
     }
     
     static func schnorrSign(
@@ -261,7 +248,7 @@ extension Bridge {
         message: [UInt8]
     ) throws -> [UInt8] {
         try _recoverPublicKey(
-            rs: ecdsaSignature.rawRepresentation,
+            rs: ecdsaSignature.compactRepresentation(),
             recoveryID: recoveryID,
             message: message
         )
@@ -299,6 +286,11 @@ extension Bridge {
     ) throws -> [UInt8] {
         var signatureBridgedToC = secp256k1_ecdsa_recoverable_signature()
         let rs = [UInt8](rsData)
+        
+        try print("🔮 RECOVER rsData \(rsData.hex)")
+        try print("🔮 RECOVER rs \(rs.hex)")
+        
+        
         try Self.call(
             ifFailThrow: .failedToParseRecoverableSignatureFromECDSASignature
         ) { context in

@@ -16,8 +16,6 @@ extension ECDSASignatureNonRecoverable {
         return try Self(rawRepresentation: signatureData)
     }
     
-
-    
     public func compactRepresentation() throws -> Data {
         try Bridge.compactRepresentationOfSignature(rawRepresentation: rawRepresentation)
     }

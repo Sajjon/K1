@@ -28,6 +28,21 @@ final class ECDASignaturePublicKeyRecoveryTests: XCTestCase {
         
         print("☑️ Test result: \(String(describing: result))")
     }
+    
+    func test_conversionRoundtrips() throws {
+        let recoverySignatureHex = "acf9e195e094f2f40eb619b9878817ff951b9b11fac37cf0d7290098bbefb574f8606281a2231a3fc781045f2ea4df086936263bbfa8d15ca17fe70e0c3d6e5601"
+        let recoverableSigRaw = try Data(hex: recoverySignatureHex)
+        let recoverableSig = try ECDSASignatureRecoverable(rawRepresentation: recoverableSigRaw)
+        let compactRecoverableSig = try recoverableSig.compact()
+        XCTAssertEqual(compactRecoverableSig.rs.hex, "74b5efbb980029d7f07cc3fa119b1b95ff178887b919b60ef4f294e095e1f9ac566e3d0c0ee77fa15cd1a8bf3b26366908dfa42e5f0481c73f1a23a2816260f8")
+        XCTAssertEqual(compactRecoverableSig.recoveryID, 1)
+        
+        let nonRecoverable = try ECDSASignatureNonRecoverable(compactRepresentation: compactRecoverableSig.rs)
+        
+        try XCTAssertEqual(nonRecoverable, recoverableSig.nonRecoverable())
+        let nonRecovDer = try nonRecoverable.derRepresentation()
+        XCTAssertEqual(nonRecovDer.hex, "3044022074b5efbb980029d7f07cc3fa119b1b95ff178887b919b60ef4f294e095e1f9ac0220566e3d0c0ee77fa15cd1a8bf3b26366908dfa42e5f0481c73f1a23a2816260f8")
+    }
 }
 
 private extension ECDASignaturePublicKeyRecoveryTests {
@@ -46,42 +61,39 @@ private extension ECDASignaturePublicKeyRecoveryTests {
                 try [UInt8](hex: vector.publicKeyCompressed),
                 try expectedPublicKey.rawRepresentation(format: .compressed)
             )
-            let signatureData = try Data(hex: vector.signature)
+         
+
+            let recoverableSig = try vector.recoverableSignature()
+            try XCTAssertEqual(recoverableSig.compact().recoveryID, vector.recoveryID)
             
-            XCTAssertThrowsError(try ECDSASignatureNonRecoverable(
-                rawRepresentation: signatureData
-            ))
-            let signature = try ECDSASignatureRecoverable(
-                rawRepresentation: signatureData
-            )
             let hashedMessage = try Data(hex: vector.hashMessage)
-            XCTAssertTrue(try expectedPublicKey.isValid(signature: signature, hashed: hashedMessage))
-            XCTAssertTrue(try expectedPublicKey.isValid(signature: signature.nonRecoverable(), hashed: hashedMessage))
-            try XCTAssertEqual(vector.recoveryID, signature.compact().recoveryID)
+            XCTAssertTrue(try expectedPublicKey.isValid(signature: recoverableSig, hashed: hashedMessage))
+            XCTAssertTrue(try expectedPublicKey.isValid(signature: recoverableSig.nonRecoverable(), hashed: hashedMessage))
+            try XCTAssertEqual(vector.recoveryID, recoverableSig.compact().recoveryID)
             
-            let recoveredPublicKey = try signature.recoverPublicKey(
+            let recoveredPublicKey = try recoverableSig.recoverPublicKey(
                 messageThatWasSigned: hashedMessage
             )
             
             XCTAssertEqual(expectedPublicKey, recoveredPublicKey)
             
-            XCTAssertTrue(try recoveredPublicKey.isValid(signature: signature, hashed: hashedMessage))
-            XCTAssertTrue(try recoveredPublicKey.isValid(signature: signature.nonRecoverable(), hashed: hashedMessage))
+            XCTAssertTrue(try recoveredPublicKey.isValid(signature: recoverableSig, hashed: hashedMessage))
+            XCTAssertTrue(try recoveredPublicKey.isValid(signature: recoverableSig.nonRecoverable(), hashed: hashedMessage))
             
-            
-//            let nonRecoverable = try ECDSASignatureNonRecoverable(rawRepresentation: signatureData.dropLast(1))
-//            try XCTAssertEqual(
-//                String(vector.signature.prefix(128)),
-//                nonRecoverable.p1364().hex
-//            )
-//            
 //            XCTAssertTrue(try expectedPublicKey.isValid(signature: nonRecoverable, hashed: hashedMessage))
 //            try XCTAssertEqual(nonRecoverable.p1364().hex, try signature.nonRecoverable().p1364().hex)
-//            let recoveredWithID = try nonRecoverable.recoverPublicKey(
-//                recoveryID: vector.recoveryID,
-//                messageThatWasSigned: hashedMessage
-//            )
-//            XCTAssertEqual(expectedPublicKey, recoveredWithID)
+            
+            print("🔮 raw \(recoverableSig.rawRepresentation.hex)")
+            try print("🔮 compact.rs \(recoverableSig.compact().rs.hex)")
+            
+            try print("🔮 nonRecoverable.raw \(recoverableSig.nonRecoverable().rawRepresentation.hex)")
+            try print("🔮 nonRecoverable compact.rs \(recoverableSig.nonRecoverable().compactRepresentation().hex)")
+            
+            let recoveredWithID = try recoverableSig.nonRecoverable().recoverPublicKey(
+                recoveryID: vector.recoveryID,
+                messageThatWasSigned: hashedMessage
+            )
+            XCTAssertEqual(expectedPublicKey, recoveredWithID)
             
             
             numberOfTestsRun += 1
@@ -94,11 +106,33 @@ private struct RecoveryTestGroup: Decodable {
     let tests: [RecoveryTestVector]
 }
 
+struct IncorrectByteCount: Swift.Error {}
 struct RecoveryTestVector: Decodable, Equatable {
     let recoveryID: Int
     let message: String
     let hashMessage: String
-    let signature: String
+    private let signature: String
+    
+    func recoverableSignature() throws -> ECDSASignatureRecoverable {
+        
+        func swapSignatureByteOrder<D>(_ data: D) throws -> Data where D: DataProtocol {
+            guard data.count == 64 || data.count == 65 else {
+                throw IncorrectByteCount()
+            }
+            let invalidByteOrder = Data(data)
+            let r = Data(invalidByteOrder[0 ..< 32].reversed())
+            let s = Data(invalidByteOrder[32 ..< 64].reversed())
+        
+            var vDataOrEmpty = Data()
+            if data.count > 64 {
+                vDataOrEmpty = Data([invalidByteOrder[64]])
+            }
+        
+            return r + s + vDataOrEmpty
+        }
+        return try .init(rawRepresentation: swapSignatureByteOrder(Data(hex: self.signature)))
+    }
+    
     let publicKeyUncompressed: String
     let publicKeyCompressed: String
 }

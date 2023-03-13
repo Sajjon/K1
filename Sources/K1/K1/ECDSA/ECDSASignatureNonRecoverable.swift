@@ -25,10 +25,6 @@ public struct ECDSASignatureNonRecoverable: Sendable, Hashable, ECSignature {
     
     public init<D: DataProtocol>(compactRepresentation: D) throws {
         var signature = secp256k1_ecdsa_signature()
-
-//        guard secp256k1_ecdsa_signature_parse_compact(secp256k1.Context.raw, &signature, Array(compactRepresentation)).boolValue else {
-//            throw secp256k1Error.underlyingCryptoError
-//        }
         let compactBytes = [UInt8](compactRepresentation)
         try Bridge.call(ifFailThrow: .failedToParseSignatureFromCompactRepresentation) { context in
             secp256k1_ecdsa_signature_parse_compact(
