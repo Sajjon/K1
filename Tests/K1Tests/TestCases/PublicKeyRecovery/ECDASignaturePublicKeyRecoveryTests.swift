@@ -103,10 +103,10 @@ struct RecoveryTestVector: Decodable, Equatable {
     let message: String
     let hashMessage: String
     private let signature: String
+
     
     func recoverableSignature() throws -> ECDSASignatureRecoverable {
-   
-        return try .init(rawRepresentation: swapSignatureByteOrder(Data(hex: self.signature)))
+        try .init(rawRepresentation: Data(hex: self.signature))
     }
     
     let publicKeyUncompressed: String
