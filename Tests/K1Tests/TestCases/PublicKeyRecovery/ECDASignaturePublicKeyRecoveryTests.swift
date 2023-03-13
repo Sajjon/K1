@@ -106,7 +106,10 @@ struct RecoveryTestVector: Decodable, Equatable {
 
     
     func recoverableSignature() throws -> ECDSASignatureRecoverable {
-        try .init(rawRepresentation: Data(hex: self.signature))
+        let raw = try Data(hex: self.signature)
+        let signature = try ECDSASignatureRecoverable(rawRepresentation: raw)
+        XCTAssertEqual(signature.rawRepresentation, raw)
+        return signature
     }
     
     let publicKeyUncompressed: String
