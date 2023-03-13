@@ -13,7 +13,6 @@ public struct ECDSASignatureRecoverable: Sendable, Hashable, ECSignature {
  
     public let rawRepresentation: Data
     
-    
     public init(compactRepresentation: Data, recoveryID: Int32) throws {
         guard
             compactRepresentation.count == ECDSASignatureNonRecoverable.byteCount
@@ -50,19 +49,7 @@ public struct ECDSASignatureRecoverable: Sendable, Hashable, ECSignature {
     
 }
 
-
-//private extension ECDSASignatureRecoverable {
-//    static let byteCount = ECDSASignatureNonRecoverable.byteCount + 1
-//}
-
 public extension ECDSASignatureRecoverable {
-    
-//    func rs() -> Data {
-//        Data(rawRepresentation.suffix(64))
-//    }
-//
-//    /// aka Signature `v`, aka `recid`
-//    var recoveryID: Int { Int(rawRepresentation[0]) }
     
     typealias Scheme = ECDSA
     static let scheme: SigningScheme = .ecdsa
