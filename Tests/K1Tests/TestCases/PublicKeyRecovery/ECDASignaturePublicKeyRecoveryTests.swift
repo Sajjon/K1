@@ -79,16 +79,7 @@ private extension ECDASignaturePublicKeyRecoveryTests {
             
             XCTAssertTrue(try recoveredPublicKey.isValid(signature: recoverableSig, hashed: hashedMessage))
             XCTAssertTrue(try recoveredPublicKey.isValid(signature: recoverableSig.nonRecoverable(), hashed: hashedMessage))
-            
-//            XCTAssertTrue(try expectedPublicKey.isValid(signature: nonRecoverable, hashed: hashedMessage))
-//            try XCTAssertEqual(nonRecoverable.p1364().hex, try signature.nonRecoverable().p1364().hex)
-            
-            print("🔮 raw \(recoverableSig.rawRepresentation.hex)")
-            try print("🔮 compact.rs \(recoverableSig.compact().rs.hex)")
-            
-            try print("🔮 nonRecoverable.raw \(recoverableSig.nonRecoverable().rawRepresentation.hex)")
-            try print("🔮 nonRecoverable compact.rs \(recoverableSig.nonRecoverable().compactRepresentation().hex)")
-            
+                   
             let recoveredWithID = try recoverableSig.nonRecoverable().recoverPublicKey(
                 recoveryID: vector.recoveryID,
                 messageThatWasSigned: hashedMessage
@@ -114,22 +105,7 @@ struct RecoveryTestVector: Decodable, Equatable {
     private let signature: String
     
     func recoverableSignature() throws -> ECDSASignatureRecoverable {
-        
-        func swapSignatureByteOrder<D>(_ data: D) throws -> Data where D: DataProtocol {
-            guard data.count == 64 || data.count == 65 else {
-                throw IncorrectByteCount()
-            }
-            let invalidByteOrder = Data(data)
-            let r = Data(invalidByteOrder[0 ..< 32].reversed())
-            let s = Data(invalidByteOrder[32 ..< 64].reversed())
-        
-            var vDataOrEmpty = Data()
-            if data.count > 64 {
-                vDataOrEmpty = Data([invalidByteOrder[64]])
-            }
-        
-            return r + s + vDataOrEmpty
-        }
+   
         return try .init(rawRepresentation: swapSignatureByteOrder(Data(hex: self.signature)))
     }
     

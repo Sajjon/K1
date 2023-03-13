@@ -99,7 +99,7 @@ extension XCTestCase {
                 continue outerloop
             }
         }
-        
+  
         numberOfTestsRun += 1
         var isValid = false
         do {
@@ -114,16 +114,25 @@ extension XCTestCase {
         } catch {
             let expectedFailure = testVector.result == "invalid" || testVector.result == "acceptable"
             let errorMessage = String(describing: error)
+            if !expectedFailure {
+                print("❌ Test ID: \(testVector.tcId) is valid, but failed \(errorMessage).")
+            }
             XCTAssert(expectedFailure, "Test ID: \(testVector.tcId) is valid, but failed \(errorMessage).", file: file, line: line)
             continue
         }
         
         switch testVector.result {
         case "valid":
+            if !isValid {
+                print("❌ Test vector is valid, but is rejected \(testVector.tcId)")
+            }
             XCTAssert(isValid, "Test vector is valid, but is rejected \(testVector.tcId)", file: file, line: line)
         case "acceptable":
-            XCTAssert(isValid, file: file, line: line)
+            XCTAssert(isValid, "'acceptable' test vector, expected isValid to be `true`, but was not, tcID: \(testVector.tcId)" ,file: file, line: line)
         case "invalid":
+            if isValid {
+                print("❌ Test ID: \(testVector.tcId) is valid (we expected 'invalid'), but failed.")
+            }
             XCTAssert(!isValid, "Test ID: \(testVector.tcId) is valid (we expected 'invalid'), but failed.", file: file, line: line)
         default:
             XCTFail("Unhandled test vector", file: file, line: line)

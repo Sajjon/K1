@@ -287,10 +287,6 @@ extension Bridge {
         var signatureBridgedToC = secp256k1_ecdsa_recoverable_signature()
         let rs = [UInt8](rsData)
         
-        try print("🔮 RECOVER rsData \(rsData.hex)")
-        try print("🔮 RECOVER rs \(rs.hex)")
-        
-        
         try Self.call(
             ifFailThrow: .failedToParseRecoverableSignatureFromECDSASignature
         ) { context in
