@@ -75,7 +75,17 @@ private struct SignatureTrezorTestVector: SignatureTestVector {
     }
     func expectedSignature() throws -> Signature {
         let derData = try Data(hex: expected.der)
-        return try ECDSASignatureNonRecoverable.import(fromDER: derData)
+        let signature = try ECDSASignatureNonRecoverable.import(fromDER: derData)
+        try XCTAssertEqual(signature.derRepresentation().hex, expected.der)
+        try XCTAssertEqual(
+            signature.compactRepresentation().hex,
+            [
+                expected.r,
+                expected.s
+            ].joined(separator: "")
+        )
+        
+        return signature
     }
     
 }
