@@ -38,9 +38,10 @@ extension Bridge {
         var signatureBridgedToC = secp256k1_ecdsa_signature()
         var compactSignature = [UInt8](repeating: 0, count: compactSignatureLength)
         
-        withUnsafeMutableBytes(of: &signatureBridgedToC.data) { pointer in
-            pointer.copyBytes(from: rawRepresentation.prefix(pointer.count))
-        }
+//        withUnsafeMutableBytes(of: &signatureBridgedToC.data) { pointer in
+//            pointer.copyBytes(from: rawRepresentation.prefix(pointer.count))
+//        }
+        
         
         try Bridge.call(ifFailThrow: .failedToSerializeCompactSignature) { context in
             secp256k1_ecdsa_signature_serialize_compact(context, &compactSignature, &signatureBridgedToC)
@@ -51,24 +52,24 @@ extension Bridge {
     }
     
     static func derRepresentationOfSignature(rawRepresentation: Data) throws -> Data {
-        
-        var signatureBridgedToC = secp256k1_ecdsa_signature()
-        var derMaxLength = 75 // in fact max is 73, but we can have some margin.
-        var derSignature = [UInt8](repeating: 0, count: derMaxLength)
-        
-        withUnsafeMutableBytes(of: &signatureBridgedToC.data) { pointer in
-            pointer.copyBytes(from: rawRepresentation.prefix(pointer.count))
-        }
-        
-        try Bridge.call(ifFailThrow: .failedToSerializeDERSignature) { context in
-            secp256k1_ecdsa_signature_serialize_der(
-                context,
-                &derSignature,
-                &derMaxLength,
-                &signatureBridgedToC
-            )
-        }
-        
-        return Data(bytes: &derSignature, count: derMaxLength)
+        fatalError()
+//        var signatureBridgedToC = secp256k1_ecdsa_signature()
+//        var derMaxLength = 75 // in fact max is 73, but we can have some margin.
+//        var derSignature = [UInt8](repeating: 0, count: derMaxLength)
+//
+//        withUnsafeMutableBytes(of: &signatureBridgedToC.data) { pointer in
+//            pointer.copyBytes(from: rawRepresentation.prefix(pointer.count))
+//        }
+//
+//        try Bridge.call(ifFailThrow: .failedToSerializeDERSignature) { context in
+//            secp256k1_ecdsa_signature_serialize_der(
+//                context,
+//                &derSignature,
+//                &derMaxLength,
+//                &signatureBridgedToC
+//            )
+//        }
+//
+//        return Data(bytes: &derSignature, count: derMaxLength)
     }
 }
