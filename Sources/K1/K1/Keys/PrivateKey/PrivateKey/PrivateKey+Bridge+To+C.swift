@@ -97,19 +97,6 @@ extension Bridge {
             )
         }
 
-//        var out64 = [UInt8](repeating: 0x00, count: 64)
-//
-//        try Self.call(
-//            ifFailThrow: .failedToSerializeCompactSignature
-//        ) { context in
-//            secp256k1_ecdsa_signature_serialize_compact(
-//                context,
-//                &out64,
-//                &signatureBridgedToC
-//            )
-//        }
-//
-//        return Data(out64)
         return Data(
             bytes: &signatureBridgedToC.data,
             count: MemoryLayout.size(ofValue: signatureBridgedToC.data)
@@ -259,11 +246,6 @@ extension Bridge {
         ecdsaSignature: ECDSASignatureRecoverable,
         message: [UInt8]
     ) throws -> [UInt8] {
-//        try _recoverPublicKey(
-//            rs: ecdsaSignature.rs,
-//            recoveryID: Int32(ecdsaSignature.recoveryID),
-//            message: message
-//        )
         var recoverableBridgedToC = secp256k1_ecdsa_recoverable_signature()
         
         withUnsafeMutableBytes(of: &recoverableBridgedToC.data) { pointer in
