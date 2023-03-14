@@ -45,7 +45,11 @@ private extension XCTestCase {
             XCTAssertTrue(try publicKey.isValidECDSASignature(expectedSignature, digest: messageDigest))
             
             let signatureFromMessage = try privateKey.ecdsaSignNonRecoverable(digest: messageDigest)
+            let signatureRecoverableFromMessage = try privateKey.ecdsaSignRecoverable(digest: messageDigest)
             XCTAssertEqual(signatureFromMessage, expectedSignature)
+            try XCTAssertEqual(signatureRecoverableFromMessage.nonRecoverable(), expectedSignature)
+            let recid = try signatureRecoverableFromMessage.compact().recoveryID
+            XCTAssertEqual(signatureRecoverableFromMessage.rawRepresentation.hex, expectedSignature.rawRepresentation.hex + "\(Data([UInt8(recid)]).hex)x")
             numberOfTestsRun += 1
         }
         return .init(numberOfTestsRun: numberOfTestsRun, idsOmittedTests: [])
