@@ -548,16 +548,14 @@ extension K1.PrivateKey {
         return sharedSecretData
     }
     
-  
-
     /// Computes a shared secret with the provided public key from another party,
     /// returning only the `X` coordinate of the point, following [ANSI X9.63][ansix963] standards.
     ///
     /// This is one of three ECDH functions, this library vendors, all three versions
     /// uses different serialization of the shared EC Point, specifically:
-    /// 1. SHA-256 hash the compressed point
-    /// 2. No hash, return point uncompressed
-    /// 3. No hash, return only the `X` coordinate of the point <- this function
+    /// 1. `ASN1 x9.63`: No hash, return only the `X` coordinate of the point <- this function
+    /// 2. `libsecp256k1`: SHA-256 hash the compressed point
+    /// 3. Custom: No hash, return point uncompressed
     ///
     /// This function uses 3. i.e. no hash, and returns only the `X` coordinate of the point.
     /// This is following the [ANSI X9.63][ansix963] standard serialization of the shared point.
@@ -591,9 +589,9 @@ extension K1.PrivateKey {
     ///
     /// This is one of three ECDH functions, this library vendors, all three versions
     /// uses different serialization of the shared EC Point, specifically:
-    /// 1. SHA-256 hash the compressed point <- this function
-    /// 2. No hash, return point uncompressed
-    /// 3. No hash, return only the `X` coordinate of the point.
+    /// 1. `ASN1 x9.63`: No hash, return only the `X` coordinate of the point
+    /// 2. `libsecp256k1`: SHA-256 hash the compressed point <- this function
+    /// 3. Custom: No hash, return point uncompressed
     ///
     /// This function uses 1. i.e.SHA-256 hash the compressed point.
     /// This is using the [default behaviour of `libsecp256k1`][libsecp256k1], which does not adhere to any
@@ -611,14 +609,15 @@ extension K1.PrivateKey {
         try _ecdh(publicKey: publicKey, serializeOutputFunction: .libsecp256kDefault)
     }
     
+    
     /// Computes a shared secret with the provided public key from another party,
     /// returning an uncompressed public point, unhashed.
     ///
     /// This is one of three ECDH functions, this library vendors, all three versions
     /// uses different serialization of the shared EC Point, specifically:
-    /// 1. SHA-256 hash the compressed point
-    /// 2. No hash, return point uncompressed <- this function
-    /// 3. No hash, return only the `X` coordinate of the point.
+    /// 1. `ASN1 x9.63`: No hash, return only the `X` coordinate of the point
+    /// 2. `libsecp256k1`: SHA-256 hash the compressed point
+    /// 3. Custom: No hash, return point uncompressed <- this function
     ///
     /// This function uses 2. i.e. no hash, return point uncompressed
     /// **This is not following any standard at all**, but might be useful if you want to write your
@@ -627,6 +626,7 @@ extension K1.PrivateKey {
     public func ecdhPoint(with publicKey: K1.PublicKey) throws -> Data {
         try _ecdh(publicKey: publicKey, serializeOutputFunction: .noHashWholePoint)
     }
+    
 }
 
 // MUST match https://github.com/apple/swift-crypto/blob/main/Sources/Crypto/Key%20Agreement/DH.swift#L34

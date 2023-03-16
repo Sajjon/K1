@@ -11,15 +11,18 @@ import XCTest
 
 final class ECDHTests: XCTestCase {
     
-    func testECDHPoint() throws {
+    func testECDHX963() throws {
         let alice = try K1.PrivateKey.generateNew()
         let bob = try K1.PrivateKey.generateNew()
         
-        let ab = try alice.ecdhPoint(with: bob.publicKey)
-        let ba = try bob.ecdhPoint(with: alice.publicKey)
+        let ab = try alice.sharedSecretFromKeyAgreement(with: bob.publicKey)
+        let ba = try bob.sharedSecretFromKeyAgreement(with: alice.publicKey)
+        ab.withUnsafeBytes {
+            XCTAssertEqual(Data($0).count, 32)
+        }
         XCTAssertEqual(ab, ba, "Alice and Bob should be able to agree on the same secret")
     }
-    
+  
     func testECDHLibsecp256k1() throws {
         let alice = try K1.PrivateKey.generateNew()
         let bob = try K1.PrivateKey.generateNew()
@@ -27,15 +30,17 @@ final class ECDHTests: XCTestCase {
         let ab = try alice.ecdh(with: bob.publicKey)
         let ba = try bob.ecdh(with: alice.publicKey)
         XCTAssertEqual(ab, ba, "Alice and Bob should be able to agree on the same secret")
+        XCTAssertEqual(ab.count, 32)
     }
     
-    func testECDHX963() throws {
+    func testECDHPoint() throws {
         let alice = try K1.PrivateKey.generateNew()
         let bob = try K1.PrivateKey.generateNew()
         
-        let ab = try alice.sharedSecretFromKeyAgreement(with: bob.publicKey)
-        let ba = try bob.sharedSecretFromKeyAgreement(with: alice.publicKey)
+        let ab = try alice.ecdhPoint(with: bob.publicKey)
+        let ba = try bob.ecdhPoint(with: alice.publicKey)
         XCTAssertEqual(ab, ba, "Alice and Bob should be able to agree on the same secret")
+        XCTAssertEqual(ab.count, 65)
     }
     
     /// Test vectors from: https://crypto.stackexchange.com/q/57695
