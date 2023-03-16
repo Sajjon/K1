@@ -5,12 +5,10 @@ import PackageDescription
 
 let package = Package(
     name: "K1",
-    
     platforms: [
       .macOS(.v11),
       .iOS(.v13),
     ],
-
     products: [
         .library(
             name: "K1",
@@ -19,12 +17,10 @@ let package = Package(
             ]
         ),
     ],
-
     dependencies: [
          // Only used by tests
         .package(url: "https://github.com/filom/ASN1Decoder", from: "1.8.0")
     ],
-
     targets: [
         
         // Target `libsecp256k1` https://github.com/bitcoin-core/secp256k1

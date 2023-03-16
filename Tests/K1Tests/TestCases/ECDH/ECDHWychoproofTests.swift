@@ -78,10 +78,13 @@ private extension ECDHWychoproofTests {
                 var privateBytes = [UInt8]()
                 privateBytes = try padKeyIfNecessary(vector: testVector.privateKey)
                 let privateKey = try PrivateKey.import(rawRepresentation: privateBytes)
-                let expectedXComponent = try Data(hex: testVector.shared)
-                let sharedPublicKeyPoint = try privateKey.sharedSecret(with: publicKey)
-                let sharedPublicKeyXComponent = Data(sharedPublicKeyPoint[1..<33]) // slice out just X component
-                XCTAssertEqual(sharedPublicKeyXComponent, expectedXComponent, file: file, line: line)
+                
+                /// ANS1 X9.63 serialization of shared secret, returning a `CryptoKit.SharedSecret`
+                let sharedPublicKeyPoint = try privateKey.sharedSecretFromKeyAgreement(with: publicKey)
+                let got = sharedPublicKeyPoint.withUnsafeBytes {
+                    Data($0)
+                }
+                XCTAssertEqual(got.hex, testVector.shared, file: file, line: line)
             } catch {
                 if testVector.result != "invalid" {
                     XCTFail("Failed with error: \(String(describing: error)), test vector: \(String(describing: testVector))")

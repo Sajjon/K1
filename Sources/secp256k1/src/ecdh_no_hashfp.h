@@ -12,4 +12,10 @@
 
 int ecdh_skip_hash_extract_x_and_y(unsigned char *output, const unsigned char *x32, const unsigned char *y32, void *data);
 
+
+int ecdh_skip_hash_extract_only_x(unsigned char *output, const unsigned char *x32, const unsigned char *y32, void *data);
+
+
+
+
 #endif /* ecdh_no_hashfp_h */
