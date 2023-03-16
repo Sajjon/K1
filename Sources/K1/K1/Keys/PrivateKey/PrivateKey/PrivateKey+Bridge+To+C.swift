@@ -165,7 +165,7 @@ extension Bridge {
         
         /// Following the [ANSI X9.63][ansix963] standard
         ///
-        /// [ansix963]: https://webstore.ansi.org/standards/ascx9/ansix9632011r2017
+        /// [ansix963]:  https://webstore.ansi.org/standards/ascx9/ansix9632011r2017
         case ansiX963
         
         /// Following no standard at all, does not hash the shared public point, and returns it in full.
@@ -569,6 +569,7 @@ extension K1.PrivateKey {
     /// - JS: `elliptic` (v6.4.0 in nodeJS v8.2.1)
     /// - JS: `crypto` (builtin) - uses openssl under the hood (in nodeJS v8.2.1)
     /// - .NET: `BouncyCastle` (BC v1.8.1.3, .NET v2.1.4)
+    /// - Python: pyca/cryptography (hazmat)
     ///
     /// [ansix963]: https://webstore.ansi.org/standards/ascx9/ansix9632011r2017
     /// [cryptostackexchange]: https://crypto.stackexchange.com/a/57727
