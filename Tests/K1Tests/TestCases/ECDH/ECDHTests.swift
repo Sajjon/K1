@@ -50,6 +50,17 @@ final class ECDHTests: XCTestCase {
         XCTAssertEqual(ans1X963.hex, "3a17fe5fa33c4f2c7e61799a65061214913f39bfcbee178ab351493d5ee17b2f")
         
     }
+    
+    /// Assert we do not introduce any regression bugs for the custom ECDh `ecdhPoint`
+    func testECDHCustom() throws {
+        let alice = try K1.PrivateKey.import(rawRepresentation: Data(repeating: 0xAA, count: 32))
+        let bob = try K1.PrivateKey.import(rawRepresentation: Data(repeating: 0xBB, count: 32))
+        let ab = try alice.ecdhPoint(with: bob.publicKey)
+        let ba = try bob.ecdhPoint(with: alice.publicKey)
+        XCTAssertEqual(ab, ba, "Alice and Bob should be able to agree on the same secret")
+        XCTAssertEqual(ab.hex, "041d3e7279da3f845c4246087cdd3dd42bea3dea7245ceaf75609d8eb0a4e89c4e8e7a7c012045a2eae87463012468d7aae911b8a1140e240c828c96d9b19bd8e7")
+        
+    }
 }
 
 extension K1.PrivateKey {
