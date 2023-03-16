@@ -27,7 +27,7 @@ public extension K1 {
         case incorrectByteCountOfMessageToValidate
         case failedToCompressPublicKey
         case failedToUncompressPublicKey
-        
+        case failedToProduceSharedSecret
         case incorrectByteCountOfPublicKey(got: Int, acceptableLengths: [Int])
         case failedToParsePublicKeyFromBytes
         case failedToParseDERSignature

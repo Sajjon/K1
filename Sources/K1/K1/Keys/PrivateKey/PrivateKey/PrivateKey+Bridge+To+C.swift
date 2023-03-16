@@ -35,7 +35,7 @@ extension Bridge {
             }
             nonceFunctionArbitraryBytes = [UInt8](nonceFunctionArbitraryData)
         }
-                
+        
         var signatureRecoverableBridgedToC = secp256k1_ecdsa_recoverable_signature()
         
         try Self.call(
@@ -81,7 +81,7 @@ extension Bridge {
             }
             nonceFunctionArbitraryBytes = [UInt8](nonceFunctionArbitraryData)
         }
-                
+        
         var signatureBridgedToC = secp256k1_ecdsa_signature()
         
         try Self.call(
@@ -96,7 +96,7 @@ extension Bridge {
                 nonceFunctionArbitraryBytes
             )
         }
-
+        
         return Data(
             bytes: &signatureBridgedToC.data,
             count: MemoryLayout.size(ofValue: signatureBridgedToC.data)
@@ -114,7 +114,7 @@ extension Bridge {
         var signatureOut = [UInt8](repeating: 0, count: 64)
         
         var keyPair = secp256k1_keypair()
-
+        
         try Self.call(
             ifFailThrow: .failedToInitializeKeyPairForSchnorrSigning
         ) { context in
@@ -140,31 +140,62 @@ extension Bridge {
                 auxilaryRandomBytes
             )
         }
-
+        
         var publicKey = secp256k1_xonly_pubkey()
-
+        
         try Self.call(
             ifFailThrow: .failedToSchnorrSignErrorGettingPubKeyFromKeyPair
         ) { context in
             secp256k1_keypair_xonly_pub(context, &publicKey, nil, &keyPair)
         }
-
+        
         try Self.call(
             ifFailThrow: .failedToSchnorrSignDigestDidNotPassVerification
         ) { context in
             secp256k1_schnorrsig_verify(context, &signatureOut, message, message.count, &publicKey)
         }
-
+        
         return Data(signatureOut)
+    }
+    
+    enum ECDHSerializeFunction {
+        
+        /// Using the `libsecp256k1` default behaviour, which is to SHA256 hash the compressed public key
+        case libsecp256kDefault
+        
+        /// Following the [ANSI X9.63][ansix963] standard
+        ///
+        /// [ansix963]: https://webstore.ansi.org/standards/ascx9/ansix9632011r2017
+        case ansiX963
+        
+        /// Following no standard at all, does not hash the shared public point, and returns it in full.
+        case noHashWholePoint
+        
+        func hashfp() -> (Optional<@convention(c) (Optional<UnsafeMutablePointer<UInt8>>, Optional<UnsafePointer<UInt8>>, Optional<UnsafePointer<UInt8>>, Optional<UnsafeMutableRawPointer>) -> Int32>) {
+            switch self {
+            case .libsecp256kDefault: return secp256k1_ecdh_hash_function_default
+            case .ansiX963: return ecdh_skip_hash_extract_only_x
+            case .noHashWholePoint: return ecdh_skip_hash_extract_x_and_y
+            }
+        }
+        
+        var outputByteCount: Int {
+            switch self {
+            case .libsecp256kDefault: return K1.Curve.Field.byteCount
+            case .ansiX963: return K1.Curve.Field.byteCount
+            case .noHashWholePoint: return K1.Format.uncompressed.length
+            }
+        }
     }
     
     static func ecdh(
         publicKey publicKeyBytes: [UInt8],
-        privateKey: SecureBytes
+        privateKey: SecureBytes,
+        hashFp: ECDHSerializeFunction
     ) throws -> Data {
-
+        
         var publicKeyBridgedToC = secp256k1_pubkey()
-
+        
         try Self.call(ifFailThrow: .incorrectByteCountOfPublicKey(providedByteCount: publicKeyBytes.count)) { context in
             /* Parse a variable-length public key into the pubkey object. */
             secp256k1_ec_pubkey_parse(
@@ -174,10 +205,10 @@ extension Bridge {
                 publicKeyBytes.count
             )
         }
-
+        
         var sharedPublicPointBytes = [UInt8](
             repeating: 0,
-            count: K1.Format.uncompressed.length
+            count: hashFp.outputByteCount
         )
         
         try Self.call(
@@ -190,7 +221,7 @@ extension Bridge {
                 &sharedPublicPointBytes, // output
                 &publicKeyBridgedToC, // pubkey
                 privateKey.backing.bytes, // seckey
-                ecdh_skip_hash_extract_x_and_y, // hashfp
+                hashFp.hashfp(), // hashfp
                 nil // arbitrary data pointer that is passed through to hashfp
             )
         }
@@ -259,7 +290,7 @@ extension Bridge {
             message: message
         )
     }
-
+    
     /// Recover an ECDSA public key from a signature.
     static func _recoverPublicKey(
         rs rsData: Data,
@@ -312,13 +343,13 @@ extension Bridge {
             try Self.call(
                 ifFailThrow: .failedToSerializePublicKeyIntoBytes
             ) { context in
-               secp256k1_ec_pubkey_serialize(
-                context,
-                pubkeyBytes.baseAddress!,
-                &pubkeyBytesSerializedCount,
-                &publicKeyBridgedToC,
-                publicKeyFormat.rawValue
-               )
+                secp256k1_ec_pubkey_serialize(
+                    context,
+                    pubkeyBytes.baseAddress!,
+                    &pubkeyBytesSerializedCount,
+                    &publicKeyBridgedToC,
+                    publicKeyFormat.rawValue
+                )
             }
         }
         guard
@@ -327,7 +358,7 @@ extension Bridge {
         else {
             throw K1.Error.failedToSerializePublicKeyIntoBytes
         }
-  
+        
         return publicPointBytes
     }
 }
@@ -384,7 +415,7 @@ public extension ECDSASignatureNonRecoverable {
 }
 
 public extension K1.PrivateKey {
-
+    
     /// Produces a **recoverable** ECDSA signature.
     func ecdsaSignRecoverable<D: DataProtocol>(
         hashed message: D,
@@ -394,7 +425,7 @@ public extension K1.PrivateKey {
         let raw = try withSecureBytes {
             try Bridge.ecdsaSignRecoverable(message: messageBytes, privateKey: $0, mode: mode)
         }
-
+        
         return try ECDSASignatureRecoverable.init(rawRepresentation: raw)
     }
     
@@ -407,7 +438,7 @@ public extension K1.PrivateKey {
         let signatureData = try withSecureBytes { (secureBytes: SecureBytes) -> Data in
             try Bridge.ecdsaSignNonRecoverable(message: messageBytes, privateKey: secureBytes, mode: mode)
         }
-
+        
         return try ECDSASignatureNonRecoverable(
             rawRepresentation: signatureData
         )
@@ -421,12 +452,12 @@ public extension K1.PrivateKey {
         let signatureData = try withSecureBytes { (secureBytes: SecureBytes) -> Data in
             try Bridge.schnorrSign(message: message, privateKey: secureBytes, input: maybeInput)
         }
-
+        
         return try SchnorrSignature(
             rawRepresentation: signatureData
         )
     }
-
+    
     func ecdsaSignNonRecoverable<D: Digest>(
         digest: D,
         mode: ECDSASignatureNonRecoverable.SigningMode = .default
@@ -470,7 +501,7 @@ public extension K1.PrivateKey {
         try schnorrSign(digest: SHA256.hash(data: data), input: maybeInput)
     }
     
-  
+    
     func sign<S: ECSignatureScheme, D: DataProtocol>(
         hashed: D,
         scheme: S.Type,
@@ -487,28 +518,121 @@ public extension K1.PrivateKey {
         try S.Signature.by(signing: Array(digest), with: self, mode: mode)
     }
     
-      func sign<S: ECSignatureScheme, D: DataProtocol>(
-          unhashed: D,
-          scheme: S.Type,
-          mode: S.Signature.SigningMode
-      ) throws -> S.Signature {
-          try sign(
+    func sign<S: ECSignatureScheme, D: DataProtocol>(
+        unhashed: D,
+        scheme: S.Type,
+        mode: S.Signature.SigningMode
+    ) throws -> S.Signature {
+        try sign(
             hashed: Data(S.hash(unhashed: unhashed)),
             scheme: scheme,
             mode: mode
-          )
-      }
+        )
+    }
+}
+
+/// MARK: ECDH
+extension K1.PrivateKey {
     
-    /// Performs a key agreement with provided public key share.
-    ///
-    /// - Parameter publicKeyShare: The public key to perform the ECDH with.
-    /// - Returns: Returns the public point obtain by performing EC mult between
-    ///  this `privateKey` and `publicKeyShare`
-    /// - Throws: An error occurred while computing the shared secret
-    func sharedSecret(with publicKeyShare: K1.PublicKey) throws -> Data {
+    private func _ecdh(
+        publicKey: K1.PublicKey,
+        serializeOutputFunction hashFp: Bridge.ECDHSerializeFunction
+    ) throws -> Data {
         let sharedSecretData = try withSecureBytes { secureBytes in
-            try Bridge.ecdh(publicKey: publicKeyShare.uncompressedRaw, privateKey: secureBytes)
+            try Bridge.ecdh(
+                publicKey: publicKey.uncompressedRaw,
+                privateKey: secureBytes,
+                hashFp: hashFp
+            )
         }
         return sharedSecretData
     }
+    
+  
+
+    /// Computes a shared secret with the provided public key from another party,
+    /// returning only the `X` coordinate of the point, following [ANSI X9.63][ansix963] standards.
+    ///
+    /// This is one of three ECDH functions, this library vendors, all three versions
+    /// uses different serialization of the shared EC Point, specifically:
+    /// 1. SHA-256 hash the compressed point
+    /// 2. No hash, return point uncompressed
+    /// 3. No hash, return only the `X` coordinate of the point <- this function
+    ///
+    /// This function uses 3. i.e. no hash, and returns only the `X` coordinate of the point.
+    /// This is following the [ANSI X9.63][ansix963] standard serialization of the shared point.
+    ///
+    /// Further more this function is compatible with CryptoKit, since it returns a CryptoKit
+    /// `SharedSecret` struct, thus offering you to use all of CryptoKit's Key Derivation Functions
+    /// (`KDF`s), which can be called on the `SharedSecret`.
+    ///
+    /// As seen on [StackExchange][cryptostackexchange], this version is compatible with the following
+    /// libraries:
+    /// - JS: `elliptic` (v6.4.0 in nodeJS v8.2.1)
+    /// - JS: `crypto` (builtin) - uses openssl under the hood (in nodeJS v8.2.1)
+    /// - .NET: `BouncyCastle` (BC v1.8.1.3, .NET v2.1.4)
+    ///
+    /// [ansix963]: https://webstore.ansi.org/standards/ascx9/ansix9632011r2017
+    /// [cryptostackexchange]: https://crypto.stackexchange.com/a/57727
+    public func sharedSecretFromKeyAgreement(
+        with publicKeyShare: K1.PublicKey
+    ) throws -> SharedSecret {
+        let sharedSecretData =  try _ecdh(publicKey: publicKeyShare, serializeOutputFunction: .ansiX963)
+        let __sharedSecret = __SharedSecret(ss: .init(bytes: sharedSecretData))
+        let sharedSecret = unsafeBitCast(__sharedSecret, to: SharedSecret.self)
+        guard sharedSecret.withUnsafeBytes({ Data($0).count == sharedSecretData.count }) else {
+            throw K1.Error.failedToProduceSharedSecret
+        }
+        return sharedSecret
+    }
+    
+    /// Computes a shared secret with the provided public key from another party,
+    /// using `libsecp256k1` default behaviour, returning a hashed of the compressed point.
+    ///
+    /// This is one of three ECDH functions, this library vendors, all three versions
+    /// uses different serialization of the shared EC Point, specifically:
+    /// 1. SHA-256 hash the compressed point <- this function
+    /// 2. No hash, return point uncompressed
+    /// 3. No hash, return only the `X` coordinate of the point.
+    ///
+    /// This function uses 1. i.e.SHA-256 hash the compressed point.
+    /// This is using the [default behaviour of `libsecp256k1`][libsecp256k1], which does not adhere to any
+    /// other standard.
+    ///
+    /// As seen on [StackExchange][cryptostackexchange], this version is compatible with all
+    /// libraries which wraps `libsecp256k1`, e.g.:
+    /// - Python wrapper: secp256k1 (v0.13.2, for python 3.6.4)
+    /// - JS wrapper: secp256k1 (v3.5.0, for nodeJS v8.2.1)
+    ///
+    /// [libsecp256k1]: https://github.com/bitcoin-core/secp256k1/blob/master/src/modules/ecdh/main_impl.h#L27
+    /// [cryptostackexchange]: https://crypto.stackexchange.com/a/57727
+    ///
+    public func ecdh(with publicKey: K1.PublicKey) throws -> Data {
+        try _ecdh(publicKey: publicKey, serializeOutputFunction: .libsecp256kDefault)
+    }
+    
+    /// Computes a shared secret with the provided public key from another party,
+    /// returning an uncompressed public point, unhashed.
+    ///
+    /// This is one of three ECDH functions, this library vendors, all three versions
+    /// uses different serialization of the shared EC Point, specifically:
+    /// 1. SHA-256 hash the compressed point
+    /// 2. No hash, return point uncompressed <- this function
+    /// 3. No hash, return only the `X` coordinate of the point.
+    ///
+    /// This function uses 2. i.e. no hash, return point uncompressed
+    /// **This is not following any standard at all**, but might be useful if you want to write your
+    /// cryptographic functions, e.g. some ECIES scheme.
+    ///
+    public func ecdhPoint(with publicKey: K1.PublicKey) throws -> Data {
+        try _ecdh(publicKey: publicKey, serializeOutputFunction: .noHashWholePoint)
+    }
+}
+
+// MUST match https://github.com/apple/swift-crypto/blob/main/Sources/Crypto/Key%20Agreement/DH.swift#L34
+
+/// A Key Agreement Result
+/// A SharedSecret has to go through a Key Derivation Function before being able to use by a symmetric key operation.
+public struct __SharedSecret {
+    var ss: SecureBytes
 }

@@ -49,7 +49,7 @@ private extension XCTestCase {
             XCTAssertEqual(signatureFromMessage, expectedSignature)
             try XCTAssertEqual(signatureRecoverableFromMessage.nonRecoverable(), expectedSignature)
             let recid = try signatureRecoverableFromMessage.compact().recoveryID
-            XCTAssertEqual(signatureRecoverableFromMessage.rawRepresentation.hex, expectedSignature.rawRepresentation.hex + "\(Data([UInt8(recid)]).hex)x")
+            XCTAssertEqual(signatureRecoverableFromMessage.rawRepresentation.hex, expectedSignature.rawRepresentation.hex + "\(Data([UInt8(recid)]).hex)")
             numberOfTestsRun += 1
         }
         return .init(numberOfTestsRun: numberOfTestsRun, idsOmittedTests: [])
