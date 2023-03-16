@@ -58,7 +58,11 @@ final class TwoVariantsOfECDHWithKDFTests: XCTestCase {
 
 extension TwoVariantsOfECDHWithKDFTests {
     
+
     fileprivate func doTest(_ vector: Vector) throws {
+        let outputByteCount = 32
+        let hash = SHA256.self
+        
         let alice = try PrivateKey(hex: vector.alicePrivateKey)
         let bob = try PrivateKey(hex: vector.bobPrivateKey)
         try XCTAssertEqual(alice.publicKey.rawRepresentation(format: .uncompressed).hex, vector.alicePublicKeyUncompressed)
@@ -78,18 +82,37 @@ extension TwoVariantsOfECDHWithKDFTests {
                 for derivedKeys in outcome.derivedKeys {
                     let info = try XCTUnwrap(derivedKeys.info.data(using: .utf8))
                     let salt = try Data(hex: derivedKeys.salt)
-                    let x963 = sharedSecretBA.x963DerivedSymmetricKey(using: SHA256.self, sharedInfo: info, outputByteCount: 32)
+                    let x963 = sharedSecretBA.x963DerivedSymmetricKey(using: hash, sharedInfo: info, outputByteCount: outputByteCount)
                     x963.withUnsafeBytes {
                         XCTAssertEqual(Data($0).hex, derivedKeys.x963, "Wrong X963 KDF result, mismatched expected from vector.")
                     }
-                    let hkdf = sharedSecretBA.hkdfDerivedSymmetricKey(using: SHA256.self, salt: salt, sharedInfo: info, outputByteCount: 32)
+                    let hkdf = sharedSecretBA.hkdfDerivedSymmetricKey(using: hash, salt: salt, sharedInfo: info, outputByteCount: outputByteCount)
                     hkdf.withUnsafeBytes {
                         XCTAssertEqual(Data($0).hex, derivedKeys.hkdf, "Wrong HKDF result, mismatched expected from vector.")
                     }
                 }
                 
             case .libsecp256k1:
-                break
+                let sharedSecretAB = try alice.ecdh(with: bob.publicKey)
+                let sharedSecretBA = try bob.ecdh(with: alice.publicKey)
+                
+                XCTAssertEqual(sharedSecretAB, sharedSecretBA)
+                sharedSecretAB.withUnsafeBytes {
+                    XCTAssertEqual(Data($0).hex, outcome.ecdhSharedKey, "Wrong ECDH secret, mismatched expected from vector.")
+                }
+                
+                for derivedKeys in outcome.derivedKeys {
+                    let info = try XCTUnwrap(derivedKeys.info.data(using: .utf8))
+                    let salt = try Data(hex: derivedKeys.salt)
+                    let x963 = x963DerivedSymmetricKey(secret: sharedSecretAB, using: hash, sharedInfo: info, outputByteCount: outputByteCount)
+                    x963.withUnsafeBytes {
+                        XCTAssertEqual(Data($0).hex, derivedKeys.x963, "Wrong X963 KDF result, mismatched expected from vector.")
+                    }
+                    let hkdf = hkdfDerivedSymmetricKey(secret: sharedSecretAB, using: hash, salt: salt, sharedInfo: info, outputByteCount: outputByteCount)
+                    hkdf.withUnsafeBytes {
+                        XCTAssertEqual(Data($0).hex, derivedKeys.hkdf, "Wrong HKDF result, mismatched expected from vector.")
+                    }
+                }
             }
         
         }
@@ -186,4 +209,21 @@ extension HashFunction {
             self.update(bufferPointer: $0)
         }
     }
+}
+
+
+/// From: https://github.com/apple/swift-crypto/blob/main/Sources/Crypto/Key%20Agreement/DH.swift#L110
+/// Derives a symmetric encryption key using HKDF key derivation.
+///
+/// - Parameters:
+///   - hashFunction: The Hash Function to use for key derivation.
+///   - salt: The salt to use for key derivation.
+///   - sharedInfo: The Shared Info to use for key derivation.
+///   - outputByteCount: The length in bytes of resulting symmetric key.
+/// - Returns: The derived symmetric key
+public func hkdfDerivedSymmetricKey<H: HashFunction, Salt: DataProtocol, SI: DataProtocol>(
+    secret: Data,
+    using hashFunction: H.Type, salt: Salt, sharedInfo: SI, outputByteCount: Int
+) -> SymmetricKey {
+    HKDF<H>.deriveKey(inputKeyMaterial: SymmetricKey(data: secret), salt: salt, info: sharedInfo, outputByteCount: outputByteCount)
 }
