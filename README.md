@@ -36,14 +36,56 @@ It is worth noting that some Schnorr implementations are incompatible with [BIP3
 
 ## ECDH
 
+This library vendors three different EC Diffie-Hellman (ECDH) key exchange functions:
+1. `ASN1 x9.63` - No hash, return only the `X` coordinate of the point - `sharedSecretFromKeyAgreement -> SharedSecret`
+2. `libsecp256k1` - SHA-256 hash the compressed point - `ecdh -> Data`
+3. Custom - No hash, return point uncompressed - `ecdhPoint -> Data`
+
 ```swift
 let alice = try K1.PrivateKey.generateNew()
 let bob = try K1.PrivateKey.generateNew()
-
-let ab = try alice.sharedSecret(with: bob.publicKey)
-let ba = try bob.sharedSecret(with: alice.publicKey)
-assert(ab == ba, "Alice and Bob should be able to agree on the same secret")
 ```
+
+### `ASN1 x9.63` ECDH
+Returning only the `X` coordinate of the point, following [ANSI X9.63][x963] standards, embedded in a [`CryptoKit.SharedSecret`][ckss], which is useful since you can use `CryptoKit` key derivation functions on this SharedSecret, e.g. [`x963DerivedSymmetricKey`](https://developer.apple.com/documentation/cryptokit/sharedsecret/x963derivedsymmetrickey(using:sharedinfo:outputbytecount:)) or [`hkdfDerivedSymmetricKey`](https://developer.apple.com/documentation/cryptokit/sharedsecret/hkdfderivedsymmetrickey(using:salt:sharedinfo:outputbytecount:)).
+
+You can retrieve the `X` coordinate as raw data using `withUnsafeBytes` if you need to.
+
+```swift
+let ab: CryptoKit.SharedSecret = try alice.sharedSecretFromKeyAgreement(with: bob.publicKey) 
+let ba: : CryptoKit.SharedSecret = try bob.sharedSecretFromKeyAgreement(with: alice.publicKey)
+
+assert(ab == ba) // pass
+
+ab.withUnsafeBytes {
+    assert(Data($0).count == 32) // pass
+}
+```
+
+### `libsecp256k1` ECDH
+
+Using `libsecp256k1` default behaviour, returning a SHA-256 hash of the **compressed** point.
+
+```swift
+let ab: Data = try alice.ecdh(with: bob.publicKey) 
+let ba: Data = try bob.ecdh(with: alice.publicKey)
+assert(ab == ba) // pass
+
+assert(ab.count == 32) // pass
+```
+
+### Custom ECDH
+
+Returns an entire uncompresed EC point, without hashing it. Might be useful if you wanna construct your own cryptographic functions, e.g. some custom ECIES.
+
+```swift
+let ab: Data = try alice.ecdhPoint(with: bob.publicKey) 
+let ba: Data = try bob.ecdhPoint(with: alice.publicKey)
+assert(ab == ba) // pass
+
+assert(ab.count == 65) // pass
+```
+
 
 # Alternatives
 
@@ -70,3 +112,5 @@ To clone the dependency [libsecp256k1][lib], using commit [427bc3cdcfbc747780704
 
 [BIP340]: https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
 [lib]: https://github.com/bitcoin-core/secp256k1
+[x963]: https://webstore.ansi.org/standards/ascx9/ansix9632011r2017
+[ckss]: https://developer.apple.com/documentation/cryptokit/sharedsecret
