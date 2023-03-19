@@ -90,7 +90,7 @@ extension K1.PrivateKey {
         mode: Bridge.ECDSA.SigningMode = .default
     ) throws -> ECDSASignatureNonRecoverable {
         try ECDSASignatureNonRecoverable(
-            wrapped: Bridge.PrivateKey.ecdsaSignNonRecoverable(
+            wrapped: Bridge.ECDSA.NonRecovery.sign(
                 hashedMessage: [UInt8](digest),
                 privateKey: wrapped,
                 mode: mode
@@ -114,7 +114,7 @@ extension K1.PrivateKey {
         mode: Bridge.ECDSA.SigningMode = .default
     ) throws -> ECDSASignatureRecoverable {
         try ECDSASignatureRecoverable(
-            wrapped: Bridge.PrivateKey.ecdsaSignRecoverable(
+            wrapped: Bridge.ECDSA.Recovery.sign(
                 hashedMessage: [UInt8](digest),
                 privateKey: wrapped,
                 mode: mode
