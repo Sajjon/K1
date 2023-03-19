@@ -72,7 +72,7 @@ extension ECDSASignatureNonRecoverable {
         try K1.PublicKey(
             wrapped: Bridge.ECDSA.NonRecovery.recoverPublicKey(
                 self.wrapped,
-                recoveryID: recoveryID.rawValue,
+                recoveryID: recoveryID.recid,
                 message: [UInt8](message)
             )
         )

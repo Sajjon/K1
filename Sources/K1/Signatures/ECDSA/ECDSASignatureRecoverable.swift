@@ -63,32 +63,95 @@ extension ECDSASignatureRecoverable {
         Data(wrapped.bytes)
     }
     
-    public func compact(
-        format: RecoverableSignatureSerializationFormat
-    ) throws -> Compact {
+    public func compact() throws -> Compact {
         
-        let (rs, recoveryID) = try Bridge.ECDSA.Recovery.serialize(
-            wrapped,
-            format: format
+        let (rs, recid) = try Bridge.ECDSA.Recovery.serialize(
+            wrapped
         )
         
-        return .init(
+        return try .init(
             rs: Data(rs),
-            recoveryID: .init(recoveryID)
+            recoveryID: .init(recid: recid)
         )
     }
     
     public struct Compact: Sendable, Hashable {
+        public static let byteCount = Self.byteCountRS + 1
+        public static let byteCountRS = 2 * Curve.Field.byteCount
         public let rs: Data
         public let recoveryID: RecoveryID
+        public init(rs: Data, recoveryID: RecoveryID) throws {
+            guard rs.count == Self.byteCountRS else {
+                throw Bridge.Error.failedToDeserializeCompactRSRecoverableSignatureInvalidByteCount(got: rs.count, expected: Self.byteCountRS)
+            }
+            self.rs = rs
+            self.recoveryID = recoveryID
+        }
+        
     }
-   
+}
+
+extension ECDSASignatureRecoverable.Compact {
+    
+    public init(
+        rawRepresentation: some DataProtocol,
+        format: SerializationFormat
+    ) throws {
+        guard rawRepresentation.count == Self.byteCount else {
+            throw Bridge.Error.failedToDeserializeCompactRecoverableSignatureInvalidByteCount(got: rawRepresentation.count, expected: Self.byteCount
+            )
+        }
+        switch format {
+        case .vrs:
+            try self.init(
+                rs: Data(rawRepresentation.suffix(Self.byteCountRS)),
+                recoveryID: .init(byte: rawRepresentation.first!) // force unwrap OK since we have checked length above.
+            )
+        case .rsv:
+            try self.init(
+                rs: Data(rawRepresentation.prefix(Self.byteCountRS)),
+                recoveryID: .init(byte: rawRepresentation.last!) // force unwrap OK since we have checked length above.
+            )
+        }
+    }
+    
+    public enum SerializationFormat {
+        
+        /// `R || S || V` - the format `libsecp256k1` v0.3.0 uses as internal representation
+        case rsv
+        
+        /// `V || R || S`.
+        case vrs
+    }
+    private var v: Data {
+        Data(
+            [UInt8(recoveryID.rawValue)]
+        )
+    }
+    
+    func serialize(format: SerializationFormat) -> Data {
+        switch format {
+        case .rsv:
+            return rs + v
+        case .vrs:
+            return v + rs
+        }
+    }
 }
 
 // MARK: Recovery
 extension ECDSASignatureRecoverable {
     
-    public typealias RecoveryID = Tagged<Self, Int32>
+    public enum RecoveryID: UInt8, Sendable, Hashable, Codable {
+        case _0 = 0
+        case _1 = 1
+        case _2 = 2
+        case _3 = 3
+        
+        internal var recid: Int32 {
+            Int32(rawValue)
+        }
+    }
     
     public func recoverPublicKey(
         message: some DataProtocol
@@ -96,6 +159,22 @@ extension ECDSASignatureRecoverable {
         try K1.PublicKey(
             wrapped: Bridge.ECDSA.Recovery.recover(wrapped, message: [UInt8](message))
         )
+    }
+}
+
+extension ECDSASignatureRecoverable.RecoveryID {
+    public init(byte: UInt8) throws {
+        guard let self_ = Self(rawValue: byte) else {
+            throw Bridge.Error.invalidRecoveryID(got: Int(byte))
+        }
+        self = self_
+    }
+    
+    public init(recid: Int32) throws {
+        guard recid <= 3 && recid >= 0 else {
+            throw Bridge.Error.invalidRecoveryID(got: Int(recid))
+        }
+        try self.init(byte: UInt8(recid))
     }
 }
 

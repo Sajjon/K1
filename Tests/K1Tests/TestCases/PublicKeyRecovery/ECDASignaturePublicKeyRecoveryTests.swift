@@ -9,12 +9,6 @@ import Foundation
 @testable import K1
 import XCTest
 
-extension ECDSASignatureRecoverable {
-    func compact() throws -> Compact {
-        try self.compact(format: .rsv)
-    }
-   
-}
 
 /// Test vectors:
 /// https://gist.github.com/webmaster128/130b628d83621a33579751846699ed15
@@ -120,3 +114,10 @@ struct RecoveryTestVector: Decodable, Equatable {
     let publicKeyUncompressed: String
     let publicKeyCompressed: String
 }
+
+extension ECDSASignatureRecoverable.RecoveryID: ExpressibleByIntegerLiteral {
+    public init(integerLiteral value: UInt8) {
+        self.init(rawValue: value)!
+    }
+}
+

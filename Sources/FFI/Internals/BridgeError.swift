@@ -39,6 +39,9 @@ extension Bridge {
         case incorrectByteCountOfRawSignature
         case incorrectByteCountOfRawRecoverableSignature(got: Int, expected: Int)
         case failedToParseNonRecoverableSignatureFromCompactRepresentation
+        case failedToDeserializeCompactRecoverableSignatureInvalidByteCount(got: Int, expected: Int)
+        case failedToDeserializeCompactRSRecoverableSignatureInvalidByteCount(got: Int, expected: Int)
+        case invalidRecoveryID(got: Int)
     }
 }
 
