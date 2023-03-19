@@ -130,19 +130,13 @@ extension K1.PublicKey {
         }
     }
     
-    public func isValidSchnorrSignature<D: Digest>(
+    public func isValidSchnorrSignature(
         _ signature: SchnorrSignature,
-        digest: D
+        digest: some Digest
     ) -> Bool {
         isValidSchnorrSignature(signature, hashed: Data(digest))
     }
-    
-    public func isValidSchnorrSignature<M: DataProtocol>(
-        _ signature: SchnorrSignature,
-        unhashed: M
-    ) -> Bool {
-        isValidSchnorrSignature(signature, digest: SHA256.hash(data: unhashed))
-    }
+
 }
 
 // MARK: Equatable

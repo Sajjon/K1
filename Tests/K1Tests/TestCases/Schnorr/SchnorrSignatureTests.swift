@@ -8,6 +8,7 @@
 import Foundation
 import K1
 import XCTest
+import CryptoKit
 @testable import FFI
 
 final class SchnorrSignatureTests: XCTestCase {
@@ -20,4 +21,13 @@ final class SchnorrSignatureTests: XCTestCase {
         XCTAssertTrue(isSignatureValid, "Signature should be valid.")
     }
     
+}
+
+extension K1.PublicKey {
+    public func isValidSchnorrSignature<M: DataProtocol>(
+        _ signature: SchnorrSignature,
+        unhashed: M
+    ) -> Bool {
+        isValidSchnorrSignature(signature, digest: SHA256.hash(data: unhashed))
+    }
 }
