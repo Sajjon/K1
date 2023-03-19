@@ -187,59 +187,7 @@ extension Bridge.PrivateKey {
         
         return try Bridge.Scnhorr.Wrapped(bytes: signatureOut)
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    //    static func __recoverPubKeyFrom(
-    //        signatureBridgedToC: secp256k1_ecdsa_recoverable_signature,
-    //        message: [UInt8]
-    //    ) throws -> [UInt8] {
-    //        var signatureBridgedToC = signatureBridgedToC
-    //        var publicKeyBridgedToC = secp256k1_pubkey()
-    //        try Self.call(
-    //            ifFailThrow: .failedToRecoverPublicKeyFromSignature
-    //        ) { context in
-    //            secp256k1_ecdsa_recover(
-    //                context,
-    //                &publicKeyBridgedToC,
-    //                &signatureBridgedToC,
-    //                message
-    //            )
-    //        }
-    //        let publicKeyFormat = K1.Format.uncompressed
-    //        var publicPointBytes = [UInt8](
-    //            repeating: 0,
-    //            count: publicKeyFormat.length
-    //        )
-    //        var pubkeyBytesSerializedCount = publicKeyFormat.length
-    //        try publicPointBytes.withUnsafeMutableBytes { pubkeyBytes in
-    //            try Self.call(
-    //                ifFailThrow: .failedToSerializePublicKeyIntoBytes
-    //            ) { context in
-    //                secp256k1_ec_pubkey_serialize(
-    //                    context,
-    //                    pubkeyBytes.baseAddress!,
-    //                    &pubkeyBytesSerializedCount,
-    //                    &publicKeyBridgedToC,
-    //                    publicKeyFormat.rawValue
-    //                )
-    //            }
-    //        }
-    //        guard
-    //            pubkeyBytesSerializedCount == K1.Format.uncompressed.length,
-    //            publicPointBytes.count == K1.Format.uncompressed.length
-    //        else {
-    //            throw Bridge.Error.failedToSerializePublicKeyIntoBytes
-    //        }
-    //
-    //        return publicPointBytes
-    //        fatalError()
-    //    }
+
 }
 
 
@@ -249,24 +197,6 @@ public struct SchnorrInput {
         self.auxilaryRandomData = auxilaryRandomData
     }
 }
-
-
-//public extension Bridge {
-//
-//    /// `recoverID` is optional since `self` can contain the recoveryID already.
-//    func recoverPublicKey(
-//        recoveryID: ECDSASignatureRecoverable.RecoveryID,
-//        message: some DataProtocol
-//    ) throws -> K1.PublicKey {
-//        try K1.PublicKey(
-//            wrapped: Bridge.ECDSA.NonRecovery.recoverPublicKey(
-//                self.wrapped,
-//                recoveryID: recoveryID.rawValue,
-//                message: [UInt8](message)
-//            )
-//        )
-//    }
-//}
 
 
 extension Bridge {

@@ -115,7 +115,7 @@ private extension SchnorrSignatureBitcoinCoreTests {
         XCTAssertEqual(signature.rawRepresentation.hex, vector.signatureCompact)
 
         XCTAssertEqual(
-            try publicKey.isValidSchnorrSignature(expectedSig, hashed: message),
+            publicKey.isValidSchnorrSignature(expectedSig, hashed: message),
             vector.isValid
         )
     }

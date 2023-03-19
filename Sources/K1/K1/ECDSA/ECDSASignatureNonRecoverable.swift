@@ -31,6 +31,7 @@ public struct ECDSASignatureNonRecoverable: Sendable, Hashable {
     }
     
     public init(rawRepresentation: some DataProtocol) throws {
+        // FIXME: Needed?
 //        guard
 //            rawRepresentation.count == Self.byteCount
 //        else {

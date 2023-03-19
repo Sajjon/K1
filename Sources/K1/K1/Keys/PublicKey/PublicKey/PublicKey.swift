@@ -114,22 +114,30 @@ public extension K1 {
             }
         }
         
+        // MARK: Schnorr
+        public func isValidSchnorrSignature(
+            _ signature: SchnorrSignature,
+            hashed: some DataProtocol
+        ) -> Bool {
+            do {
+                return try wrapped.isValid(schnorrSignature: signature.wrapped, message: [UInt8](hashed))
+            } catch {
+                return false
+            }
+        }
         
+        public func isValidSchnorrSignature<D: Digest>(
+            _ signature: SchnorrSignature,
+            digest: D
+        ) -> Bool {
+            isValidSchnorrSignature(signature, hashed: Data(digest))
+        }
+        
+        public func isValidSchnorrSignature<M: DataProtocol>(
+            _ signature: SchnorrSignature,
+            unhashed: M
+        ) -> Bool {
+            isValidSchnorrSignature(signature, digest: SHA256.hash(data: unhashed))
+        }
     }
-}
-
-
-// MARK: - Convenience Init
-// MARK: -
-public extension K1.PublicKey {
-    
-    static func `import`(
-        from data: some DataProtocol
-    ) throws -> Self {
-//        try self.init(
-//            wrapped: (from: [UInt8](data))
-//        )
-        fatalError()
-    }
-    
 }

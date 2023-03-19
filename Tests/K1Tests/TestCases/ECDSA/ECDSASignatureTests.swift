@@ -11,10 +11,10 @@ import XCTest
 
 final class ECDSASignatureTests: XCTestCase {
     func testECDSA() throws {
-        let alice = try K1.PrivateKey()
+        let alice = K1.PrivateKey()
         let message = "Send Bob 3 BTC".data(using: .utf8)!
         let signature = try alice.ecdsaSignNonRecoverable(unhashed: message)
-        let isSignatureValid = try alice.publicKey.isValidECDSASignature(signature, unhashed: message)
+        let isSignatureValid = alice.publicKey.isValidECDSASignature(signature, unhashed: message)
         XCTAssertTrue(isSignatureValid, "Signature should be valid.")
     }
 

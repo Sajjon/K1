@@ -107,7 +107,7 @@ extension XCTestCase {
             let signature = try testVector.expectedSignature()
             let messageDigest = try testVector.messageDigest()
             
-            isValid = try key.isValidECDSASignature(
+            isValid = key.isValidECDSASignature(
                 signature,
                 digest: messageDigest,
                 mode: signatureValidationMode

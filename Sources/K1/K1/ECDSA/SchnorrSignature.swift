@@ -30,9 +30,12 @@ public struct SchnorrSignature: Sendable, Hashable {
 public extension SchnorrSignature {
     
     func compactRepresentation() throws -> Data {
-        try Bridge.compactRepresentationOfSignature(rawRepresentation: rawRepresentation)
+        // FIXME: Needed?
+//        try Bridge.compactRepresentationOfSignature(rawRepresentation: rawRepresentation)
+        fatalError()
     }
     func derRepresentation() throws -> Data {
+        // FIXME: Needed?
 //        try Bridge.derRepresentationOfSignature(rawRepresentation: rawRepresentation)
 //        Data(Bridge.Scnhorr.der(wrapped: .init())
         fatalError()

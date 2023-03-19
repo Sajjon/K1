@@ -34,6 +34,7 @@ public struct ECDSASignatureRecoverable: Sendable, Hashable {
     }
     
     public init(compactRepresentation: Data, recoveryID: Int32) throws {
+        // FIXME: Needed?
         guard
             compactRepresentation.count == ECDSASignatureNonRecoverable.byteCount
          else {

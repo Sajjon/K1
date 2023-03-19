@@ -64,7 +64,6 @@ extension TwoVariantsOfECDHWithKDFTests {
     
 
     fileprivate func doTest(_ vector: Vector) throws {
-        print(String(describing: vector))
         let outputByteCount = 32
         let hash = SHA256.self
         
