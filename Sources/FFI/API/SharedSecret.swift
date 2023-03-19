@@ -6,9 +6,6 @@
 //
 
 import Foundation
-import secp256k1
-
-
 
 // MUST match https://github.com/apple/swift-crypto/blob/main/Sources/Crypto/Key%20Agreement/DH.swift#L34
 import struct CryptoKit.SharedSecret
