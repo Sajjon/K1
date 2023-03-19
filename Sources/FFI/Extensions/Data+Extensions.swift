@@ -8,13 +8,6 @@
 
 import Foundation
 
-extension Data {
-    public var bytes: [UInt8] {
-        withUnsafeBytes { pointer in
-            Array(pointer)
-        }
-    }
-}
 
 extension ContiguousBytes {
 

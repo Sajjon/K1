@@ -38,48 +38,51 @@ extension Bridge {
                     return Bridge.PublicKey.Wrapped(raw: raw)
                 }
             }
+        }
+    }
+}
+
+// MARK: Init
+extension Bridge.PrivateKey.Wrapped {
+    fileprivate convenience init(bytes: [UInt8]) throws {
+        try self.init(secureBytes: .init(bytes: bytes))
+    }
+    
+    public convenience init() {
+        func generateNew() -> SecureBytes {
+            var attempt = 0
             
-            fileprivate convenience init(bytes: [UInt8]) throws {
-                try self.init(secureBytes: .init(bytes: bytes))
+            while attempt < 100 {
+                defer { attempt += 1 }
+                do {
+                    let secureBytes = SecureBytes(count: Curve.Field.byteCount)
+                    let _ = try Bridge.PrivateKey.Wrapped(secureBytes: secureBytes)
+                    return secureBytes
+                } catch {
+                    // Failure (due to unlikely scenario that the private key scalar > order of the curve) => retry
+                }
             }
             
-            public convenience init() {
-                func generateNew() -> SecureBytes {
-                    var attempt = 0
-                    
-                    while attempt < 100 {
-                        defer { attempt += 1 }
-                        do {
-                            let secureBytes = SecureBytes(count: Curve.Field.byteCount)
-                            let _ = try Wrapped(secureBytes: secureBytes)
-                            return secureBytes
-                        } catch {
-                            // Failure (due to unlikely scenario that the private key scalar > order of the curve) => retry
-                        }
-                    }
-                    
-                    // Probability of this happening is:
-                    // n = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
-                    // (n / 2^256) ^ 100 = lim 0
-                    // I.e. will not happen.
-                    fatalError("""
+            // Probability of this happening is:
+            // n = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
+            // (n / 2^256) ^ 100 = lim 0
+            // I.e. will not happen.
+            fatalError("""
                                 Failed to generate private key after #\(attempt) attempts.
                                 You are the most unlucky person in the universe.
                                 Or by Occam's razor: the person writing this code made some error.
                                 """
-                    )
-                }
-                try! self.init(secureBytes: generateNew())
-            }
-            
+            )
         }
-        
-        
-        public static func from(
-            rawRepresentation: some DataProtocol
-        ) throws -> Wrapped {
-            try Wrapped(bytes: [UInt8](rawRepresentation))
-        }
+        try! self.init(secureBytes: generateNew())
+    }
+}
+
+extension Bridge.PrivateKey {
+    public static func from(
+        rawRepresentation: some DataProtocol
+    ) throws -> Wrapped {
+        try Wrapped(bytes: [UInt8](rawRepresentation))
     }
 }
 
@@ -96,6 +99,7 @@ protocol WrappedECDSASignature {
     static func sign() -> (OpaquePointer, UnsafeMutablePointer<Raw>, UnsafePointer<UInt8>, UnsafePointer<UInt8>, secp256k1_nonce_function?, UnsafeRawPointer?) -> Int32
 }
 
+// MARK: ECDSA Shared
 extension Bridge.PrivateKey {
     
     private static func ecdsa<WrappedSignature>(
@@ -127,7 +131,10 @@ extension Bridge.PrivateKey {
         return .init(raw: raw)
         
     }
+}
     
+// MARK: ECDSA Recoverable
+extension Bridge.PrivateKey {
     
     /// Produces a **recoverable** ECDSA signature from a hashed `message`
     public static func ecdsaSignRecoverable(
@@ -137,7 +144,10 @@ extension Bridge.PrivateKey {
     ) throws -> Bridge.ECDSA.Recovery.Wrapped {
         try Self.ecdsa(message: hashedMessage, privateKey: privateKey, mode: mode)
     }
-    
+}
+
+// MARK: ECDSA Non-Recoverable
+extension Bridge.PrivateKey {
     /// Produces a **non recoverable** ECDSA signature from a hashed `message`
     public static func ecdsaSignNonRecoverable(
         hashedMessage: [UInt8],
@@ -146,7 +156,10 @@ extension Bridge.PrivateKey {
     ) throws -> Bridge.ECDSA.NonRecovery.Wrapped {
         try Self.ecdsa(message: hashedMessage, privateKey: privateKey, mode: mode)
     }
-    
+}
+
+// MARK: ECDSA Schnorr
+extension Bridge.PrivateKey {
     public static func schnorrSign(
         hashedMessage message: [UInt8],
         privateKey: Wrapped,
@@ -187,7 +200,7 @@ extension Bridge.PrivateKey {
         
         return try Bridge.Scnhorr.Wrapped(bytes: signatureOut)
     }
-
+    
 }
 
 
