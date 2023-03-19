@@ -64,7 +64,7 @@ extension K1.PrivateKey {
         hashed: some DataProtocol,
         input: SchnorrInput? = nil
     ) throws -> SchnorrSignature {
-        let wrapped = try Bridge.PrivateKey.schnorrSign(
+        let wrapped = try Bridge.Scnhorr.sign(
             hashedMessage: [UInt8](hashed),
             privateKey: wrapped,
             input: input

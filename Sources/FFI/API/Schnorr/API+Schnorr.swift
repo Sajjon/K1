@@ -37,9 +37,60 @@ extension Bridge.Scnhorr {
             self.bytes = bytes
         }
     }
-    public static func der(wrapped: Wrapped) -> [UInt8] {
-        fatalError()
+}
+
+
+// MARK: Schnorr Sign
+extension Bridge.Scnhorr {
+    public static func sign(
+        hashedMessage message: [UInt8],
+        privateKey: Bridge.PrivateKey.Wrapped,
+        input: SchnorrInput?
+    ) throws -> Bridge.Scnhorr.Wrapped {
+        guard message.count == Curve.Field.byteCount else {
+            throw Bridge.Error.unableToSignMessageHasInvalidLength(got: message.count, expected: Curve.Field.byteCount)
+        }
+        var signatureOut = [UInt8](repeating: 0, count: Bridge.Scnhorr.Wrapped.byteCount)
+        
+        var keyPair = secp256k1_keypair()
+        
+        try Bridge.call(
+            ifFailThrow: .failedToInitializeKeyPairForSchnorrSigning
+        ) { context in
+            secp256k1_keypair_create(context, &keyPair, privateKey.secureBytes.backing.bytes)
+        }
+        
+        var auxilaryRandomBytes: [UInt8]? = nil
+        if let auxilaryRandomData = input?.auxilaryRandomData {
+            guard auxilaryRandomData.count == Curve.Field.byteCount else {
+                throw Bridge.Error.failedToSchnorrSignDigestProvidedRandomnessInvalidLength
+            }
+            auxilaryRandomBytes = [UInt8](auxilaryRandomData)
+        }
+        
+        try Bridge.call(
+            ifFailThrow: .failedToSchnorrSignDigest
+        ) { context in
+            secp256k1_schnorrsig_sign32(
+                context,
+                &signatureOut,
+                message,
+                &keyPair,
+                auxilaryRandomBytes
+            )
+        }
+        
+        return try Bridge.Scnhorr.Wrapped(bytes: signatureOut)
     }
     
-    
 }
+
+
+public struct SchnorrInput {
+    public let auxilaryRandomData: Data
+    public init(auxilaryRandomData: Data) {
+        self.auxilaryRandomData = auxilaryRandomData
+    }
+}
+
+
