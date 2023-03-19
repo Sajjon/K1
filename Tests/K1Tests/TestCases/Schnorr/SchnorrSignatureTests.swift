@@ -31,3 +31,12 @@ extension K1.PublicKey {
         isValidSchnorrSignature(signature, digest: SHA256.hash(data: unhashed))
     }
 }
+
+extension K1.PrivateKey {
+    func schnorrSign(
+        unhashed: some DataProtocol,
+        input maybeInput: SchnorrInput? = nil
+    ) throws -> SchnorrSignature {
+        try schnorrSign(digest: SHA256.hash(data: unhashed), input: maybeInput)
+    }
+}

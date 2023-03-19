@@ -10,8 +10,6 @@ import CryptoKit
 import Foundation
 
 // MARK: - PrivateKey
-// MARK: -
-
 public extension K1 {
     
     struct PrivateKey: Sendable, Hashable {
@@ -19,29 +17,31 @@ public extension K1 {
         typealias Wrapped = Bridge.PrivateKey.Wrapped
         internal let wrapped: Wrapped
         
-        
         public let publicKey: PublicKey
         
         internal init(wrapped: Wrapped) {
             self.wrapped = wrapped
             self.publicKey = PublicKey(wrapped: wrapped.publicKey)
         }
+    }
+}
 
-        public init(
-            rawRepresentation: some DataProtocol
-        ) throws {
-            try self.init(wrapped: Bridge.PrivateKey.from(rawRepresentation: rawRepresentation))
-        }
-        
-        public init() {
-            self.init(wrapped: .init())
-        }
+// MARK: Inits
+extension K1.PrivateKey {
+    
+    public init(
+        rawRepresentation: some DataProtocol
+    ) throws {
+        try self.init(wrapped: Bridge.PrivateKey.from(rawRepresentation: rawRepresentation))
+    }
+    
+    public init() {
+        self.init(wrapped: .init())
     }
 }
 
 
 // MARK: - Equatable
-// MARK: -
 public extension K1.PrivateKey {
     /// Two PrivateKey are considered equal if their PublicKeys are equal
     static func == (lhs: Self, rhs: Self) -> Bool {
@@ -50,7 +50,6 @@ public extension K1.PrivateKey {
 }
 
 // MARK: - Hashable
-// MARK: -
 public extension K1.PrivateKey {
     /// We use the public key of the private key as input to hash
     func hash(into hasher: inout Hasher) {
@@ -58,79 +57,77 @@ public extension K1.PrivateKey {
     }
 }
 
-public extension K1.PrivateKey {
+// MARK: Schnorr Sign
+extension K1.PrivateKey {
     
-     func schnorrSign(
-         hashed: some DataProtocol,
-         input: SchnorrInput? = nil
-     ) throws -> SchnorrSignature {
-         let wrapped = try Bridge.PrivateKey.schnorrSign(
+    public func schnorrSign(
+        hashed: some DataProtocol,
+        input: SchnorrInput? = nil
+    ) throws -> SchnorrSignature {
+        let wrapped = try Bridge.PrivateKey.schnorrSign(
             hashedMessage: [UInt8](hashed),
             privateKey: wrapped,
             input: input
         )
-         return SchnorrSignature(
+        return SchnorrSignature(
             wrapped: wrapped
-         )
-     }
-     
-     func ecdsaSignNonRecoverable(
-         digest: some Digest,
-         mode: Bridge.ECDSA.SigningMode = .default
-     ) throws -> ECDSASignatureNonRecoverable {
-         try ECDSASignatureNonRecoverable(
+        )
+    }
+    
+    public func schnorrSign(
+        digest: some Digest,
+        input maybeInput: SchnorrInput? = nil
+    ) throws -> SchnorrSignature {
+        try schnorrSign(hashed: Array(digest), input: maybeInput)
+    }
+    
+}
+
+// MARK: ECDSA Non-Recoverable
+extension K1.PrivateKey {
+    public func ecdsaSignNonRecoverable(
+        digest: some Digest,
+        mode: Bridge.ECDSA.SigningMode = .default
+    ) throws -> ECDSASignatureNonRecoverable {
+        try ECDSASignatureNonRecoverable(
             wrapped: Bridge.PrivateKey.ecdsaSignNonRecoverable(
                 hashedMessage: [UInt8](digest),
                 privateKey: wrapped,
                 mode: mode
             )
-         )
-     }
-     
+        )
+    }
+    
     /// SHA256 hashes `unhashed` before signing it.
-    func ecdsaSignNonRecoverable(
+    public func ecdsaSignNonRecoverable(
         unhashed: some DataProtocol,
         mode: Bridge.ECDSA.SigningMode = .default
     ) throws -> ECDSASignatureNonRecoverable {
         try ecdsaSignNonRecoverable(digest: SHA256.hash(data: unhashed), mode: mode)
     }
-    
-     func ecdsaSignRecoverable(
-         digest: some Digest,
-         mode: Bridge.ECDSA.SigningMode = .default
-     ) throws -> ECDSASignatureRecoverable {
-         try ECDSASignatureRecoverable(
+}
+
+// MARK: ECDSA Recoverable
+extension K1.PrivateKey {
+    public func ecdsaSignRecoverable(
+        digest: some Digest,
+        mode: Bridge.ECDSA.SigningMode = .default
+    ) throws -> ECDSASignatureRecoverable {
+        try ECDSASignatureRecoverable(
             wrapped: Bridge.PrivateKey.ecdsaSignRecoverable(
                 hashedMessage: [UInt8](digest),
                 privateKey: wrapped,
                 mode: mode
             )
-         )
-     }
-     
-     func ecdsaSignRecoverable<D: DataProtocol>(
-         unhashed data: D,
-         mode: Bridge.ECDSA.SigningMode = .default
-     ) throws -> ECDSASignatureRecoverable {
-         try ecdsaSignRecoverable(digest: SHA256.hash(data: data), mode: mode)
-     }
-     
-     
-     func schnorrSign<D: Digest>(
-         digest: D,
-         input maybeInput: SchnorrInput? = nil
-     ) throws -> SchnorrSignature {
-         try schnorrSign(hashed: Array(digest), input: maybeInput)
-     }
-     
-     func schnorrSign<D: DataProtocol>(
-         unhashed data: D,
-         input maybeInput: SchnorrInput? = nil
-     ) throws -> SchnorrSignature {
-         try schnorrSign(digest: SHA256.hash(data: data), input: maybeInput)
-     }
+        )
+    }
     
-     
+    public func ecdsaSignRecoverable<D: DataProtocol>(
+        unhashed data: D,
+        mode: Bridge.ECDSA.SigningMode = .default
+    ) throws -> ECDSASignatureRecoverable {
+        try ecdsaSignRecoverable(digest: SHA256.hash(data: data), mode: mode)
+    }
 }
 
 // MARK: ECDH
