@@ -45,7 +45,7 @@ extension K1.PublicKey {
     public func isValidECDSASignature(
         _ signature: ECDSASignatureNonRecoverable,
         hashed: some DataProtocol,
-        mode: SignatureValidationMode = .default
+        mode: Bridge.ECDSA.ValidationMode = .default
     ) -> Bool {
         do {
             return try wrapped.isValid(
@@ -59,10 +59,15 @@ extension K1.PublicKey {
     }
     
     /// Verifies an elliptic curve digital signature algorithm (ECDSA) signature on a digest over the `secp256k1` elliptic curve.
+    /// - Parameters:
+    ///   - signature: <#signature description#>
+    ///   - digest: <#digest description#>
+    ///   - mode: <#mode description#>
+    /// - Returns: A Boolean value that’s true if the signature is valid for the given digest.
     public func isValidECDSASignature(
         _ signature: ECDSASignatureNonRecoverable,
         digest: some Digest,
-        mode: SignatureValidationMode = .default
+        mode: Bridge.ECDSA.ValidationMode = .default
     ) -> Bool {
         isValidECDSASignature(
             signature,
@@ -82,7 +87,7 @@ extension K1.PublicKey {
     public func isValidECDSASignature(
         _ signature: ECDSASignatureRecoverable,
         hashed: some DataProtocol,
-        mode: SignatureValidationMode = .default
+        mode: Bridge.ECDSA.ValidationMode = .default
     ) -> Bool {
         do {
             return try isValidECDSASignature(
@@ -101,10 +106,14 @@ extension K1.PublicKey {
     public func isValidECDSASignature(
         _ signature: ECDSASignatureRecoverable,
         digest: some Digest,
-        mode: SignatureValidationMode = .default
+        mode: Bridge.ECDSA.ValidationMode = .default
     ) -> Bool {
         do {
-            return try isValidECDSASignature(signature.nonRecoverable(), digest: digest, mode: mode)
+            return try isValidECDSASignature(
+                signature.nonRecoverable(),
+                digest: digest,
+                mode: mode
+            )
         } catch {
             return false
         }

@@ -16,7 +16,8 @@
 //===----------------------------------------------------------------------===//
 import XCTest
 import CryptoKit
-import enum FFI.SignatureValidationMode // FIXME move `SignatureValidationMode` to some `Prelude` package which `K1` and `FFI` can depend on
+import FFI
+
 @testable import K1
 
 struct TestSuite<T: Decodable>: Decodable {
@@ -72,7 +73,7 @@ extension XCTestCase {
     
     func doTestGroup<HF: HashFunction, TV: WycheproofTestVector>(
         group: ECDSAWycheTestGroup<TV>,
-        signatureValidationMode: SignatureValidationMode,
+        signatureValidationMode: Bridge.ECDSA.ValidationMode,
         hashFunction: HF.Type,
         skipIfContainsFlags: [String] = [],
         skipIfContainsComment: [String] = [],

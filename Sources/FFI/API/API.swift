@@ -8,21 +8,6 @@
 import Foundation
 import secp256k1
 
-/// Validation mode controls whether or not signature malleability should
-/// is forbidden or allowed. Read more about it [here][more]
-///
-/// [more]: https://github.com/bitcoin-core/secp256k1/blob/2e5e4b67dfb67950563c5f0ab2a62e25eb1f35c5/include/secp256k1.h#L510-L550
-public enum SignatureValidationMode {
-    case preventSignatureMalleability
-    case acceptSignatureMalleability
-}
-
-public extension SignatureValidationMode {
-    static let `default`: Self = .acceptSignatureMalleability
-}
-
-
-
 // MARK: - Curve
 // MARK: -
 
@@ -47,6 +32,15 @@ extension Bridge {
 }
 extension Bridge.ECDSA {
     
+    /// Validation mode controls whether or not signature malleability should
+    /// is forbidden or allowed. Read more about it [here][more]
+    ///
+    /// [more]: https://github.com/bitcoin-core/secp256k1/blob/2e5e4b67dfb67950563c5f0ab2a62e25eb1f35c5/include/secp256k1.h#L510-L550
+    public enum ValidationMode {
+        case preventSignatureMalleability
+        case acceptSignatureMalleability
+    }
+    
     public struct SigningMode {
         public let nonceFunctionArbitraryData: Data?
         public init(nonceFunctionArbitraryData: Data? = nil) {
@@ -58,6 +52,10 @@ extension Bridge.ECDSA {
     
     public enum Recovery {}
     public enum NonRecovery {}
+}
+
+extension Bridge.ECDSA.ValidationMode {
+    public static let `default`: Self = .acceptSignatureMalleability
 }
 
 public enum RecoverableSignatureSerializationFormat {
@@ -279,7 +277,7 @@ extension Bridge.Scnhorr {
         public static func == (lhs: Wrapped, rhs: Wrapped) -> Bool {
             lhs.bytes == rhs.bytes
         }
-     
+        
         public func hash(into hasher: inout Hasher) {
             hasher.combine(bytes)
         }
@@ -384,7 +382,7 @@ extension Bridge.PublicKey {
         public func isValid(
             ecdsaSignature: Bridge.ECDSA.NonRecovery.Wrapped,
             message: [UInt8],
-            mode: SignatureValidationMode
+            mode: Bridge.ECDSA.ValidationMode
         ) throws -> Bool {
             try Bridge.toC { bridge -> Bool in
                 var maybeMalleable = ecdsaSignature.raw
@@ -458,7 +456,7 @@ extension CryptoKit.SharedSecret {
         guard sharedSecret.withUnsafeBytes({ Data($0).count == data.count }) else {
             throw Bridge.Error.failedToProduceSharedSecret
         }
-
+        
         self = sharedSecret
     }
 }
