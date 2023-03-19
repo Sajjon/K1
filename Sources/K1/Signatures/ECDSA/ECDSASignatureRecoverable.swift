@@ -11,28 +11,16 @@ import FFI
 import Tagged
 
 public struct ECDSASignatureRecoverable: Sendable, Hashable {
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.wrapped.withUnsafeBytes { lhsBytes in
-            rhs.wrapped.withUnsafeBytes { rhsBytes in
-                safeCompare(lhsBytes, rhsBytes)
-            }
-        }
-    }
-    public func hash(into hasher: inout Hasher) {
-        wrapped.withUnsafeBytes {
-            hasher.combine(bytes: $0)
-        }
-    }
-    
- 
-//    public let rawRepresentation: Data
     typealias Wrapped = Bridge.ECDSA.Recovery.Wrapped
     private let wrapped: Wrapped
     
     internal init(wrapped: Wrapped) {
         self.wrapped = wrapped
     }
-    
+}
+
+// MARK: Init
+extension ECDSASignatureRecoverable {
     public init(compactRepresentation: Data, recoveryID: Int32) throws {
         // FIXME: Needed?
         guard
@@ -59,26 +47,17 @@ public struct ECDSASignatureRecoverable: Sendable, Hashable {
     }
     
 
-    public init<D: DataProtocol>(rawRepresentation: D) throws {
-        try self.init(wrapped: Bridge.ECDSA.Recovery.from(rawRepresentation: rawRepresentation))
-    }
-    
-    public func recoverPublicKey(
-        message: some DataProtocol
-    ) throws -> K1.PublicKey {
-        try K1.PublicKey(
-            wrapped: Bridge.ECDSA.Recovery.recover(wrapped, message: [UInt8](message))
+    public init(rawRepresentation: some DataProtocol) throws {
+        try self.init(
+            wrapped: Bridge.ECDSA.Recovery.from(rawRepresentation: rawRepresentation)
         )
     }
+    
+  
 }
 
+// MARK: Serialize
 extension ECDSASignatureRecoverable {
-    
-    public func nonRecoverable() throws -> ECDSASignatureNonRecoverable {
-        try ECDSASignatureNonRecoverable(
-            wrapped: Bridge.ECDSA.Recovery.nonRecoverable(self.wrapped)
-        )
-    }
     
     internal var rawRepresentation: Data {
         Data(wrapped.bytes)
@@ -103,6 +82,50 @@ extension ECDSASignatureRecoverable {
         public let rs: Data
         public let recoveryID: RecoveryID
     }
-    public typealias RecoveryID = Tagged<Self, Int32>
+   
 }
 
+// MARK: Recovery
+extension ECDSASignatureRecoverable {
+    
+    public typealias RecoveryID = Tagged<Self, Int32>
+    
+    public func recoverPublicKey(
+        message: some DataProtocol
+    ) throws -> K1.PublicKey {
+        try K1.PublicKey(
+            wrapped: Bridge.ECDSA.Recovery.recover(wrapped, message: [UInt8](message))
+        )
+    }
+}
+
+// MARK: Conversion
+extension ECDSASignatureRecoverable {
+    public func nonRecoverable() throws -> ECDSASignatureNonRecoverable {
+        try ECDSASignatureNonRecoverable(
+            wrapped: Bridge.ECDSA.Recovery.nonRecoverable(self.wrapped)
+        )
+    }
+}
+
+// MARK: Equatable
+extension ECDSASignatureRecoverable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.wrapped.withUnsafeBytes { lhsBytes in
+            rhs.wrapped.withUnsafeBytes { rhsBytes in
+                safeCompare(lhsBytes, rhsBytes)
+            }
+        }
+    }
+    
+}
+
+// MARK: Hashable
+extension ECDSASignatureRecoverable {
+
+    public func hash(into hasher: inout Hasher) {
+        wrapped.withUnsafeBytes {
+            hasher.combine(bytes: $0)
+        }
+    }
+}
