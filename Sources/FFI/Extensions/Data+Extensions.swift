@@ -9,7 +9,7 @@
 import Foundation
 
 extension Data {
-    var bytes: [UInt8] {
+    public var bytes: [UInt8] {
         withUnsafeBytes { pointer in
             Array(pointer)
         }
@@ -19,7 +19,7 @@ extension Data {
 extension ContiguousBytes {
 
     @inlinable
-    var bytes: [UInt8] {
+    public var bytes: [UInt8] {
         withUnsafeBytes { pointer in
             Array(pointer)
         }

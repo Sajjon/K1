@@ -16,6 +16,7 @@
 //===----------------------------------------------------------------------===//
 import XCTest
 import CryptoKit
+import enum FFI.SignatureValidationMode // FIXME move `SignatureValidationMode` to some `Prelude` package which `K1` and `FFI` can depend on
 @testable import K1
 
 struct TestSuite<T: Decodable>: Decodable {
@@ -160,6 +161,7 @@ struct ECDSAKey: Codable {
     let curve: String
 }
 
+
 protocol SignatureTestVector: Codable {
     associatedtype MessageDigest: Digest
     associatedtype Signature: ECSignature
@@ -176,11 +178,6 @@ protocol WycheproofTestVector: SignatureTestVector where Signature == ECDSASigna
 
 
 typealias PublicKey = K1.PublicKey
-extension PublicKey {
-    init(x963Representation: [UInt8]) throws {
-        self = try Self.import(from: x963Representation)
-    }
-}
 typealias PrivateKey = K1.PrivateKey
 
 

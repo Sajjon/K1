@@ -6,6 +6,7 @@
 //
 
 import XCTest
+import FFI
 import Foundation
 @testable import K1
 
@@ -90,12 +91,12 @@ final class SchnorrSignatureBitcoinCoreTests: XCTestCase {
 private extension SchnorrSignatureBitcoinCoreTests {
     func doTestSchnorrSign(vector: SchnorrTestSignVector) throws {
         
-        let privateKey = try K1.PrivateKey.import(
+        let privateKey = try K1.PrivateKey(
             rawRepresentation: Data(hex: vector.privateKeyHex)
         )
         
         let publicKey = privateKey.publicKey
-        let expectedPublicKey = try K1.PublicKey.import(from: Data(hex: vector.publicKeyHex))
+        let expectedPublicKey = try K1.PublicKey(x963Representation: Data(hex: vector.publicKeyHex))
         XCTAssertEqual(publicKey, expectedPublicKey)
 
         XCTAssertEqual(
@@ -121,12 +122,12 @@ private extension SchnorrSignatureBitcoinCoreTests {
     
     func doTestSchnorrVerify(vector: SchnorrTestVector) throws {
         func parsePublicKey() throws -> PublicKey {
-            try PublicKey.import(from: Data(hex: vector.publicKeyHex))
+            try PublicKey(x963Representation: Data(hex: vector.publicKeyHex))
         }
         guard !vector.invalidPublicKey else {
             XCTAssertThrowsError(try parsePublicKey(), "") { anyError in
-                if let error = anyError as? K1.Error {
-                    XCTAssertEqual(error, K1.Error.failedToParsePublicKeyFromBytes)
+                if let error = anyError as? Bridge.Error {
+                    XCTAssertEqual(error, Bridge.Error.failedToDeserializePublicKey)
                 } else {
                     XCTFail("Failed to cast error")
                 }

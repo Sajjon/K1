@@ -9,6 +9,13 @@ import Foundation
 @testable import K1
 import XCTest
 
+extension ECDSASignatureRecoverable {
+    func compact() throws -> Compact {
+        try self.compact(format: .rsv)
+    }
+   
+}
+
 /// Test vectors:
 /// https://gist.github.com/webmaster128/130b628d83621a33579751846699ed15
 final class ECDASignaturePublicKeyRecoveryTests: XCTestCase {
@@ -54,11 +61,10 @@ private extension ECDASignaturePublicKeyRecoveryTests {
         var numberOfTestsRun = 0
         for vector in group.tests {
             let publicKeyUncompressed = try [UInt8](hex: vector.publicKeyUncompressed)
-            let expectedPublicKey = try K1.PublicKey(
-                wrapped: .init(uncompressedRaw: publicKeyUncompressed)
-            )
+            let expectedPublicKey =  try K1.PublicKey.init(x963Representation: publicKeyUncompressed)
+         
             XCTAssertEqual(
-                try [UInt8](hex: vector.publicKeyCompressed),
+                try Data(hex: vector.publicKeyCompressed),
                 try expectedPublicKey.rawRepresentation(format: .compressed)
             )
          
@@ -67,22 +73,22 @@ private extension ECDASignaturePublicKeyRecoveryTests {
             try XCTAssertEqual(recoverableSig.compact().recoveryID, vector.recoveryID)
             
             let hashedMessage = try Data(hex: vector.hashMessage)
-            XCTAssertTrue(try expectedPublicKey.isValid(signature: recoverableSig, hashed: hashedMessage))
-            XCTAssertTrue(try expectedPublicKey.isValid(signature: recoverableSig.nonRecoverable(), hashed: hashedMessage))
+            XCTAssertTrue(expectedPublicKey.isValidECDSASignature(recoverableSig, hashed: hashedMessage))
+            try XCTAssertTrue(expectedPublicKey.isValidECDSASignature(recoverableSig.nonRecoverable(), hashed: hashedMessage))
             try XCTAssertEqual(vector.recoveryID, recoverableSig.compact().recoveryID)
             
             let recoveredPublicKey = try recoverableSig.recoverPublicKey(
-                messageThatWasSigned: hashedMessage
+                message: hashedMessage
             )
             
             XCTAssertEqual(expectedPublicKey, recoveredPublicKey)
             
-            XCTAssertTrue(try recoveredPublicKey.isValid(signature: recoverableSig, hashed: hashedMessage))
-            XCTAssertTrue(try recoveredPublicKey.isValid(signature: recoverableSig.nonRecoverable(), hashed: hashedMessage))
+            XCTAssertTrue(recoveredPublicKey.isValidECDSASignature(recoverableSig, hashed: hashedMessage))
+            try XCTAssertTrue(recoveredPublicKey.isValidECDSASignature(recoverableSig.nonRecoverable(), hashed: hashedMessage))
                    
             let recoveredWithID = try recoverableSig.nonRecoverable().recoverPublicKey(
                 recoveryID: vector.recoveryID,
-                messageThatWasSigned: hashedMessage
+                message: hashedMessage
             )
             XCTAssertEqual(expectedPublicKey, recoveredWithID)
             
@@ -99,17 +105,16 @@ private struct RecoveryTestGroup: Decodable {
 
 struct IncorrectByteCount: Swift.Error {}
 struct RecoveryTestVector: Decodable, Equatable {
-    let recoveryID: Int
+    let recoveryID: ECDSASignatureRecoverable.RecoveryID
     let message: String
     let hashMessage: String
     private let signature: String
 
     
     func recoverableSignature() throws -> ECDSASignatureRecoverable {
-        let raw = try Data(hex: self.signature)
-        let signature = try ECDSASignatureRecoverable(rawRepresentation: raw)
-        XCTAssertEqual(signature.rawRepresentation, raw)
-        return signature
+        try ECDSASignatureRecoverable(
+            rawRepresentation: Data(hex: signature)
+        )
     }
     
     let publicKeyUncompressed: String

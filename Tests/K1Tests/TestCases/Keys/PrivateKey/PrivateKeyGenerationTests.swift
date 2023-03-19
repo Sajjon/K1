@@ -12,12 +12,12 @@ import XCTest
 final class PrivateKeyGenerationTests: XCTestCase {
 
     func testGenerationWorks() throws {
-        XCTAssertNoThrow(try PrivateKey.generateNew())
+        XCTAssertNoThrow(try PrivateKey())
     }
     
     func testRandom() throws {
         // The probability of two keys being identical is approximately: 1/2^256
-        XCTAssertNotEqual(try PrivateKey.generateNew(), try PrivateKey.generateNew())
+        XCTAssertNotEqual(try PrivateKey(), try PrivateKey())
     }
     
 }

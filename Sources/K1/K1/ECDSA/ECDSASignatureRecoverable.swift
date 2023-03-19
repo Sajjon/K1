@@ -7,100 +7,101 @@
 
 import Foundation
 import CryptoKit
-import secp256k1
+import FFI
+import Tagged
 
-public struct ECDSASignatureRecoverable: Sendable, Hashable, ECSignature {
+public struct ECDSASignatureRecoverable: Sendable, Hashable {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.wrapped.withUnsafeBytes { lhsBytes in
+            rhs.wrapped.withUnsafeBytes { rhsBytes in
+                safeCompare(lhsBytes, rhsBytes)
+            }
+        }
+    }
+    public func hash(into hasher: inout Hasher) {
+        wrapped.withUnsafeBytes {
+            hasher.combine(bytes: $0)
+        }
+    }
+    
  
-    public let rawRepresentation: Data
+//    public let rawRepresentation: Data
+    typealias Wrapped = Bridge.ECDSA.Recovery.Wrapped
+    private let wrapped: Wrapped
+    
+    internal init(wrapped: Wrapped) {
+        self.wrapped = wrapped
+    }
     
     public init(compactRepresentation: Data, recoveryID: Int32) throws {
         guard
             compactRepresentation.count == ECDSASignatureNonRecoverable.byteCount
          else {
-             throw K1.Error.incorrectByteCountOfRawSignature
+             throw Bridge.Error.incorrectByteCountOfRawSignature
          }
-        var recoverableSignature = secp256k1_ecdsa_recoverable_signature()
-        let rs = [UInt8](compactRepresentation)
-  
-        try Bridge.call(ifFailThrow: .failedToParseRecoverableSignatureFromCompactRepresentation) { context in
-            secp256k1_ecdsa_recoverable_signature_parse_compact(
-                context,
-                &recoverableSignature,
-                rs,
-                recoveryID
-            )
-        }
-        self.rawRepresentation = Data(
-            bytes: &recoverableSignature.data,
-            count: MemoryLayout.size(ofValue: recoverableSignature.data)
-        )
+//        var recoverableSignature = secp256k1_ecdsa_recoverable_signature()
+//        let rs = [UInt8](compactRepresentation)
+//
+//        try Bridge.call(ifFailThrow: .failedToParseRecoverableSignatureFromCompactRepresentation) { context in
+//            secp256k1_ecdsa_recoverable_signature_parse_compact(
+//                context,
+//                &recoverableSignature,
+//                rs,
+//                recoveryID
+//            )
+//        }
+//        self.rawRepresentation = Data(
+//            bytes: &recoverableSignature.data,
+//            count: MemoryLayout.size(ofValue: recoverableSignature.data)
+//        )
+        fatalError()
     }
+    
 
     public init<D: DataProtocol>(rawRepresentation: D) throws {
-
-        guard
-            rawRepresentation.count == ECDSASignatureNonRecoverable.byteCount + 1
-        else {
-            throw K1.Error.incorrectByteCountOfRawSignature
-        }
-        self.rawRepresentation = Data(rawRepresentation)
+        try self.init(wrapped: Bridge.ECDSA.Recovery.from(rawRepresentation: rawRepresentation))
     }
     
-    
+    public func recoverPublicKey(
+        message: some DataProtocol
+    ) throws -> K1.PublicKey {
+        try K1.PublicKey(
+            wrapped: Bridge.ECDSA.Recovery.recover(wrapped, message: [UInt8](message))
+        )
+    }
 }
 
-public extension ECDSASignatureRecoverable {
+extension ECDSASignatureRecoverable {
     
-    typealias Scheme = ECDSA
-    static let scheme: SigningScheme = .ecdsa
-    
-    func nonRecoverable() throws -> ECDSASignatureNonRecoverable {
-        try Bridge.convertToNonRecoverable(ecdsaSignature: self)
+    public func nonRecoverable() throws -> ECDSASignatureNonRecoverable {
+        try ECDSASignatureNonRecoverable(
+            wrapped: Bridge.ECDSA.Recovery.nonRecoverable(self.wrapped)
+        )
     }
     
-    func compact() throws -> (rs: Data, recoveryID: Int) {
-        var rsBytes = [UInt8](repeating: 0, count: 64)
-        var recoveryID: Int32 = 0
-        
-        var recoverableBridgedToC = secp256k1_ecdsa_recoverable_signature()
-        withUnsafeMutableBytes(of: &recoverableBridgedToC.data) { pointer in
-            pointer.copyBytes(
-                from: rawRepresentation.prefix(pointer.count)
-            )
-        }
-        
-        try Bridge.call(
-            ifFailThrow: .failedSignatureToConvertRecoverableSignatureToCompact) { context in
-                secp256k1_ecdsa_recoverable_signature_serialize_compact(
-                context,
-                &rsBytes,
-                &recoveryID,
-                &recoverableBridgedToC
-            )
-        }
-        return (rs: Data(rsBytes), recoveryID: Int(recoveryID))
+    internal var rawRepresentation: Data {
+        Data(wrapped.bytes)
     }
     
+    public func compact(
+        format: RecoverableSignatureSerializationFormat
+    ) throws -> Compact {
+        
+        let (rs, recoveryID) = try Bridge.ECDSA.Recovery.serialize(
+            wrapped,
+            format: format
+        )
+        
+        return .init(
+            rs: Data(rs),
+            recoveryID: .init(recoveryID)
+        )
+    }
+    
+    public struct Compact: Sendable, Hashable {
+        public let rs: Data
+        public let recoveryID: RecoveryID
+    }
+    public typealias RecoveryID = Tagged<Self, Int32>
 }
 
-public extension ECDSASignatureRecoverable {
-    typealias ValidationMode = ECDSASignatureNonRecoverable.ValidationMode
-    typealias SigningMode = ECDSASignatureNonRecoverable.SigningMode
-   
-    func wasSigned<D>(by signer: K1.PublicKey, for digest: D, mode: ValidationMode) throws -> Bool where D : Digest {
-        try nonRecoverable().wasSigned(by: signer, for: digest, mode: mode)
-    }
-    
-    func wasSigned<D>(by signer: K1.PublicKey, hashedMessage: D, mode: ValidationMode) throws -> Bool where D : DataProtocol {
-        try nonRecoverable().wasSigned(by: signer, hashedMessage: hashedMessage, mode: mode)
-    }
-    
-    static func by<D>(signing hashed: D, with privateKey: K1.PrivateKey, mode: SigningMode) throws -> Self where D : DataProtocol {
-        try privateKey.ecdsaSignRecoverable(hashed: hashed, mode: mode)
-    }
-        
-    func wasSigned<D>(by signer: K1.PublicKey, for digest: D) throws -> Bool where D : Digest {
-        try nonRecoverable().wasSigned(by: signer, for: digest)
-    }
-
-}

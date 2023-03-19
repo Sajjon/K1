@@ -5,12 +5,11 @@
 //  Created by Alexander Cyon on 2022-01-27.
 //
 
-
 // Bridge to C
 import secp256k1
 
 // MARK: Context
-extension K1.Context {
+extension Bridge.Context {
     
     /// Bridging value used by libsecp256k1 methods that requires info about
     /// how the context is used, e.g. for signing or verification (validate).
@@ -28,7 +27,7 @@ extension K1.Context {
 }
 
 // MARK: Format
-public extension K1.Format {
+public extension Bridge.Format {
     
     /// Bridging value used by libsecp256k1 public key specifying the format
     /// of the imported public key, i.e. how many bytes.

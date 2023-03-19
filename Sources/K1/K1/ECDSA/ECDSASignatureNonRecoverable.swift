@@ -7,43 +7,78 @@
 
 import Foundation
 import CryptoKit
-import secp256k1
+import FFI
 
-public struct ECDSASignatureNonRecoverable: Sendable, Hashable, ECSignature {
+public struct ECDSASignatureNonRecoverable: Sendable, Hashable {
     
-    public let rawRepresentation: Data
-    
-    public init<D: DataProtocol>(rawRepresentation: D) throws {
-        guard
-            rawRepresentation.count == Self.byteCount
-        else {
-            throw K1.Error.incorrectByteCountOfRawSignature
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.wrapped.withUnsafeBytes { lhsBytes in
+            rhs.wrapped.withUnsafeBytes { rhsBytes in
+                safeCompare(lhsBytes, rhsBytes)
+            }
         }
-        
-        self.rawRepresentation = Data(rawRepresentation)
+    }
+    public func hash(into hasher: inout Hasher) {
+        wrapped.withUnsafeBytes {
+            hasher.combine(bytes: $0)
+        }
     }
     
-    public init<D: DataProtocol>(compactRepresentation: D) throws {
-        var signature = secp256k1_ecdsa_signature()
-        let compactBytes = [UInt8](compactRepresentation)
-        try Bridge.call(ifFailThrow: .failedToParseSignatureFromCompactRepresentation) { context in
-            secp256k1_ecdsa_signature_parse_compact(
-                context,
-                &signature,
-                compactBytes
-            )
-        }
-
-        try self.init(rawRepresentation: Data(
-            bytes: &signature.data,
-            count: MemoryLayout.size(ofValue: signature.data)
-        ))
+    typealias Wrapped = Bridge.ECDSA.NonRecovery.Wrapped
+    internal let wrapped: Wrapped
+    init(wrapped: Wrapped) {
+        self.wrapped = wrapped
     }
+    
+    public init(rawRepresentation: some DataProtocol) throws {
+//        guard
+//            rawRepresentation.count == Self.byteCount
+//        else {
+//            throw Bridge.Error.incorrectByteCountOfRawSignature
+//        }
+//
+//        self.rawRepresentation = Data(rawRepresentation)
+        fatalError()
+    }
+    
+    public init(compactRepresentation: some DataProtocol) throws {
+
+        try self.init(wrapped: Bridge.ECDSA.NonRecovery.from(compactBytes: [UInt8](compactRepresentation)))
+    }
+    
+    public init(derRepresentation: some DataProtocol) throws {
+        try self.init(
+            wrapped: Bridge.ECDSA.NonRecovery.from(derRepresentation: [UInt8](derRepresentation))
+        )
+    }
+    
+    public func compactRepresentation() throws -> Data {
+        try Bridge.ECDSA.NonRecovery.compact(wrapped)
+    }
+    
+    internal var rawRepresentation: Data {
+        Data(wrapped.bytes)
+    }
+    
+    public func derRepresentation() throws -> Data {
+        try Bridge.ECDSA.NonRecovery.der(wrapped)
+    }
+    
+    public func recoverPublicKey(
+        recoveryID: ECDSASignatureRecoverable.RecoveryID,
+        message: some DataProtocol
+    ) throws -> K1.PublicKey {
+        try K1.PublicKey(
+            wrapped:  Bridge.ECDSA.NonRecovery.recoverPublicKey(self.wrapped, recoveryID: recoveryID.rawValue, message: [UInt8](message))
+        )
+       
+    }
+    
+
 }
 
 extension ECDSASignatureNonRecoverable {
-    internal static let byteCount = 2 * K1.Curve.Field.byteCount
-    public typealias Scheme = ECDSA
-    public static let scheme: SigningScheme = .ecdsa
+    internal static let byteCount = Bridge.ECDSA.Recovery.byteCount
+
 }
 

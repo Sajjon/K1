@@ -45,7 +45,7 @@ private extension ECDHWychoproofTests {
             //
             // Second, Wycheproof inputs may be too short or too long with
             // leading zeros.
-            let curveSize = K1.Curve.Field.byteCount
+            let curveSize = 32 //K1.Curve.Field.byteCount
             var privateBytes = [UInt8](repeating: 0, count: curveSize)
 
             let hexFromVector = (vector.count % 2 == 0) ? vector : "0\(vector)"
@@ -74,10 +74,10 @@ private extension ECDHWychoproofTests {
             }
             numberOfTestsRun += 1
             do {
-                let publicKey = try PublicKey.import(der: Data(hex: testVector.publicKey))
+                let publicKey = try PublicKey(der: Data(hex: testVector.publicKey))
                 var privateBytes = [UInt8]()
                 privateBytes = try padKeyIfNecessary(vector: testVector.privateKey)
-                let privateKey = try PrivateKey.import(rawRepresentation: privateBytes)
+                let privateKey = try PrivateKey(rawRepresentation: privateBytes)
                 
                 /// ANS1 X9.63 serialization of shared secret, returning a `CryptoKit.SharedSecret`
                 let sharedPublicKeyPoint = try privateKey.sharedSecretFromKeyAgreement(with: publicKey)

@@ -8,7 +8,7 @@ _K1_ is Swift wrapper around [libsecp256k1 (bitcoin-core/secp256k1)][lib], offer
 ## ECDSA Signatures
 
 ```swift
-let alice = try K1.PrivateKey.generateNew()
+let alice = try K1.PrivateKey()
 let message = "Send Bob 3 BTC".data(using: .utf8)!
 let signature = try alice.ecdsaSign(unhashed: message)
 let isSignatureValid = try alice.publicKey.isValidECDSASignature(signature, unhashed: message)
@@ -20,7 +20,7 @@ assert(isSignatureValid, "Signature should be valid.")
 
 
 ```swift
-let alice = try K1.PrivateKey.generateNew()
+let alice = try K1.PrivateKey()
 let message = "Send Bob 3 BTC".data(using: .utf8)!
 let signature = try alice.schnorrSign(unhashed: message)
 let isSignatureValid = try alice.publicKey.isValidSchnorrSignature(signature, unhashed: message)
@@ -42,8 +42,8 @@ This library vendors three different EC Diffie-Hellman (ECDH) key exchange funct
 3. Custom - No hash, return point uncompressed - `ecdhPoint -> Data`
 
 ```swift
-let alice = try K1.PrivateKey.generateNew()
-let bob = try K1.PrivateKey.generateNew()
+let alice = try K1.PrivateKey()
+let bob = try K1.PrivateKey()
 ```
 
 ### `ASN1 x9.63` ECDH

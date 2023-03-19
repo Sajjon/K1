@@ -2,6 +2,7 @@ import XCTest
 import CryptoKit
 @testable import K1
 
+
 /// Test vectors from [trezor][trezor], signature data from [oleganza][oleganza]
 ///
 /// More vectors can be founds on bitcointalk forum, [here][bitcointalk1] and [here][bitcointalk2] (unreliable?)
@@ -37,7 +38,7 @@ private extension XCTestCase {
     ) throws -> ResultOfTestGroup {
         var numberOfTestsRun = 0
         for vector in group.tests {
-            let privateKey = try K1.PrivateKey.import(rawRepresentation: Data(hex: vector.privateKey))
+            let privateKey = try K1.PrivateKey(rawRepresentation: Data(hex: vector.privateKey))
             let publicKey = privateKey.publicKey
             
             let expectedSignature = try vector.expectedSignature()
@@ -49,7 +50,7 @@ private extension XCTestCase {
             XCTAssertEqual(signatureFromMessage, expectedSignature)
             try XCTAssertEqual(signatureRecoverableFromMessage.nonRecoverable(), expectedSignature)
             let recid = try signatureRecoverableFromMessage.compact().recoveryID
-            XCTAssertEqual(signatureRecoverableFromMessage.rawRepresentation.hex, expectedSignature.rawRepresentation.hex + "\(Data([UInt8(recid)]).hex)")
+            XCTAssertEqual(signatureRecoverableFromMessage.rawRepresentation.hex, expectedSignature.rawRepresentation.hex + "\(Data([UInt8(recid.rawValue)]).hex)")
             numberOfTestsRun += 1
         }
         return .init(numberOfTestsRun: numberOfTestsRun, idsOmittedTests: [])
@@ -79,7 +80,7 @@ private struct SignatureTrezorTestVector: SignatureTestVector {
     }
     func expectedSignature() throws -> Signature {
         let derData = try Data(hex: expected.der)
-        let signature = try ECDSASignatureNonRecoverable.import(fromDER: derData)
+        let signature = try ECDSASignatureNonRecoverable(derRepresentation: derData)
         try XCTAssertEqual(signature.derRepresentation().hex, expected.der)
         try XCTAssertEqual(
             signature.compactRepresentation().hex,

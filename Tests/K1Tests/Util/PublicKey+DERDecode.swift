@@ -67,8 +67,8 @@ extension K1.PublicKey {
     }
     
 
-    static func `import`(der: Data) throws -> Self {
-        let publicKeyData = try importPublicKeyDataFromASN1Object(der: der)
-        return try Self.import(from: publicKeyData)
+    init(der: some DataProtocol) throws {
+        let publicKeyData = try Self.importPublicKeyDataFromASN1Object(der: Data(der))
+        try self.init(x963Representation: publicKeyData)
     }
 }

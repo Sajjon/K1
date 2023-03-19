@@ -2,34 +2,34 @@
 //  File.swift
 //  
 //
-//  Created by Alexander Cyon on 2022-01-27.
+//  Created by Alexander Cyon on 2023-03-17.
 //
 
+import Foundation
 
-public extension K1 {
-    
+extension Bridge {
     /// Bridging type for: `secp256k1_ec_pubkey_serialize`
-    enum Format: UInt32, CaseIterable {
+    public enum Format: UInt32, CaseIterable {
         case compressed, uncompressed
     }
 }
 
-public extension K1.Format {
+extension Bridge.Format {
     
-    var length: Int {
+    public var length: Int {
         switch self {
         case .compressed: return 33
         case .uncompressed: return 65
         }
     }
     
-    init(byteCount: Int) throws {
+    public init(byteCount: Int) throws {
         if byteCount == Self.uncompressed.length {
             self = .uncompressed
         } else if byteCount == Self.compressed.length {
             self = .compressed
         } else {
-            throw K1.Error.incorrectByteCountOfPublicKey(providedByteCount: byteCount)
+            throw Bridge.Error.incorrectByteCountOfPublicKey(providedByteCount: byteCount)
         }
     }
 }

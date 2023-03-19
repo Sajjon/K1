@@ -9,15 +9,15 @@
 import CryptoKit
 import secp256k1
 
-internal final class Bridge {
+public final class Bridge {
     
     let context: OpaquePointer
     init() throws {
         guard
             /* "Create a secp256k1 context object." */
-            let context = secp256k1_context_create(K1.Context.sign.rawValue | K1.Context.verify.rawValue)
+            let context = secp256k1_context_create(Context.sign.rawValue | Bridge.Context.verify.rawValue)
         else {
-            throw K1.Error.failedToCreateContextForSecp256k1
+            throw Bridge.Error.failedToCreateContextForSecp256k1
         }
         
         self.context = context
@@ -31,7 +31,7 @@ internal final class Bridge {
 
 extension Bridge {
     
-    static func toC<T>(
+    public static func toC<T>(
         _ closure: (Bridge) throws -> T
     ) throws -> T {
         let bridge = try Bridge()
@@ -39,21 +39,21 @@ extension Bridge {
     }
     
     /// Returns `true` iff result code is `1`
-    func validate(
+    public func validate(
         _ method: (OpaquePointer) -> Int32
     ) -> Bool {
         method(context) == 1
     }
     
-    func callWithResultCode(
+    public func callWithResultCode(
         _ method: (OpaquePointer) -> Int32
     ) -> Int {
         let result = method(context)
         return Int(result)
     }
     
-    func call(
-        ifFailThrow error: K1.Error,
+    public func call(
+        ifFailThrow error: Bridge.Error,
         _ method: (OpaquePointer) -> Int32
     ) throws {
       let result = callWithResultCode(method)
@@ -63,8 +63,8 @@ extension Bridge {
         }
     }
     
-    static func call(
-        ifFailThrow error: K1.Error,
+    public static func call(
+        ifFailThrow error: Bridge.Error,
         _ method: (OpaquePointer) -> Int32
     ) throws {
         try toC { bridge in

@@ -12,8 +12,8 @@ import XCTest
 final class ECDHTests: XCTestCase {
     
     func testECDHX963() throws {
-        let alice = try K1.PrivateKey.generateNew()
-        let bob = try K1.PrivateKey.generateNew()
+        let alice = K1.PrivateKey()
+        let bob = K1.PrivateKey()
         
         let ab = try alice.sharedSecretFromKeyAgreement(with: bob.publicKey)
         let ba = try bob.sharedSecretFromKeyAgreement(with: alice.publicKey)
@@ -24,18 +24,20 @@ final class ECDHTests: XCTestCase {
     }
   
     func testECDHLibsecp256k1() throws {
-        let alice = try K1.PrivateKey.generateNew()
-        let bob = try K1.PrivateKey.generateNew()
+        let alice = K1.PrivateKey()
+        let bob = K1.PrivateKey()
         
         let ab = try alice.ecdh(with: bob.publicKey)
         let ba = try bob.ecdh(with: alice.publicKey)
+        ab.withUnsafeBytes {
+            XCTAssertEqual(Data($0).count, 32)
+        }
         XCTAssertEqual(ab, ba, "Alice and Bob should be able to agree on the same secret")
-        XCTAssertEqual(ab.count, 32)
     }
     
     func testECDHPoint() throws {
-        let alice = try K1.PrivateKey.generateNew()
-        let bob = try K1.PrivateKey.generateNew()
+        let alice = K1.PrivateKey()
+        let bob = K1.PrivateKey()
         
         let ab = try alice.ecdhPoint(with: bob.publicKey)
         let ba = try bob.ecdhPoint(with: alice.publicKey)
@@ -51,15 +53,18 @@ final class ECDHTests: XCTestCase {
         let libsecp256k1 = try privateKey1.ecdh(with: privateKey2.publicKey)
         let ans1X963 = try privateKey1.sharedSecretFromKeyAgreement(with: privateKey2.publicKey).withUnsafeBytes({ Data($0) })
         
-        XCTAssertEqual(libsecp256k1.hex, "5935d0476af9df2998efb60383adf2ff23bc928322cfbb738fca88e49d557d7e")
+        libsecp256k1.withUnsafeBytes {
+            XCTAssertEqual(Data($0).hex, "5935d0476af9df2998efb60383adf2ff23bc928322cfbb738fca88e49d557d7e")
+        }
+        
         XCTAssertEqual(ans1X963.hex, "3a17fe5fa33c4f2c7e61799a65061214913f39bfcbee178ab351493d5ee17b2f")
         
     }
     
     /// Assert we do not introduce any regression bugs for the custom ECDh `ecdhPoint`
     func testECDHCustom() throws {
-        let alice = try K1.PrivateKey.import(rawRepresentation: Data(repeating: 0xAA, count: 32))
-        let bob = try K1.PrivateKey.import(rawRepresentation: Data(repeating: 0xBB, count: 32))
+        let alice = try K1.PrivateKey(rawRepresentation: Data(repeating: 0xAA, count: 32))
+        let bob = try K1.PrivateKey(rawRepresentation: Data(repeating: 0xBB, count: 32))
         let ab = try alice.ecdhPoint(with: bob.publicKey)
         let ba = try bob.ecdhPoint(with: alice.publicKey)
         XCTAssertEqual(ab, ba, "Alice and Bob should be able to agree on the same secret")
@@ -70,6 +75,6 @@ final class ECDHTests: XCTestCase {
 
 extension K1.PrivateKey {
     init(hex: String) throws {
-        self = try Self.import(rawRepresentation: Data(hex: hex))
+        self = try Self(rawRepresentation: Data(hex: hex))
     }
 }

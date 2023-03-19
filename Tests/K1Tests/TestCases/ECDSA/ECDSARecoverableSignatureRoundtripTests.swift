@@ -11,10 +11,10 @@ import XCTest
 
 final class ECDSARecoverableSignatureRoundtripTests: XCTestCase {
     func testECDSARecoverable() throws {
-        let alice = try K1.PrivateKey.generateNew()
+        let alice = K1.PrivateKey()
         let message = "Send Bob 3 BTC".data(using: .utf8)!
         let signature = try alice.ecdsaSignRecoverable(unhashed: message)
-        let isSignatureValid = try alice.publicKey.isValid(signature: signature, unhashed: message)
+        let isSignatureValid = alice.publicKey.isValidECDSASignature(signature, unhashed: message)
         XCTAssertTrue(isSignatureValid, "Signature should be valid.")
     }
 

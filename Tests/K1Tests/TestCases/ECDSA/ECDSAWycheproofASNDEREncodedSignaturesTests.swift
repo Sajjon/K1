@@ -18,6 +18,7 @@ import Foundation
 import XCTest
 import CryptoKit
 @testable import K1
+@testable import FFI
 
 final class ECDSA_Wycheproof_ASN_DER_EncodedSignaturesTests: XCTestCase {
     
@@ -57,7 +58,7 @@ private struct SignatureWycheproofDERTestVector: WycheproofTestVector {
     }
     func expectedSignature() throws -> Signature {
         let derData = try Data(hex: sig)
-        let signature = try ECDSASignatureNonRecoverable.import(fromDER: derData)
+        let signature = try ECDSASignatureNonRecoverable(derRepresentation: derData)
         if self.result == "valid" {
             try XCTAssertEqual(sig, signature.derRepresentation().hex)
         }
