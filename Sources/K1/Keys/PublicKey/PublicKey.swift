@@ -42,6 +42,11 @@ extension K1.PublicKey {
 extension K1.PublicKey {
     
     /// Verifies an elliptic curve digital signature algorithm (ECDSA) signature on some _hash_ over the `secp256k1` elliptic curve.
+    /// - Parameters:
+    ///   - signature: The (non-recoverable) signature to check against the _hashed_ data.
+    ///   - hashed: The _hashed_ data covered by the signature.
+    ///   - mode: Whether or not to consider malleable signatures valid.
+    /// - Returns: A Boolean value that’s true if the signature is valid for the given _hashed_ data.
     public func isValidECDSASignature(
         _ signature: ECDSASignatureNonRecoverable,
         hashed: some DataProtocol,
@@ -60,9 +65,9 @@ extension K1.PublicKey {
     
     /// Verifies an elliptic curve digital signature algorithm (ECDSA) signature on a digest over the `secp256k1` elliptic curve.
     /// - Parameters:
-    ///   - signature: <#signature description#>
-    ///   - digest: <#digest description#>
-    ///   - mode: <#mode description#>
+    ///   - signature: The (non-recoverable) signature to check against the given digest.
+    ///   - digest: The digest covered by the signature.
+    ///   - mode: Whether or not to consider malleable signatures valid.
     /// - Returns: A Boolean value that’s true if the signature is valid for the given digest.
     public func isValidECDSASignature(
         _ signature: ECDSASignatureNonRecoverable,

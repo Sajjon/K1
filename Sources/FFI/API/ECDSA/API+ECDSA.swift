@@ -13,12 +13,13 @@ extension Bridge {
 }
 extension Bridge.ECDSA {
     
-    /// Validation mode controls whether or not signature malleability should
-    /// is forbidden or allowed. Read more about it [here][more]
+    /// Whether or not to consider malleable signatures valid.
     ///
     /// [more]: https://github.com/bitcoin-core/secp256k1/blob/2e5e4b67dfb67950563c5f0ab2a62e25eb1f35c5/include/secp256k1.h#L510-L550
     public enum ValidationMode {
+        /// Considers all malleable signatures **invalid**.
         case preventSignatureMalleability
+        /// Accepts malleable signatures valid.
         case acceptSignatureMalleability
     }
     
