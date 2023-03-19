@@ -64,12 +64,13 @@ public extension K1.PrivateKey {
          hashed: some DataProtocol,
          input: SchnorrInput? = nil
      ) throws -> SchnorrSignature {
-         try SchnorrSignature(
-            wrapped: Bridge.PrivateKey.schnorrSign(
-                hashedMessage: [UInt8](hashed),
-                privateKey: wrapped,
-                input: input
-            )
+         let wrapped = try Bridge.PrivateKey.schnorrSign(
+            hashedMessage: [UInt8](hashed),
+            privateKey: wrapped,
+            input: input
+        )
+         return SchnorrSignature(
+            wrapped: wrapped
          )
      }
      

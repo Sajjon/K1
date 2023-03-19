@@ -112,7 +112,7 @@ private extension SchnorrSignatureBitcoinCoreTests {
 
         let expectedSig = try SchnorrSignature(rawRepresentation: Data(hex: vector.signatureCompact))
 
-        XCTAssertEqual(signature, expectedSig)
+        XCTAssertEqual(signature.rawRepresentation.hex, vector.signatureCompact)
 
         XCTAssertEqual(
             try publicKey.isValidSchnorrSignature(expectedSig, hashed: message),

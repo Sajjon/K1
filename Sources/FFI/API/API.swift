@@ -272,15 +272,20 @@ extension Bridge {
     public enum Scnhorr {}
 }
 extension Bridge.Scnhorr {
-    public final class Wrapped: @unchecked Sendable, ContiguousBytes {
+    public final class Wrapped: @unchecked Sendable, Hashable {
         public static let byteCount = 2 * Curve.Field.byteCount
         internal let bytes: [UInt8]
         
-        public func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
-            var raw = bytes
-            return try Swift.withUnsafeBytes(of: &raw) { pointer in
-                try body(pointer)
-            }
+        public static func == (lhs: Wrapped, rhs: Wrapped) -> Bool {
+            lhs.bytes == rhs.bytes
+        }
+     
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(bytes)
+        }
+        
+        public var rawRepresentation: Data {
+            Data(bytes)
         }
         
         
@@ -364,7 +369,6 @@ extension Bridge.PublicKey {
                 try bridge.call(ifFailThrow: .failedToSchnorrVerifyGettingXFromPubKey) { context in
                     secp256k1_xonly_pubkey_from_pubkey(context, &publicKeyX, nil, &self.raw)
                 }
-                
                 return bridge.validate { context in
                     secp256k1_schnorrsig_verify(
                         context,
