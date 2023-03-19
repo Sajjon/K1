@@ -161,14 +161,15 @@ extension K1.PrivateKey {
     /// [ansix963]: https://webstore.ansi.org/standards/ascx9/ansix9632011r2017
     /// [cryptostackexchange]: https://crypto.stackexchange.com/a/57727
     public func sharedSecretFromKeyAgreement(
-        with publicKeyShare: K1.PublicKey
+        with publicKey: K1.PublicKey
     ) throws -> SharedSecret {
         let data = try Bridge.ECDH.keyExchange(
             publicKey: publicKey.wrapped,
             privateKey: self.wrapped,
             serializeOutputFunction: .ansiX963
         )
-        return try SharedSecret(data: data)
+        return try SharedSecret.init(data: data)
+        
     }
     
     /// Computes a shared secret with the provided public key from another party,

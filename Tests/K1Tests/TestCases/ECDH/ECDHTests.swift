@@ -14,7 +14,7 @@ final class ECDHTests: XCTestCase {
     func testECDHX963() throws {
         let alice = K1.PrivateKey()
         let bob = K1.PrivateKey()
-        
+        XCTAssertNotEqual(alice, bob)
         let ab = try alice.sharedSecretFromKeyAgreement(with: bob.publicKey)
         let ba = try bob.sharedSecretFromKeyAgreement(with: alice.publicKey)
         ab.withUnsafeBytes {
@@ -26,7 +26,7 @@ final class ECDHTests: XCTestCase {
     func testECDHLibsecp256k1() throws {
         let alice = K1.PrivateKey()
         let bob = K1.PrivateKey()
-        
+        XCTAssertNotEqual(alice, bob)
         let ab = try alice.ecdh(with: bob.publicKey)
         let ba = try bob.ecdh(with: alice.publicKey)
         ab.withUnsafeBytes {
@@ -38,7 +38,7 @@ final class ECDHTests: XCTestCase {
     func testECDHPoint() throws {
         let alice = K1.PrivateKey()
         let bob = K1.PrivateKey()
-        
+        XCTAssertNotEqual(alice, bob)
         let ab = try alice.ecdhPoint(with: bob.publicKey)
         let ba = try bob.ecdhPoint(with: alice.publicKey)
         XCTAssertEqual(ab, ba, "Alice and Bob should be able to agree on the same secret")

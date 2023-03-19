@@ -458,6 +458,7 @@ extension CryptoKit.SharedSecret {
         guard sharedSecret.withUnsafeBytes({ Data($0).count == data.count }) else {
             throw Bridge.Error.failedToProduceSharedSecret
         }
+
         self = sharedSecret
     }
 }

@@ -48,7 +48,10 @@ private struct Vector: Decodable {
 
 
 final class TwoVariantsOfECDHWithKDFTests: XCTestCase {
-    
+    override func setUp() {
+        super.setUp()
+        continueAfterFailure = false
+    }
     func testTwoVariantsOfECDHWithKDF_vectors() throws {
         let fileURL = Bundle.module.url(forResource: "ecdh_secp256k1_two_variants_with_kdf_test", withExtension: ".json")
         let data = try Data(contentsOf: fileURL!)
@@ -61,6 +64,7 @@ extension TwoVariantsOfECDHWithKDFTests {
     
 
     fileprivate func doTest(_ vector: Vector) throws {
+        print(String(describing: vector))
         let outputByteCount = 32
         let hash = SHA256.self
         

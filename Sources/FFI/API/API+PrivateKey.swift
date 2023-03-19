@@ -326,6 +326,13 @@ extension Bridge.ECDH {
             repeating: 0,
             count: hashFp.outputByteCount
         )
+        var arbitraryData: [UInt8]? = {
+            switch hashFp {
+            case let .libsecp256kDefault(arbitraryData?): return [UInt8](arbitraryData)
+            case .libsecp256kDefault(.none): return nil
+            case .ansiX963, .noHashWholePoint: return nil
+            }
+        }()
         try Bridge.call(
             ifFailThrow: .failedToPerformDiffieHellmanKeyExchange
         ) { context in
@@ -333,11 +340,12 @@ extension Bridge.ECDH {
                 context,
                 &sharedPublicPointBytes, // output
                 &publicKey.raw, // pubkey
-                privateKey.secureBytes.bytes, // seckey
+                privateKey.secureBytes.backing.bytes, // seckey
                 hashFp.hashfp(), // hashfp
-                nil // arbitrary data pointer that is passed through to hashfp
+                &arbitraryData // arbitrary data pointer that is passed through to hashfp
             )
         }
+        
         return Data(sharedPublicPointBytes)
         
     }
