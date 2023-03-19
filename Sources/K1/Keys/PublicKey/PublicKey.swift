@@ -40,50 +40,64 @@ extension K1.PublicKey {
 
 // MARK: Validate ECDSA Non-Recoverable
 extension K1.PublicKey {
+    
+    /// Verifies an elliptic curve digital signature algorithm (ECDSA) signature on some _hash_ over the `secp256k1` elliptic curve.
     public func isValidECDSASignature(
         _ signature: ECDSASignatureNonRecoverable,
         hashed: some DataProtocol,
         mode: SignatureValidationMode = .default
     ) -> Bool {
         do {
-            return try wrapped.isValid(ecdsaSignature: signature.wrapped, message: [UInt8](hashed), mode: mode)
+            return try wrapped.isValid(
+                ecdsaSignature: signature.wrapped,
+                message: [UInt8](hashed),
+                mode: mode
+            )
         } catch {
             return false
         }
     }
     
+    /// Verifies an elliptic curve digital signature algorithm (ECDSA) signature on a digest over the `secp256k1` elliptic curve.
     public func isValidECDSASignature(
         _ signature: ECDSASignatureNonRecoverable,
         digest: some Digest,
         mode: SignatureValidationMode = .default
     ) -> Bool {
-        isValidECDSASignature(signature, hashed: Data(digest), mode: mode)
+        isValidECDSASignature(
+            signature,
+            hashed: Data(digest),
+            mode: mode
+        )
     }
-    
-    /// `SHA256` hashes `unhashed` bore calling `isValidECDSASignature`
-    public func isValidECDSASignature(
-        _ signature: ECDSASignatureNonRecoverable,
-        unhashed: some DataProtocol,
-        mode: SignatureValidationMode = .default
-    ) -> Bool {
-        isValidECDSASignature(signature, digest: SHA256.hash(data: unhashed), mode: mode)
-    }
+
 }
 
 // MARK: Validate ECDSA Recoverable
 extension K1.PublicKey {
+    
+    /// Converts a recoverable ECDSA signature to
+    /// non-recoverable and validates it against
+    /// a `SHA256` hashed messages for this public key.
     public func isValidECDSASignature(
         _ signature: ECDSASignatureRecoverable,
         hashed: some DataProtocol,
         mode: SignatureValidationMode = .default
     ) -> Bool {
         do {
-            return try isValidECDSASignature(signature.nonRecoverable(), hashed: hashed, mode: mode)
+            return try isValidECDSASignature(
+                signature.nonRecoverable(),
+                hashed: hashed,
+                mode: mode
+            )
         } catch {
             return false
         }
     }
     
+    /// Converts a recoverable ECDSA signature to
+    /// non-recoverable and validates it against
+    /// a `SHA256` hashed messages for this public key.
     public func isValidECDSASignature(
         _ signature: ECDSASignatureRecoverable,
         digest: some Digest,
@@ -95,29 +109,22 @@ extension K1.PublicKey {
             return false
         }
     }
-    
-    /// `SHA256` hashes `unhashed` bore calling `isValidECDSASignature`
-    public func isValidECDSASignature(
-        _ signature: ECDSASignatureRecoverable,
-        unhashed: some DataProtocol,
-        mode: SignatureValidationMode = .default
-    ) -> Bool {
-        do {
-            return try isValidECDSASignature(signature.nonRecoverable(), unhashed: unhashed, mode: mode)
-        } catch {
-            return false
-        }
-    }
+
 }
 
 // MARK: Validate Schnorr Signatures
 extension K1.PublicKey {
+    
+    
     public func isValidSchnorrSignature(
         _ signature: SchnorrSignature,
         hashed: some DataProtocol
     ) -> Bool {
         do {
-            return try wrapped.isValid(schnorrSignature: signature.wrapped, message: [UInt8](hashed))
+            return try wrapped.isValid(
+                schnorrSignature: signature.wrapped,
+                message: [UInt8](hashed)
+            )
         } catch {
             return false
         }
