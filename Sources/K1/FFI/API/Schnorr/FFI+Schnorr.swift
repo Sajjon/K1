@@ -9,20 +9,53 @@ import Foundation
 import secp256k1
 
 extension FFI {
-    enum Scnhorr {}
+    enum Schnorr {}
+}
+
+// MARK: Schnorr Validate
+extension FFI.Schnorr {
+    static func isValid(
+        schnorrSignature: FFI.Schnorr.Wrapped,
+        publicKey: FFI.PublicKey.Wrapped,
+        message: [UInt8]
+    ) throws -> Bool {
+        
+        try FFI.toC { ffi -> Bool in
+            var publicKeyX = secp256k1_xonly_pubkey()
+            
+            try FFI.call(ifFailThrow: .failedToSchnorrVerifyGettingXFromPubKey) { context in
+                secp256k1_xonly_pubkey_from_pubkey(
+                    context,
+                    &publicKeyX,
+                    nil,
+                    &publicKey.raw
+                )
+            }
+            
+            return ffi.validate { context in
+                secp256k1_schnorrsig_verify(
+                    context,
+                    schnorrSignature.bytes,
+                    message,
+                    message.count,
+                    &publicKeyX
+                )
+            }
+        }
+    }
 }
 
 // MARK: Schnorr Sign
-extension FFI.Scnhorr {
+extension FFI.Schnorr {
     static func sign(
         hashedMessage message: [UInt8],
         privateKey: FFI.PrivateKey.Wrapped,
         input: SchnorrInput?
-    ) throws -> FFI.Scnhorr.Wrapped {
+    ) throws -> FFI.Schnorr.Wrapped {
         guard message.count == Curve.Field.byteCount else {
             throw K1.Error.unableToSignMessageHasInvalidLength(got: message.count, expected: Curve.Field.byteCount)
         }
-        var signatureOut = [UInt8](repeating: 0, count: FFI.Scnhorr.Wrapped.byteCount)
+        var signatureOut = [UInt8](repeating: 0, count: FFI.Schnorr.Wrapped.byteCount)
         
         var keyPair = secp256k1_keypair()
         
@@ -52,9 +85,9 @@ extension FFI.Scnhorr {
             )
         }
         
-        return try FFI.Scnhorr.Wrapped(bytes: signatureOut)
+        return try FFI.Schnorr.Wrapped(bytes: signatureOut)
     }
-    
+
 }
 
 // MARK: SchnorrInput

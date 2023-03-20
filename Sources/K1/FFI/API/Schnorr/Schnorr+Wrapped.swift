@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension FFI.Scnhorr {
+extension FFI.Schnorr {
     final class Wrapped: @unchecked Sendable, Hashable {
         static let byteCount = 2 * Curve.Field.byteCount
         
@@ -26,21 +26,21 @@ extension FFI.Scnhorr {
 }
 
 // MARK: Serialization
-extension FFI.Scnhorr.Wrapped {
+extension FFI.Schnorr.Wrapped {
     var rawRepresentation: Data {
         Data(bytes)
     }
 }
 
 // MARK: Equatable
-extension FFI.Scnhorr.Wrapped {
-    static func == (lhs: FFI.Scnhorr.Wrapped, rhs: FFI.Scnhorr.Wrapped) -> Bool {
+extension FFI.Schnorr.Wrapped {
+    static func == (lhs: FFI.Schnorr.Wrapped, rhs: FFI.Schnorr.Wrapped) -> Bool {
         lhs.bytes == rhs.bytes
     }
 }
 
 // MARK: Hashable
-extension FFI.Scnhorr.Wrapped {
+extension FFI.Schnorr.Wrapped {
     func hash(into hasher: inout Hasher) {
         hasher.combine(bytes)
     }

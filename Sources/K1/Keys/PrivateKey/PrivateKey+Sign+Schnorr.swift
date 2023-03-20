@@ -17,7 +17,7 @@ extension K1.PrivateKey {
         input: SchnorrInput? = nil
     ) throws -> SchnorrSignature {
         try SchnorrSignature(
-            wrapped: FFI.Scnhorr.sign(
+            wrapped: FFI.Schnorr.sign(
                 hashedMessage: [UInt8](hashed),
                 privateKey: wrapped,
                 input: input

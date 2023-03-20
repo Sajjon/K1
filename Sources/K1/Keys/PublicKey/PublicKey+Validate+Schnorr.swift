@@ -17,8 +17,9 @@ extension K1.PublicKey {
         hashed: some DataProtocol
     ) -> Bool {
         do {
-            return try wrapped.isValid(
+            return try FFI.Schnorr.isValid(
                 schnorrSignature: signature.wrapped,
+                publicKey: self.wrapped,
                 message: [UInt8](hashed)
             )
         } catch {

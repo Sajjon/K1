@@ -104,6 +104,54 @@ extension FFI.ECDSA.NonRecovery {
 }
 
 
+// MARK: Validate
+extension FFI.ECDSA.NonRecovery {
+    static func isValid(
+        ecdsaSignature: FFI.ECDSA.NonRecovery.Wrapped,
+        publicKey: FFI.PublicKey.Wrapped,
+        message: [UInt8],
+        mode: K1.ECDSA.ValidationMode
+    ) throws -> Bool {
+        try FFI.toC { ffi -> Bool in
+            var maybeMalleable = ecdsaSignature.raw
+            var normalized = secp256k1_ecdsa_signature()
+            
+            let codeForSignatureWasMalleable = 1
+            let signatureWasMalleableResult = ffi.callWithResultCode { context in
+                secp256k1_ecdsa_signature_normalize(context, &normalized, &maybeMalleable)
+            }
+            let signatureWasMalleable = signatureWasMalleableResult == codeForSignatureWasMalleable
+            let isSignatureValid = ffi.validate { context in
+                secp256k1_ecdsa_verify(
+                    context,
+                    &normalized,
+                    message,
+                    &publicKey.raw
+                )
+            }
+            let acceptMalleableSignatures = mode == .acceptSignatureMalleability
+            switch (isSignatureValid, signatureWasMalleable, acceptMalleableSignatures) {
+            case (true, false, _):
+                // Signature is valid
+                return true
+            case (true, true, true):
+                // Signature was valid but malleable, since you specified to
+                // accept malleability => considering signature valid.
+                return true
+            case (true, true, false):
+                // Signature was valid, but not normalized which was required =>
+                // considering signature invalid.
+                return false
+            case (false, _, _):
+                // Signature is invalid.
+                return false
+            }
+        }
+    }
+    
+}
+    
+
 // MARK: Sign
 extension FFI.ECDSA.NonRecovery {
     

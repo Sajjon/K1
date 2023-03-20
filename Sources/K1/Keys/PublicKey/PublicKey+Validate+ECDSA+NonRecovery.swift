@@ -23,8 +23,9 @@ extension K1.PublicKey {
         mode: K1.ECDSA.ValidationMode = .default
     ) -> Bool {
         do {
-            return try wrapped.isValid(
+            return try FFI.ECDSA.NonRecovery.isValid(
                 ecdsaSignature: signature.wrapped,
+                publicKey: self.wrapped,
                 message: [UInt8](hashed),
                 mode: mode
             )
