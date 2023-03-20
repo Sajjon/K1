@@ -99,9 +99,9 @@ private extension SchnorrSignatureBitcoinCoreTests {
         XCTAssertEqual(publicKey, expectedPublicKey)
 
         XCTAssertEqual(
-            try! publicKey.rawRepresentation(format: .compressed).hex.lowercased(),
-            try! expectedPublicKey.rawRepresentation(format: .compressed).hex.lowercased()
-            )
+            publicKey.compressedRepresentation,
+            expectedPublicKey.compressedRepresentation
+        )
 
         let message = try Data(hex: vector.messageHex)
         let signature = try privateKey.schnorrSign(

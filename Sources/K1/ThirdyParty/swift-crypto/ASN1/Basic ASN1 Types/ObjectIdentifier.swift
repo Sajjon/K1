@@ -141,6 +141,11 @@ extension ASN1.ASN1ObjectIdentifier: ExpressibleByArrayLiteral {
 
 extension ASN1.ASN1ObjectIdentifier {
     enum NamedCurves {
+        
+        /// ASN1 identifier for `secp256k1`
+        /// https://oidref.com/1.3.132.0.10
+        static let secp256k1: ASN1.ASN1ObjectIdentifier = [1, 3, 132, 0, 10]
+        
         static let secp256r1: ASN1.ASN1ObjectIdentifier = [1, 2, 840, 10_045, 3, 1, 7]
 
         static let secp384r1: ASN1.ASN1ObjectIdentifier = [1, 3, 132, 0, 34]

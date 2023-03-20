@@ -68,8 +68,8 @@ extension TwoVariantsOfECDHWithKDFTests {
         
         let alice = try PrivateKey(hex: vector.alicePrivateKey)
         let bob = try PrivateKey(hex: vector.bobPrivateKey)
-        try XCTAssertEqual(alice.publicKey.rawRepresentation(format: .uncompressed).hex, vector.alicePublicKeyUncompressed)
-        try XCTAssertEqual(bob.publicKey.rawRepresentation(format: .uncompressed).hex, vector.bobPublicKeyUncompressed)
+        XCTAssertEqual(alice.publicKey.x963Representation.hex, vector.alicePublicKeyUncompressed)
+        XCTAssertEqual(bob.publicKey.x963Representation.hex, vector.bobPublicKeyUncompressed)
         
         for outcome in vector.outcomes {
             switch outcome.ecdhVariant {

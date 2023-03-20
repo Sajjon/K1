@@ -48,8 +48,27 @@ extension K1.PublicKey {
 
 // MARK: Serialize
 extension K1.PublicKey {
-    public func rawRepresentation(format: K1.Format) throws -> Data {
-        try FFI.PublicKey.rawRepresentation(wrapped, format: format)
+    
+    /// `04 || X || Y` 65 bytes
+    public var x963Representation: Data {
+        try! FFI.PublicKey.rawRepresentation(wrapped, format: .uncompressed)
+    }
+    
+    /// `02|03 || X` as 33 bytes
+    public var compressedRepresentation: Data {
+        try! FFI.PublicKey.rawRepresentation(wrapped, format: .compressed)
+    }
+    
+    public var derRepresentation: Data {
+        let spki = ASN1.SubjectPublicKeyInfo(
+            algorithmIdentifier: .secp256k1,
+            key: Array(self.x963Representation)
+        )
+        var serializer = ASN1.Serializer()
+        
+        // Serializing these keys can't throw
+        try! serializer.serialize(spki)
+        return Data(serializer.serializedBytes)
     }
 }
 

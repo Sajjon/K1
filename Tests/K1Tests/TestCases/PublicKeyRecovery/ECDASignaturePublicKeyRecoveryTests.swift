@@ -84,7 +84,7 @@ private extension ECDASignaturePublicKeyRecoveryTests {
          
             XCTAssertEqual(
                 try Data(hex: vector.publicKeyCompressed),
-                try expectedPublicKey.rawRepresentation(format: .compressed)
+                expectedPublicKey.compressedRepresentation
             )
          
 

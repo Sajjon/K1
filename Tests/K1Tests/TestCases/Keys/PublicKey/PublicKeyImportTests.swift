@@ -45,14 +45,15 @@ final class PublicKeyImportTests: XCTestCase {
     func testAssertImportValidPublicKeyWorks() throws {
         let raw = Data(repeating: 0x02, count: 33)
         let publicKey = try PublicKey(compressedRepresentation: raw)
-        try XCTAssertEqual(publicKey.rawRepresentation(format: .uncompressed).hex, "040202020202020202020202020202020202020202020202020202020202020202415456f0fc01d66476251cab4525d9db70bfec652b2d8130608675674cde64b2")
+        XCTAssertEqual(publicKey.compressedRepresentation.hex, "020202020202020202020202020202020202020202020202020202020202020202")
+        XCTAssertEqual(publicKey.x963Representation.hex, "040202020202020202020202020202020202020202020202020202020202020202415456f0fc01d66476251cab4525d9db70bfec652b2d8130608675674cde64b2")
     }
     
     func test_compress_pubkey() throws {
         let raw = Data(repeating: 0x02, count: 33)
         let publicKey = try PublicKey(compressedRepresentation: raw)
-        try XCTAssertEqual(publicKey.rawRepresentation(format: .compressed).hex, "020202020202020202020202020202020202020202020202020202020202020202")
-        try XCTAssertEqual(publicKey.rawRepresentation(format: .uncompressed).hex, "040202020202020202020202020202020202020202020202020202020202020202415456f0fc01d66476251cab4525d9db70bfec652b2d8130608675674cde64b2")
+        XCTAssertEqual(publicKey.compressedRepresentation.hex, "020202020202020202020202020202020202020202020202020202020202020202")
+        XCTAssertEqual(publicKey.x963Representation.hex, "040202020202020202020202020202020202020202020202020202020202020202415456f0fc01d66476251cab4525d9db70bfec652b2d8130608675674cde64b2")
     }
     
     func testNotOnCurve() throws {

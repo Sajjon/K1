@@ -17,10 +17,7 @@ let package = Package(
             ]
         ),
     ],
-    dependencies: [
-         // Only used by tests
-        .package(url: "https://github.com/filom/ASN1Decoder", from: "1.8.0"),
-    ],
+    dependencies: [],
     targets: [
         
         // Target `libsecp256k1` https://github.com/bitcoin-core/secp256k1
@@ -78,9 +75,6 @@ let package = Package(
             name: "K1Tests",
             dependencies: [
                 "K1",
-                
-                // DER decoding of public keys from test vectors
-                "ASN1Decoder"
             ],
             resources: [
                 .process("TestVectors/"),

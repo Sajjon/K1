@@ -87,10 +87,9 @@ extension XCTestCase {
         let key = try PublicKey(x963Representation: keyBytes)
         
         let keyFromDER = try PublicKey(derRepresentation: Data(hex: group.keyDer))
-        let keyFromDER2 = try PublicKey(der: Data(hex: group.keyDer))
+        XCTAssertEqual(key.derRepresentation.hex, group.keyDer)
 
         XCTAssertEqual(keyFromDER, key)
-        XCTAssertEqual(keyFromDER2, key)
         
         let compactXRaw = try Data(hex: group.key.wx)
         let compactYRaw = try Data(hex: group.key.wy)
