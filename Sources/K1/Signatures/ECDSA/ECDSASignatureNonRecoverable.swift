@@ -21,17 +21,6 @@ public struct ECDSASignatureNonRecoverable: Sendable, Hashable {
 
 // MARK: Inits
 extension ECDSASignatureNonRecoverable {
-    public init(rawRepresentation: some DataProtocol) throws {
-        // FIXME: Needed?
-        //        guard
-        //            rawRepresentation.count == Self.byteCount
-        //        else {
-        //            throw K1.Error.incorrectByteCountOfRawSignature
-        //        }
-        //
-        //        self.rawRepresentation = Data(rawRepresentation)
-        fatalError()
-    }
     
     public init(compactRepresentation: some DataProtocol) throws {
         
