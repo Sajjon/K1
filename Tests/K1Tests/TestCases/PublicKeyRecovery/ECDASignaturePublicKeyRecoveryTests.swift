@@ -33,7 +33,7 @@ final class ECDASignaturePublicKeyRecoveryTests: XCTestCase {
     func test_conversionRoundtrips() throws {
         let recoverySignatureHex = "acf9e195e094f2f40eb619b9878817ff951b9b11fac37cf0d7290098bbefb574f8606281a2231a3fc781045f2ea4df086936263bbfa8d15ca17fe70e0c3d6e5601"
         let recoverableSigRaw = try Data(hex: recoverySignatureHex)
-        let recoverableSig = try ECDSASignatureRecoverable(rawRepresentation: recoverableSigRaw)
+        let recoverableSig = try ECDSASignatureRecoverable(rawRepresentation: recoverableSigRaw, format: .rsv)
         
         let compactRecoverableSig = try recoverableSig.compact()
         
@@ -42,7 +42,10 @@ final class ECDASignaturePublicKeyRecoveryTests: XCTestCase {
         XCTAssertEqual(compactRecoverableSig.rs.hex, compactRecoverableSigRSHex)
         XCTAssertEqual(compactRecoverableSig.recoveryID, recid)
         
-        
+        let compactRecoverableSigRS = try Data(hex: compactRecoverableSigRSHex)
+        try XCTAssertEqual(ECDSASignatureRecoverable(rs: compactRecoverableSigRS, recoveryID: recid), ECDSASignatureRecoverable(compact: compactRecoverableSig))
+        try XCTAssertEqual(ECDSASignatureRecoverable.Compact.init(rs: compactRecoverableSigRS, recoveryID: recid), compactRecoverableSig)
+   
         let nonRecoverable = try ECDSASignatureNonRecoverable(compactRepresentation: compactRecoverableSig.rs)
         
         try XCTAssertEqual(nonRecoverable, recoverableSig.nonRecoverable())
@@ -113,7 +116,8 @@ struct RecoveryTestVector: Decodable, Equatable {
     
     func recoverableSignature() throws -> ECDSASignatureRecoverable {
         try ECDSASignatureRecoverable(
-            rawRepresentation: Data(hex: signature)
+            rawRepresentation: Data(hex: signature),
+            format: .rsv
         )
     }
     

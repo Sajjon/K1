@@ -34,9 +34,33 @@ extension ECDSASignatureRecoverable {
     }
     
 
-    public init(rawRepresentation: some DataProtocol) throws {
+    public init(
+        rawRepresentation: some DataProtocol,
+        format: Compact.SerializationFormat = .default
+    ) throws {
+        
+        let expected = ECDSASignatureRecoverable.Compact.byteCount
+        guard
+            rawRepresentation.count == expected
+        else {
+            throw K1.Error.incorrectByteCountOfRawRecoverableSignature(
+                got: rawRepresentation.count,
+                expected: expected
+            )
+        }
+        
+        let data: Data = {
+            switch format {
+            case .rsv: return Data(rawRepresentation)
+            case .vrs:
+                let vData = Data([rawRepresentation.first!]) // safe since we asserted length above
+                let rsData = Data(rawRepresentation.suffix(ECDSASignatureRecoverable.Compact.byteCountRS)) // safe since we asserted length above
+                // Reverse vrs => rsv
+                return rsData + vData
+            }
+        }()
         try self.init(
-            wrapped: FFI.ECDSA.Recovery.from(rawRepresentation: rawRepresentation)
+            wrapped: FFI.ECDSA.Recovery.from(rawRepresentation: data)
         )
     }
     
@@ -105,15 +129,17 @@ extension ECDSASignatureRecoverable.Compact {
     public enum SerializationFormat {
         
         /// `R || S || V` - the format `libsecp256k1` v0.3.0 uses as internal representation
+        /// This is the default value of this library.
         case rsv
+        
+        /// We use `R || S || V` as default values since `libsecp256k1` v0.3.0 uses it as its internal representation.
+        public static let `default`: Self = .rsv
         
         /// `V || R || S`.
         case vrs
     }
     private var v: Data {
-        Data(
-            [UInt8(recoveryID.rawValue)]
-        )
+        recoveryID.vData
     }
     
     func serialize(format: SerializationFormat) -> Data {
@@ -123,6 +149,13 @@ extension ECDSASignatureRecoverable.Compact {
         case .vrs:
             return v + rs
         }
+    }
+}
+extension ECDSASignatureRecoverable.RecoveryID {
+    var vData: Data {
+        Data(
+            [UInt8(rawValue)]
+        )
     }
 }
 
