@@ -81,6 +81,7 @@ extension FFI.PrivateKey.Wrapped {
     }
 }
 
+// MARK: Deserialize
 extension FFI.PrivateKey {
     static func from(
         rawRepresentation: some DataProtocol

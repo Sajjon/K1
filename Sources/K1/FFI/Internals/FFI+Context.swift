@@ -8,6 +8,19 @@
 // FFI to C
 import secp256k1
 
+extension FFI {
+    
+    ///  Bridging type used for underlying libsecp256k1 methods:
+    ///  - `secp256k1_context_create`
+    ///  - `secp256k1_context_preallocated_size`
+    ///  - `secp256k1_context_preallocated_create`
+    enum Context: UInt32 {
+        case none, sign, verify
+    }
+    
+}
+
+
 // MARK: Context
 extension FFI.Context {
     
@@ -22,22 +35,6 @@ extension FFI.Context {
             case .verify: value = SECP256K1_CONTEXT_VERIFY
         }
 
-        return UInt32(value)
-    }
-}
-
-// MARK: Format
-extension K1.Format {
-    
-    /// Bridging value used by libsecp256k1 key specifying the format
-    /// of the imported key, i.e. how many bytes.
-    public var rawValue: UInt32 {
-        let value: Int32
-        switch self {
-        case .compressed: value = SECP256K1_EC_COMPRESSED
-        case .uncompressed: value = SECP256K1_EC_UNCOMPRESSED
-        }
-        
         return UInt32(value)
     }
 }

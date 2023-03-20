@@ -8,10 +8,11 @@
 import Foundation
 import secp256k1
 
-
 extension FFI {
     enum PublicKey {}
 }
+
+// MARK: PublicKey Wrapped
 extension FFI.PublicKey {
     
     final class Wrapped: @unchecked Sendable, ContiguousBytes {
@@ -23,19 +24,26 @@ extension FFI.PublicKey {
     }
 }
 
+// MARK: ContiguousBytes
 extension FFI.PublicKey.Wrapped {
     func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
         try Swift.withUnsafeBytes(of: &raw.data) { pointer in
             try body(pointer)
         }
     }
-    
+}
+
+// MARK: Comparison
+extension FFI.PublicKey.Wrapped {
     func compare(to other: FFI.PublicKey.Wrapped) throws -> Bool {
         return try FFI().callWithResultCode { context in
             secp256k1_ec_pubkey_cmp(context, &self.raw, &other.raw)
         } == 0
     }
-    
+}
+
+// MARK: Serialize
+extension FFI.PublicKey.Wrapped {
     func rawRepresentation(format: K1.Format) throws -> Data {
         var byteCount = format.length
         var out = [UInt8](repeating: 0x00, count: byteCount)
@@ -50,7 +58,10 @@ extension FFI.PublicKey.Wrapped {
         }
         return Data(out.prefix(byteCount))
     }
-    
+}
+
+// MARK: Validate Schnorr
+extension FFI.PublicKey.Wrapped {
     func isValid(
         schnorrSignature: FFI.Scnhorr.Wrapped,
         message: [UInt8]
@@ -72,7 +83,10 @@ extension FFI.PublicKey.Wrapped {
             }
         }
     }
-    
+}
+
+// MARK: Validate ECDSA Non-Recovery
+extension FFI.PublicKey.Wrapped {
     func isValid(
         ecdsaSignature: FFI.ECDSA.NonRecovery.Wrapped,
         message: [UInt8],
@@ -117,10 +131,13 @@ extension FFI.PublicKey.Wrapped {
     
 }
     
+// MARK: Deserialize
 extension FFI.PublicKey {
+   
     public static let x963ByteCount = 65
     public static let compactByteCount = 64
     public static let compressedByteCount = 33
+   
     static func from(x963Representation contiguousBytes: some ContiguousBytes) throws -> Wrapped {
         try contiguousBytes.withUnsafeBytes { bufferPointer throws -> Wrapped in
             let expected = Self.x963ByteCount

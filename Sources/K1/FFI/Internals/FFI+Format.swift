@@ -6,6 +6,23 @@
 //
 
 import Foundation
+import secp256k1
+
+// MARK: Format
+extension K1.Format {
+    
+    /// Bridging value used by libsecp256k1 key specifying the format
+    /// of the imported key, i.e. how many bytes.
+    public var rawValue: UInt32 {
+        let value: Int32
+        switch self {
+        case .compressed: value = SECP256K1_EC_COMPRESSED
+        case .uncompressed: value = SECP256K1_EC_UNCOMPRESSED
+        }
+        
+        return UInt32(value)
+    }
+}
 
 extension K1 {
     
