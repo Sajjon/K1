@@ -35,32 +35,11 @@ extension ECDSASignatureRecoverable {
     
 
     public init(
-        rawRepresentation: some DataProtocol,
-        format: Compact.SerializationFormat = .default
+        rawRepresentation: some DataProtocol
     ) throws {
-        
-        let expected = ECDSASignatureRecoverable.Compact.byteCount
-        guard
-            rawRepresentation.count == expected
-        else {
-            throw K1.Error.incorrectByteCountOfRawRecoverableSignature(
-                got: rawRepresentation.count,
-                expected: expected
-            )
-        }
-        
-        let data: Data = {
-            switch format {
-            case .rsv: return Data(rawRepresentation)
-            case .vrs:
-                let vData = Data([rawRepresentation.first!]) // safe since we asserted length above
-                let rsData = Data(rawRepresentation.suffix(ECDSASignatureRecoverable.Compact.byteCountRS)) // safe since we asserted length above
-                // Reverse vrs => rsv
-                return rsData + vData
-            }
-        }()
+
         try self.init(
-            wrapped: FFI.ECDSA.Recovery.from(rawRepresentation: data)
+            wrapped: FFI.ECDSA.Recovery.from(rawRepresentation: rawRepresentation)
         )
     }
     
@@ -104,6 +83,7 @@ extension ECDSASignatureRecoverable {
 
 extension ECDSASignatureRecoverable.Compact {
     
+    /// Takes either `R || S || V` data or `V || R || S` data, as per specification of `format`.
     public init(
         rawRepresentation: some DataProtocol,
         format: SerializationFormat
