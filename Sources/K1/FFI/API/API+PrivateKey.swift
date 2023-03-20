@@ -45,6 +45,7 @@ extension FFI {
 
 // MARK: Init
 extension FFI.PrivateKey.Wrapped {
+    
     fileprivate convenience init(bytes: [UInt8]) throws {
         try self.init(secureBytes: .init(bytes: bytes))
     }
@@ -68,11 +69,12 @@ extension FFI.PrivateKey.Wrapped {
             // n = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
             // (n / 2^256) ^ 100 = lim 0
             // I.e. will not happen.
-            fatalError("""
-                                Failed to generate private key after #\(attempt) attempts.
-                                You are the most unlucky person in the universe.
-                                Or by Occam's razor: the person writing this code made some error.
-                                """
+            fatalError(
+                """
+                Failed to generate private key after #\(attempt) attempts.
+                You are the most unlucky person in the universe.
+                Or by Occam's razor: the person writing this code made some error.
+                """
             )
         }
         try! self.init(secureBytes: generateNew())
