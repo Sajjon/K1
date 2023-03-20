@@ -20,14 +20,14 @@ extension K1.PublicKey {
     public func isValidECDSASignature(
         _ signature: ECDSASignatureNonRecoverable,
         hashed: some DataProtocol,
-        mode: K1.ECDSA.ValidationMode = .default
+        input: K1.ECDSA.ValidationInput = .default
     ) -> Bool {
         do {
             return try FFI.ECDSA.NonRecovery.isValid(
                 ecdsaSignature: signature.wrapped,
                 publicKey: self.wrapped,
                 message: [UInt8](hashed),
-                mode: mode
+                input: input
             )
         } catch {
             return false
@@ -43,12 +43,12 @@ extension K1.PublicKey {
     public func isValidECDSASignature(
         _ signature: ECDSASignatureNonRecoverable,
         digest: some Digest,
-        mode: K1.ECDSA.ValidationMode = .default
+        input: K1.ECDSA.ValidationInput = .default
     ) -> Bool {
         isValidECDSASignature(
             signature,
             hashed: Data(digest),
-            mode: mode
+            input: input
         )
     }
 

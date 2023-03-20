@@ -13,7 +13,7 @@ final class ECDSA_Wycheproof_IEEE_P1364_RS_EncodedSignaturesTests: XCTestCase {
             testFunction: { (group: ECDSAWycheTestGroup<SignatureWycheproofP1364TestVector>) in
                 try doTestGroup(
                     group: group,
-                    signatureValidationMode: .acceptSignatureMalleability,
+                    signatureValidationMode: .init(malleabilityStrictness: .accepted),
                     hashFunction: SHA256.self,
                     skipIfContainsFlags: .init(["MissingZero", "BER", "SigSize"]),
                     skipIfContainsComment: ["r too large"]

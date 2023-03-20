@@ -29,7 +29,7 @@ final class ECDSA_Wycheproof_ASN_DER_EncodedSignaturesTests: XCTestCase {
                 
                 try doTestGroup(
                     group: group,
-                    signatureValidationMode: .acceptSignatureMalleability,
+                    signatureValidationMode: .init(malleabilityStrictness: .accepted),
                     hashFunction: SHA256.self,
                     skipIfContainsFlags: .init(["MissingZero", "BER"])
                 )

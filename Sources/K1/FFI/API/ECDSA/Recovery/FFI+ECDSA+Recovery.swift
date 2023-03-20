@@ -102,13 +102,13 @@ extension FFI.ECDSA.Recovery {
     static func sign(
         hashedMessage: [UInt8],
         privateKey: K1.PrivateKey.Wrapped,
-        mode: K1.ECDSA.SigningMode
+        input: K1.ECDSA.SigningInput = .default
     ) throws -> FFI.ECDSA.Recovery.Wrapped {
        
         try FFI.ECDSA._sign(
             message: hashedMessage,
             privateKey: privateKey,
-            mode: mode
+            input: input
         )
     }
 }
