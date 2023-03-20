@@ -8,11 +8,11 @@
 import Foundation
 import secp256k1
 
-
 extension FFI {
+    
+    /// Just a namespace for `FFI ECDH` 
     enum ECDH  {}
 }
-
 
 // MARK: SerializeFunction
 extension FFI.ECDH {

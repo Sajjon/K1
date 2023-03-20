@@ -12,34 +12,6 @@ extension FFI {
     enum Scnhorr {}
 }
 
-extension FFI.Scnhorr {
-    final class Wrapped: @unchecked Sendable, Hashable {
-        static let byteCount = 2 * Curve.Field.byteCount
-        internal let bytes: [UInt8]
-        
-        static func == (lhs: Wrapped, rhs: Wrapped) -> Bool {
-            lhs.bytes == rhs.bytes
-        }
-        
-        func hash(into hasher: inout Hasher) {
-            hasher.combine(bytes)
-        }
-        
-        var rawRepresentation: Data {
-            Data(bytes)
-        }
-        
-        
-        init(bytes: [UInt8]) throws {
-            guard bytes.count == Self.byteCount else {
-                throw K1.Error.failedToInitSchnorrSignatureInvalidByteCount(got: bytes.count, expected: Self.byteCount)
-            }
-            self.bytes = bytes
-        }
-    }
-}
-
-
 // MARK: Schnorr Sign
 extension FFI.Scnhorr {
     static func sign(
@@ -85,7 +57,7 @@ extension FFI.Scnhorr {
     
 }
 
-
+// MARK: SchnorrInput
 public struct SchnorrInput {
     public let auxilaryRandomData: Data
     public init(auxilaryRandomData: Data) {

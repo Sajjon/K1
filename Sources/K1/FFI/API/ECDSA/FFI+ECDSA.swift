@@ -36,9 +36,6 @@ extension FFI {
     public enum ECDSA {}
 }
 extension FFI.ECDSA {
-    
-    
-    
     public enum Recovery {}
     public enum NonRecovery {}
 }
