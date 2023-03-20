@@ -24,13 +24,13 @@ extension K1.Format {
         }
     }
     
-    init(byteCount: Int) throws {
+    internal init(byteCount: Int) throws {
         if byteCount == Self.uncompressed.length {
             self = .uncompressed
         } else if byteCount == Self.compressed.length {
             self = .compressed
         } else {
-            throw K1.Error.incorrectByteCountOfPublicKey(providedByteCount: byteCount)
+           fatalError("invalid byte count: \(byteCount)")
         }
     }
 }

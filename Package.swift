@@ -69,6 +69,9 @@ let package = Package(
             name: "K1",
             dependencies: [
                 "secp256k1",
+            ],
+            swiftSettings: [
+                .define("CRYPTO_IN_SWIFTPM_FORCE_BUILD_API"),
             ]
         ),
         .testTarget(

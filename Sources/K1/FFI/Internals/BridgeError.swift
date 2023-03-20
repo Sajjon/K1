@@ -19,7 +19,9 @@ extension K1 {
         case failedToDeserializePublicKey
         case failedToSerializePublicKey
         case failedToSchnorrVerifyGettingXFromPubKey
-        case incorrectByteCountOfPublicKey(got: Int, acceptableLengths: [Int])
+        case incorrectByteCountOfX963PublicKey(got: Int, expected: Int)
+        case incorrectByteCountOfCompactPublicKey(got: Int, expected: Int)
+        case incorrectByteCountOfCompressedPublicKey(got: Int, expected: Int)
         case failedSignatureToConvertRecoverableSignatureToCompact
         case failedToConvertRecoverableSignatureToNonRecoverable
         case failedToRecoverPublicKey
@@ -45,12 +47,3 @@ extension K1 {
     }
 }
 
-extension K1.Error {
-    
-    static func incorrectByteCountOfPublicKey(providedByteCount: Int) -> Self {
-          .incorrectByteCountOfPublicKey(
-            got: providedByteCount,
-            acceptableLengths: K1.Format.allCases.map(\.length)
-          )
-      }
-}

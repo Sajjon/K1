@@ -23,8 +23,26 @@ extension K1 {
 // MARK: Init
 extension K1.PublicKey {
     
-    public init(x963Representation: some ContiguousBytes) throws  {
+    /// `04 || X || Y` 65 bytes
+    public init(x963Representation: some ContiguousBytes) throws {
         try self.init(wrapped: FFI.PublicKey.from(x963Representation: x963Representation))
+    }
+    
+    /// `DER`
+    public init(derRepresentation: some RandomAccessCollection<UInt8>) throws {
+        let bytes = [UInt8](derRepresentation)
+        let parsed = try ASN1.SubjectPublicKeyInfo(asn1Encoded: bytes)
+        self = try .init(x963Representation: parsed.key)
+    }
+    
+    /// `X || Y` as 64 bytes
+    public init(compactRepresentation: some ContiguousBytes) throws {
+        try self.init(wrapped: FFI.PublicKey.from(compactRepresentation: compactRepresentation))
+    }
+    
+    /// `02|03 || X` as 33 bytes
+    public init(compressedRepresentation: some ContiguousBytes) throws {
+        try self.init(wrapped: FFI.PublicKey.from(compressedRepresentation: compressedRepresentation))
     }
 }
 

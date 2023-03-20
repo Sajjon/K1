@@ -118,28 +118,64 @@ extension FFI.PublicKey.Wrapped {
 }
     
 extension FFI.PublicKey {
-    static func from(x963Representation bytes: some ContiguousBytes) throws -> Wrapped {
-        try Self.from(bytes: bytes)
+    public static let x963ByteCount = 65
+    public static let compactByteCount = 64
+    public static let compressedByteCount = 33
+    static func from(x963Representation contiguousBytes: some ContiguousBytes) throws -> Wrapped {
+        try contiguousBytes.withUnsafeBytes { bufferPointer throws -> Wrapped in
+            let expected = Self.x963ByteCount
+            guard bufferPointer.count == expected  else {
+                throw K1.Error.incorrectByteCountOfX963PublicKey(got: bufferPointer.count, expected: expected)
+            }
+            return try Self.from(bytes: [UInt8](bufferPointer))
+        }
     }
     
-    internal static func from(bytes contiguousBytes: some ContiguousBytes) throws -> Wrapped {
-        return try contiguousBytes.withUnsafeBytes { bytes throws -> Wrapped in
-            guard K1.Format.allCases.map(\.length).contains(bytes.count) else {
-                throw K1.Error.incorrectByteCountOfPublicKey(providedByteCount: bytes.count)
+    static func from(compactRepresentation contiguousBytes: some ContiguousBytes) throws -> Wrapped {
+        
+        try contiguousBytes.withUnsafeBytes { bufferPointer throws -> Wrapped in
+            let expected = Self.compactByteCount
+            guard bufferPointer.count == expected  else {
+                throw K1.Error.incorrectByteCountOfCompactPublicKey(got: bufferPointer.count, expected: expected)
             }
-            var raw = secp256k1_pubkey()
-            try FFI.call(
-                ifFailThrow: .failedToDeserializePublicKey
-            ) { context in
-                secp256k1_ec_pubkey_parse(
-                    context,
-                    &raw,
-                    bytes.baseAddress!,
-                    bytes.count
-                )
+            let bytes = [UInt8](bufferPointer)
+            do {
+                return try Self.from(bytes: bytes)
+            } catch {
+                // failed to parse 64 bytes => prepend with `04` and parse as `x963`
+                return try Self.from(bytes: [0x04] + bytes)
             }
-            return .init(raw: raw)
         }
+        
+    }
+    
+    static func from(compressedRepresentation contiguousBytes: some ContiguousBytes) throws -> Wrapped {
+        
+        try contiguousBytes.withUnsafeBytes { bufferPointer throws -> Wrapped in
+            let expected = Self.compressedByteCount
+            guard bufferPointer.count == expected  else {
+                throw K1.Error.incorrectByteCountOfCompressedPublicKey(got: bufferPointer.count, expected: expected)
+            }
+            return try Self.from(bytes: [UInt8](bufferPointer))
+        }
+        
+        
+    }
+    
+    internal static func from(bytes: [UInt8]) throws -> Wrapped {
+        var raw = secp256k1_pubkey()
+        try FFI.call(
+            ifFailThrow: .failedToDeserializePublicKey
+        ) { context in
+            secp256k1_ec_pubkey_parse(
+                context,
+                &raw,
+                bytes,
+                bytes.count
+            )
+            
+        }
+        return .init(raw: raw)
     }
 }
 
