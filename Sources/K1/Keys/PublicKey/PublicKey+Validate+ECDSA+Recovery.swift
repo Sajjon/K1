@@ -49,4 +49,23 @@ extension K1.PublicKey {
         }
     }
 
+    /// `SHA256` hashed messages and converts a
+    /// recoverable ECDSA signature to non-recoverable and
+    /// validates it against the hashed message for this public key.
+    public func isValidECDSASignature(
+        _ signature: ECDSASignatureRecoverable,
+        unhashed: some DataProtocol,
+        input: K1.ECDSA.ValidationInput = .default
+    ) -> Bool {
+        do {
+            return try isValidECDSASignature(
+                signature.nonRecoverable(),
+                unhashed: unhashed,
+                input: input
+            )
+        } catch {
+            return false
+        }
+    }
+    
 }

@@ -7,6 +7,7 @@
 
 import Foundation
 import protocol CryptoKit.Digest
+import struct CryptoKit.SHA256
 
 // MARK: Validate ECDSA Non-Recoverable
 extension K1.PublicKey {
@@ -52,4 +53,19 @@ extension K1.PublicKey {
         )
     }
 
+    /// Verifies an elliptic curve digital signature algorithm (ECDSA) signature on a block of data over the `secp256k1` elliptic curve.
+    ///
+    /// The function computes an SHA-256 hash from the data before verifying the signature. If you separately hash the data to be signed, use `isValidECDSASignature(_:digest:input)` with the created digest. Or if you have access to a digest just as `some DataProtocol`, use
+    /// `isValidECDSASignature(_:hashed:input)`.
+    public func isValidECDSASignature(
+        _ signature: ECDSASignatureNonRecoverable,
+        unhashed: some DataProtocol,
+        input: K1.ECDSA.ValidationInput = .default
+    ) -> Bool {
+        isValidECDSASignature(
+            signature,
+            digest: SHA256.hash(data: unhashed),
+            input: input
+        )
+    }
 }
