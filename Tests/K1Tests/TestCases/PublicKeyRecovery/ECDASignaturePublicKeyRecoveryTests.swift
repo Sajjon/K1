@@ -34,7 +34,7 @@ final class ECDASignaturePublicKeyRecoveryTests: XCTestCase {
         let recoverySignatureHex = "acf9e195e094f2f40eb619b9878817ff951b9b11fac37cf0d7290098bbefb574f8606281a2231a3fc781045f2ea4df086936263bbfa8d15ca17fe70e0c3d6e5601"
         let recoverableSigRaw = try Data(hex: recoverySignatureHex)
         let recoverableSig = try ECDSASignatureRecoverable(rawRepresentation: recoverableSigRaw, format: .rsv)
-        
+        XCTAssertEqual(recoverableSig.rawRepresentation.hex, recoverySignatureHex)
         let compactRecoverableSig = try recoverableSig.compact()
         
         let compactRecoverableSigRSHex = "74b5efbb980029d7f07cc3fa119b1b95ff178887b919b60ef4f294e095e1f9ac566e3d0c0ee77fa15cd1a8bf3b26366908dfa42e5f0481c73f1a23a2816260f8"
