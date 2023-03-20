@@ -49,7 +49,7 @@ extension K1.PublicKey {
 // MARK: Serialize
 extension K1.PublicKey {
     public func rawRepresentation(format: K1.Format) throws -> Data {
-        try wrapped.rawRepresentation(format: format)
+        try FFI.PublicKey.rawRepresentation(wrapped, format: format)
     }
 }
 
