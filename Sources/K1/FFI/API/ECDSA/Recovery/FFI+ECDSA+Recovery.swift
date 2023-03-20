@@ -1,47 +1,14 @@
 import Foundation
 import secp256k1
 
+// MARK: Deserialize
 extension FFI.ECDSA.Recovery {
     static let byteCount = FFI.ECDSA.NonRecovery.byteCount + 1
-    final class Wrapped: @unchecked Sendable, ContiguousBytes, WrappedECDSASignature {
-        
-        static func sign() -> (OpaquePointer, UnsafeMutablePointer<Raw>, UnsafePointer<UInt8>, UnsafePointer<UInt8>, secp256k1_nonce_function?, UnsafeRawPointer?) -> Int32 {
-            secp256k1_ecdsa_sign_recoverable
-        }
-        
-        func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
-            try Swift.withUnsafeBytes(of: &raw.data) { pointer in
-                try body(pointer)
-            }
-        }
-        
-        typealias Raw = secp256k1_ecdsa_recoverable_signature
-        var raw: Raw
-        init(raw: Raw) {
-            self.raw = raw
-        }
-    }
     
     static func from(
         rawRepresentation: some DataProtocol
     ) throws -> Wrapped {
         try Wrapped(raw: Raw.recoverableSignature(rawRepresentation))
-    }
-    
-    static func recover(
-        _ wrapped: Wrapped,
-        message: [UInt8]
-    ) throws -> FFI.PublicKey.Wrapped {
-        guard message.count == Curve.Field.byteCount else {
-            throw K1.Error.unableToRecoverMessageHasInvalidLength(got: message.count, expected: Curve.Field.byteCount)
-        }
-        var raw = secp256k1_pubkey()
-        try FFI.call(
-            ifFailThrow: .failedToRecoverPublicKey
-        ) { context in
-            secp256k1_ecdsa_recover(context, &raw, &wrapped.raw, message)
-        }
-        return FFI.PublicKey.Wrapped(raw: raw)
     }
     
     static func deserializeCompact(
@@ -61,7 +28,11 @@ extension FFI.ECDSA.Recovery {
         }
         return .init(raw: raw)
     }
-    
+}
+
+
+// MARK: Serialize
+extension FFI.ECDSA.Recovery {
     static func serializeCompact(
         _ wrapped: Wrapped
     ) throws -> (rs: [UInt8], recoveryID: Int32) {
@@ -80,7 +51,10 @@ extension FFI.ECDSA.Recovery {
         }
         return (rs, recoveryID)
     }
-    
+}
+
+// MARK: Convert
+extension FFI.ECDSA.Recovery {
     static func nonRecoverable(
         _ wrapped: Wrapped
     ) throws -> FFI.ECDSA.NonRecovery.Wrapped {
@@ -99,5 +73,42 @@ extension FFI.ECDSA.Recovery {
         }
         
         return .init(raw: raw)
+    }
+}
+
+// MARK: Recover
+extension FFI.ECDSA.Recovery {
+    static func recover(
+        _ wrapped: Wrapped,
+        message: [UInt8]
+    ) throws -> FFI.PublicKey.Wrapped {
+        guard message.count == Curve.Field.byteCount else {
+            throw K1.Error.unableToRecoverMessageHasInvalidLength(got: message.count, expected: Curve.Field.byteCount)
+        }
+        var raw = secp256k1_pubkey()
+        try FFI.call(
+            ifFailThrow: .failedToRecoverPublicKey
+        ) { context in
+            secp256k1_ecdsa_recover(context, &raw, &wrapped.raw, message)
+        }
+        return FFI.PublicKey.Wrapped(raw: raw)
+    }
+}
+
+// MARK: Sign
+extension FFI.ECDSA.Recovery {
+    
+    /// Produces a **recoverable** ECDSA signature from a hashed `message`
+    static func sign(
+        hashedMessage: [UInt8],
+        privateKey: K1.PrivateKey.Wrapped,
+        mode: K1.ECDSA.SigningMode
+    ) throws -> FFI.ECDSA.Recovery.Wrapped {
+       
+        try FFI.ECDSA._sign(
+            message: hashedMessage,
+            privateKey: privateKey,
+            mode: mode
+        )
     }
 }

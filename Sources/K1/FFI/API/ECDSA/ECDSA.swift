@@ -64,7 +64,7 @@ protocol WrappedECDSASignature {
 // MARK: ECDSA Shared
 extension FFI.ECDSA {
     
-    private static func _sign<WrappedSignature>(
+    internal static func _sign<WrappedSignature>(
         message: [UInt8],
         privateKey: FFI.PrivateKey.Wrapped,
         mode: K1.ECDSA.SigningMode
@@ -95,38 +95,4 @@ extension FFI.ECDSA {
     }
 }
     
-// MARK: ECDSA Recoverable
-extension FFI.ECDSA.Recovery {
-    
-    /// Produces a **recoverable** ECDSA signature from a hashed `message`
-    static func sign(
-        hashedMessage: [UInt8],
-        privateKey: K1.PrivateKey.Wrapped,
-        mode: K1.ECDSA.SigningMode
-    ) throws -> FFI.ECDSA.Recovery.Wrapped {
-       
-        try FFI.ECDSA._sign(
-            message: hashedMessage,
-            privateKey: privateKey,
-            mode: mode
-        )
-    }
-}
 
-// MARK: ECDSA Non-Recoverable
-extension FFI.ECDSA.NonRecovery {
-    
-    /// Produces a **non recoverable** ECDSA signature from a hashed `message`
-    static func sign(
-        hashedMessage: [UInt8],
-        privateKey: FFI.PrivateKey.Wrapped,
-        mode: K1.ECDSA.SigningMode
-    ) throws -> FFI.ECDSA.NonRecovery.Wrapped {
-        
-        try FFI.ECDSA._sign(
-            message: hashedMessage,
-            privateKey: privateKey,
-            mode: mode
-        )
-    }
-}
