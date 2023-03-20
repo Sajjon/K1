@@ -11,6 +11,12 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 //===----------------------------------------------------------------------===//
+
+// Changes by Alexander Cyon:
+// * Removed RFC5480AlgorithmIdentifier for swift-crypto curves
+// * Added RFC5480AlgorithmIdentifier for curve `secp256k1`
+
+
 #if (os(macOS) || os(iOS) || os(watchOS) || os(tvOS)) && CRYPTO_IN_SWIFTPM && !CRYPTO_IN_SWIFTPM_FORCE_BUILD_API
 @_exported import CryptoKit
 #else
@@ -110,21 +116,6 @@ extension ASN1 {
 
 // MARK: Algorithm Identifier Statics
 extension ASN1.RFC5480AlgorithmIdentifier {
-    static let ecdsaP256 = ASN1.RFC5480AlgorithmIdentifier(
-        algorithm: .AlgorithmIdentifier.idEcPublicKey,
-        parameters: try! .init(erasing: ASN1.ASN1ObjectIdentifier.NamedCurves.secp256r1)
-    )
-    
-    static let ecdsaP384 = ASN1.RFC5480AlgorithmIdentifier(
-        algorithm: .AlgorithmIdentifier.idEcPublicKey,
-        parameters: try! .init(erasing: ASN1.ASN1ObjectIdentifier.NamedCurves.secp384r1)
-    )
-    
-    static let ecdsaP521 = ASN1.RFC5480AlgorithmIdentifier(
-        algorithm: .AlgorithmIdentifier.idEcPublicKey,
-        parameters: try! .init(erasing: ASN1.ASN1ObjectIdentifier.NamedCurves.secp521r1)
-    )
-    
     static let secp256k1 = ASN1.RFC5480AlgorithmIdentifier(
         algorithm: .AlgorithmIdentifier.idEcPublicKey,
         parameters: try! .init(erasing: ASN1.ASN1ObjectIdentifier.NamedCurves.secp256k1)

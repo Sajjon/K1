@@ -11,6 +11,11 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 //===----------------------------------------------------------------------===//
+
+// Changes by Alexander Cyon:
+// * Removed ASN1 identifiers for swift-crypto curves
+// * Added ASN1 identifier for curve `secp256k1`
+
 #if (os(macOS) || os(iOS) || os(watchOS) || os(tvOS)) && CRYPTO_IN_SWIFTPM && !CRYPTO_IN_SWIFTPM_FORCE_BUILD_API
 @_exported import CryptoKit
 #else
@@ -145,12 +150,7 @@ extension ASN1.ASN1ObjectIdentifier {
         /// ASN1 identifier for `secp256k1`
         /// https://oidref.com/1.3.132.0.10
         static let secp256k1: ASN1.ASN1ObjectIdentifier = [1, 3, 132, 0, 10]
-        
-        static let secp256r1: ASN1.ASN1ObjectIdentifier = [1, 2, 840, 10_045, 3, 1, 7]
 
-        static let secp384r1: ASN1.ASN1ObjectIdentifier = [1, 3, 132, 0, 34]
-
-        static let secp521r1: ASN1.ASN1ObjectIdentifier = [1, 3, 132, 0, 35]
     }
     
     enum HashFunctions {
