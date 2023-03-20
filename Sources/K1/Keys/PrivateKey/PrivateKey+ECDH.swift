@@ -80,7 +80,6 @@ extension K1.PrivateKey {
         return try SharedSecret(data: data)
     }
     
-    
     /// Computes a shared secret with the provided public key from another party,
     /// returning an uncompressed public point, unhashed.
     ///
@@ -101,8 +100,4 @@ extension K1.PrivateKey {
             serializeOutputFunction: .noHashWholePoint
         )
     }
-    
 }
-
-
-

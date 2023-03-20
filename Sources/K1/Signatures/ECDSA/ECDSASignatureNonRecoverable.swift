@@ -11,7 +11,6 @@ import CryptoKit
 public struct ECDSASignatureNonRecoverable: Sendable, Hashable {
     
     typealias Wrapped = FFI.ECDSA.NonRecovery.Wrapped
-    
     internal let wrapped: Wrapped
     
     init(wrapped: Wrapped) {

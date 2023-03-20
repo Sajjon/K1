@@ -31,7 +31,9 @@ extension K1.PrivateKey {
     public init(
         rawRepresentation: some DataProtocol
     ) throws {
-        try self.init(wrapped: FFI.PrivateKey.from(rawRepresentation: rawRepresentation))
+        try self.init(
+            wrapped: FFI.PrivateKey.from(rawRepresentation: rawRepresentation)
+        )
     }
     
     public init() {
@@ -42,9 +44,9 @@ extension K1.PrivateKey {
 
 // MARK: - Equatable
 extension K1.PrivateKey {
-    /// Two PrivateKey are considered equal if their PublicKeys are equal
+    /// Constant-time comparision.
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.publicKey == rhs.publicKey
+        lhs.wrapped.secureBytes == rhs.wrapped.secureBytes
     }
 }
 

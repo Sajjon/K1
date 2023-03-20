@@ -32,18 +32,14 @@ extension ECDSASignatureRecoverable {
     public init(rs: Data, recoveryID: RecoveryID) throws {
         try self.init(compact: .init(rs: rs, recoveryID: recoveryID))
     }
-    
 
     public init(
         rawRepresentation: some DataProtocol
     ) throws {
-
         try self.init(
             wrapped: FFI.ECDSA.Recovery.from(rawRepresentation: rawRepresentation)
         )
     }
-    
-  
 }
 
 // MARK: Serialize
@@ -54,11 +50,9 @@ extension ECDSASignatureRecoverable {
     }
     
     public func compact() throws -> Compact {
-        
         let (rs, recid) = try FFI.ECDSA.Recovery.serializeCompact(
             wrapped
         )
-        
         return try .init(
             rs: Data(rs),
             recoveryID: .init(recid: recid)
@@ -66,10 +60,10 @@ extension ECDSASignatureRecoverable {
     }
     
     public struct Compact: Sendable, Hashable {
-        public static let byteCount = Self.byteCountRS + 1
-        public static let byteCountRS = 2 * Curve.Field.byteCount
+      
         public let rs: Data
         public let recoveryID: RecoveryID
+      
         public init(rs: Data, recoveryID: RecoveryID) throws {
             guard rs.count == Self.byteCountRS else {
                 throw K1.Error.failedToDeserializeCompactRSRecoverableSignatureInvalidByteCount(got: rs.count, expected: Self.byteCountRS)
@@ -82,6 +76,9 @@ extension ECDSASignatureRecoverable {
 }
 
 extension ECDSASignatureRecoverable.Compact {
+    
+    public static let byteCountRS = 2 * Curve.Field.byteCount
+    public static let byteCount = Self.byteCountRS + 1
     
     /// Takes either `R || S || V` data or `V || R || S` data, as per specification of `format`.
     public init(
@@ -118,6 +115,7 @@ extension ECDSASignatureRecoverable.Compact {
         /// `V || R || S`.
         case vrs
     }
+    
     private var v: Data {
         recoveryID.vData
     }
@@ -169,7 +167,6 @@ extension ECDSASignatureRecoverable {
             }
         }
     }
-    
 }
 
 // MARK: Hashable
