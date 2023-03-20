@@ -64,15 +64,11 @@ extension ECDSASignatureNonRecoverable {
                 message: [UInt8](message)
             )
         )
-        
     }
-    
-    
 }
 
 extension ECDSASignatureNonRecoverable {
     internal static let byteCount = FFI.ECDSA.Recovery.byteCount
-    
 }
 
 // MARK: Equatable
