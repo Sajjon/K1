@@ -9,9 +9,9 @@ import Foundation
 import FFI
 import CryptoKit
 
-public extension K1 {
+extension K1 {
     
-    struct PublicKey: Sendable, Hashable {
+    public struct PublicKey: Sendable, Hashable {
         
         typealias Wrapped = Bridge.PublicKey.Wrapped
         internal let wrapped: Wrapped

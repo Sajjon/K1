@@ -10,9 +10,9 @@ import CryptoKit
 import Foundation
 
 // MARK: - PrivateKey
-public extension K1 {
+extension K1 {
     
-    struct PrivateKey: Sendable, Hashable {
+    public struct PrivateKey: Sendable, Hashable {
         
         typealias Wrapped = Bridge.PrivateKey.Wrapped
         internal let wrapped: Wrapped
@@ -42,17 +42,17 @@ extension K1.PrivateKey {
 
 
 // MARK: - Equatable
-public extension K1.PrivateKey {
+extension K1.PrivateKey {
     /// Two PrivateKey are considered equal if their PublicKeys are equal
-    static func == (lhs: Self, rhs: Self) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.publicKey == rhs.publicKey
     }
 }
 
 // MARK: - Hashable
-public extension K1.PrivateKey {
+extension K1.PrivateKey {
     /// We use the public key of the private key as input to hash
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(self.publicKey)
     }
 }

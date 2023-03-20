@@ -13,7 +13,7 @@ extension Bridge.Context {
     
     /// Bridging value used by libsecp256k1 methods that requires info about
     /// how the context is used, e.g. for signing or verification (validate).
-    var rawValue: UInt32 {
+    public var rawValue: UInt32 {
         let value: Int32
 
         switch self {
@@ -27,11 +27,11 @@ extension Bridge.Context {
 }
 
 // MARK: Format
-public extension Bridge.Format {
+extension Bridge.Format {
     
     /// Bridging value used by libsecp256k1 public key specifying the format
     /// of the imported public key, i.e. how many bytes.
-    var rawValue: UInt32 {
+    public var rawValue: UInt32 {
         let value: Int32
         switch self {
         case .compressed: value = SECP256K1_EC_COMPRESSED

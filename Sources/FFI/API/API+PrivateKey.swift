@@ -22,6 +22,7 @@ extension Bridge {
                         expected: Curve.Field.byteCount
                     )
                 }
+                
                 if secureBytes.allSatisfy({ $0 == .zero }) {
                     throw Bridge.Error.invalidPrivateKeyMustNotBeZero
                 }

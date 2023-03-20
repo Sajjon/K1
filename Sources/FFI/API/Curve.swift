@@ -13,12 +13,12 @@ import Foundation
 public enum Curve {}
 
 // MARK: - FiniteField
-public extension Curve {
+extension Curve {
     /// The finite field of the secp256k1 curve.
-    enum Field {}
+    public enum Field {}
 }
 
-public extension Curve.Field {
+extension Curve.Field {
     /// Finite field members are 256 bits large, i.e. 32 bytes.
-    static let byteCount = 32
+    public static let byteCount = 32
 }

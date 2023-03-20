@@ -8,7 +8,7 @@
 import Foundation
 @testable import K1
 
-public extension Data {
+extension Data {
     init(hex: String) throws {
        try self.init(Array<UInt8>(hex: hex))
     }
