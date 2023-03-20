@@ -53,7 +53,7 @@ You can retrieve the `X` coordinate as raw data using `withUnsafeBytes` if you n
 
 ```swift
 let ab: CryptoKit.SharedSecret = try alice.sharedSecretFromKeyAgreement(with: bob.publicKey) 
-let ba: : CryptoKit.SharedSecret = try bob.sharedSecretFromKeyAgreement(with: alice.publicKey)
+let ba: CryptoKit.SharedSecret = try bob.sharedSecretFromKeyAgreement(with: alice.publicKey)
 
 assert(ab == ba) // pass
 
@@ -71,7 +71,9 @@ let ab: Data = try alice.ecdh(with: bob.publicKey)
 let ba: Data = try bob.ecdh(with: alice.publicKey)
 assert(ab == ba) // pass
 
-assert(ab.count == 32) // pass
+ab.withUnsafeBytes {
+    assert(Data($0).count == 32) // pass
+}
 ```
 
 ### Custom ECDH
@@ -86,18 +88,10 @@ assert(ab == ba) // pass
 assert(ab.count == 65) // pass
 ```
 
+# Acknowledgements
+`K1` is a Swift wrapper around [libsecp256k1][lib], so this library would not exist without the Bitcoin Core developers. Massive thank you for a wonder ful library! I've included it as a submodule, without any changes to the code, i.e. with copyright headers in files intact.
 
-# Alternatives
-
-- [GigaBitcoin/secp256k1.swift](https://github.com/GigaBitcoin/secp256k1.swift) (also using `libsecp256k1`, ⚠️ possibly unsafe, ✅ Schnorr support)  
-- [KevinVitale/WalletKit](https://github.com/KevinVitale/WalletKit/) (also using `libsecp256k1`, ❌ No Schnorr)  
-- [leif-ibsen/SwiftECC](https://github.com/leif-ibsen/SwiftECC) (Custom ECC impl, ⚠️ possibly unsafe, ❌ No Schnorr)  
-- [yenom/BitcoinKit](https://github.com/yenom/BitcoinKit) (💀 Discontinued, also using `libsecp256k1`, ❌ No Schnorr)  
-- [oleganza/CoreBitcoin](https://github.com/oleganza/CoreBitcoin) (OpenSSL as ECC impl, ObjC + Swift, ⚠️ possibly unsafe, ❌ No Schnorr)  
-- [Sajjon/EllipticCurveKit](https://github.com/Sajjon/EllipticCurveKit) (Custom ECC impl (mine), ☣️ unsafe, ✅ Schnorr support)  
-
-## Non-Swift but SPM support
-[greymass/secp256k1](https://github.com/greymass/secp256k1) (Fork of `libsecp256k1`)
+`K1` uses some code from [`swift-crypto`][swc], which has been copied over with relevant copyright header. Since [`swift-crypto`][swc] is licensed under [Apache](https://github.com/apple/swift-crypto/blob/main/LICENSE.txt), so is this library.
 
 # Development
 
@@ -110,7 +104,18 @@ git submodule update
 
 To clone the dependency [libsecp256k1][lib], using commit [427bc3cdcfbc74778070494daab1ae5108c71368](https://github.com/bitcoin-core/secp256k1/commit/427bc3cdcfbc74778070494daab1ae5108c71368) (semver 0.3.0)
 
+# Alternatives
+
+- [GigaBitcoin/secp256k1.swift](https://github.com/GigaBitcoin/secp256k1.swift) (also using `libsecp256k1`, ⚠️ possibly unsafe, ✅ Schnorr support)  
+- [KevinVitale/WalletKit](https://github.com/KevinVitale/WalletKit/) (also using `libsecp256k1`, ❌ No Schnorr)  
+- [leif-ibsen/SwiftECC](https://github.com/leif-ibsen/SwiftECC) (Custom ECC impl, ⚠️ possibly unsafe, ❌ No Schnorr)  
+- [yenom/BitcoinKit](https://github.com/yenom/BitcoinKit) (💀 Discontinued, also using `libsecp256k1`, ❌ No Schnorr)  
+- [oleganza/CoreBitcoin](https://github.com/oleganza/CoreBitcoin) (OpenSSL as ECC impl, ObjC + Swift, ⚠️ possibly unsafe, ❌ No Schnorr)  
+- [Sajjon/EllipticCurveKit](https://github.com/Sajjon/EllipticCurveKit) (Custom ECC impl (mine), ☣️ unsafe, ✅ Schnorr support)
+
+
 [BIP340]: https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
 [lib]: https://github.com/bitcoin-core/secp256k1
 [x963]: https://webstore.ansi.org/standards/ascx9/ansix9632011r2017
 [ckss]: https://developer.apple.com/documentation/cryptokit/sharedsecret
+[swc]: https://github.com/apple/swift-crypto

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import FFI
 
 // MARK: Recovery
 extension ECDSASignatureRecoverable {
@@ -26,14 +25,14 @@ extension ECDSASignatureRecoverable {
 extension ECDSASignatureRecoverable.RecoveryID {
     public init(byte: UInt8) throws {
         guard let self_ = Self(rawValue: byte) else {
-            throw Bridge.Error.invalidRecoveryID(got: Int(byte))
+            throw K1.Error.invalidRecoveryID(got: Int(byte))
         }
         self = self_
     }
     
     public init(recid: Int32) throws {
         guard recid <= 3 && recid >= 0 else {
-            throw Bridge.Error.invalidRecoveryID(got: Int(recid))
+            throw K1.Error.invalidRecoveryID(got: Int(recid))
         }
         try self.init(byte: UInt8(recid))
     }

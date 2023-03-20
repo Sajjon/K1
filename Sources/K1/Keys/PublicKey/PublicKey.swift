@@ -6,14 +6,12 @@
 //
 
 import Foundation
-import FFI
-import CryptoKit
 
 extension K1 {
     
     public struct PublicKey: Sendable, Hashable {
         
-        typealias Wrapped = Bridge.PublicKey.Wrapped
+        typealias Wrapped = FFI.PublicKey.Wrapped
         internal let wrapped: Wrapped
         
         internal init(wrapped: Wrapped) {
@@ -25,132 +23,53 @@ extension K1 {
 // MARK: Init
 extension K1.PublicKey {
     
-    public init(x963Representation: some ContiguousBytes) throws  {
-        try self.init(wrapped: Bridge.PublicKey.from(x963Representation: x963Representation))
+    /// `04 || X || Y` 65 bytes
+    public init(x963Representation: some ContiguousBytes) throws {
+        try self.init(wrapped: FFI.PublicKey.from(x963Representation: x963Representation))
+    }
+    
+    /// `DER`
+    public init(derRepresentation: some RandomAccessCollection<UInt8>) throws {
+        let bytes = [UInt8](derRepresentation)
+        let parsed = try ASN1.SubjectPublicKeyInfo(asn1Encoded: bytes)
+        self = try .init(x963Representation: parsed.key)
+    }
+    
+    /// `X || Y` as 64 bytes
+    public init(compactRepresentation: some ContiguousBytes) throws {
+        try self.init(wrapped: FFI.PublicKey.from(compactRepresentation: compactRepresentation))
+    }
+    
+    /// `02|03 || X` as 33 bytes
+    public init(compressedRepresentation: some ContiguousBytes) throws {
+        try self.init(wrapped: FFI.PublicKey.from(compressedRepresentation: compressedRepresentation))
     }
 }
 
 // MARK: Serialize
 extension K1.PublicKey {
-    public func rawRepresentation(format: Bridge.Format) throws -> Data {
-        try wrapped.rawRepresentation(format: format)
+    
+    /// `04 || X || Y` 65 bytes
+    public var x963Representation: Data {
+        try! FFI.PublicKey.rawRepresentation(wrapped, format: .uncompressed)
     }
     
-}
-
-// MARK: Validate ECDSA Non-Recoverable
-extension K1.PublicKey {
-    
-    /// Verifies an elliptic curve digital signature algorithm (ECDSA) signature on some _hash_ over the `secp256k1` elliptic curve.
-    /// - Parameters:
-    ///   - signature: The (non-recoverable) signature to check against the _hashed_ data.
-    ///   - hashed: The _hashed_ data covered by the signature.
-    ///   - mode: Whether or not to consider malleable signatures valid.
-    /// - Returns: A Boolean value that’s true if the signature is valid for the given _hashed_ data.
-    public func isValidECDSASignature(
-        _ signature: ECDSASignatureNonRecoverable,
-        hashed: some DataProtocol,
-        mode: Bridge.ECDSA.ValidationMode = .default
-    ) -> Bool {
-        do {
-            return try wrapped.isValid(
-                ecdsaSignature: signature.wrapped,
-                message: [UInt8](hashed),
-                mode: mode
-            )
-        } catch {
-            return false
-        }
+    /// `02|03 || X` as 33 bytes
+    public var compressedRepresentation: Data {
+        try! FFI.PublicKey.rawRepresentation(wrapped, format: .compressed)
     }
     
-    /// Verifies an elliptic curve digital signature algorithm (ECDSA) signature on a digest over the `secp256k1` elliptic curve.
-    /// - Parameters:
-    ///   - signature: The (non-recoverable) signature to check against the given digest.
-    ///   - digest: The digest covered by the signature.
-    ///   - mode: Whether or not to consider malleable signatures valid.
-    /// - Returns: A Boolean value that’s true if the signature is valid for the given digest.
-    public func isValidECDSASignature(
-        _ signature: ECDSASignatureNonRecoverable,
-        digest: some Digest,
-        mode: Bridge.ECDSA.ValidationMode = .default
-    ) -> Bool {
-        isValidECDSASignature(
-            signature,
-            hashed: Data(digest),
-            mode: mode
+    public var derRepresentation: Data {
+        let spki = ASN1.SubjectPublicKeyInfo(
+            algorithmIdentifier: .secp256k1,
+            key: Array(self.x963Representation)
         )
+        var serializer = ASN1.Serializer()
+        
+        // Serializing these keys can't throw
+        try! serializer.serialize(spki)
+        return Data(serializer.serializedBytes)
     }
-
-}
-
-// MARK: Validate ECDSA Recoverable
-extension K1.PublicKey {
-    
-    /// Converts a recoverable ECDSA signature to
-    /// non-recoverable and validates it against
-    /// a `SHA256` hashed messages for this public key.
-    public func isValidECDSASignature(
-        _ signature: ECDSASignatureRecoverable,
-        hashed: some DataProtocol,
-        mode: Bridge.ECDSA.ValidationMode = .default
-    ) -> Bool {
-        do {
-            return try isValidECDSASignature(
-                signature.nonRecoverable(),
-                hashed: hashed,
-                mode: mode
-            )
-        } catch {
-            return false
-        }
-    }
-    
-    /// Converts a recoverable ECDSA signature to
-    /// non-recoverable and validates it against
-    /// a `SHA256` hashed messages for this public key.
-    public func isValidECDSASignature(
-        _ signature: ECDSASignatureRecoverable,
-        digest: some Digest,
-        mode: Bridge.ECDSA.ValidationMode = .default
-    ) -> Bool {
-        do {
-            return try isValidECDSASignature(
-                signature.nonRecoverable(),
-                digest: digest,
-                mode: mode
-            )
-        } catch {
-            return false
-        }
-    }
-
-}
-
-// MARK: Validate Schnorr Signatures
-extension K1.PublicKey {
-    
-    
-    public func isValidSchnorrSignature(
-        _ signature: SchnorrSignature,
-        hashed: some DataProtocol
-    ) -> Bool {
-        do {
-            return try wrapped.isValid(
-                schnorrSignature: signature.wrapped,
-                message: [UInt8](hashed)
-            )
-        } catch {
-            return false
-        }
-    }
-    
-    public func isValidSchnorrSignature(
-        _ signature: SchnorrSignature,
-        digest: some Digest
-    ) -> Bool {
-        isValidSchnorrSignature(signature, hashed: Data(digest))
-    }
-
 }
 
 // MARK: Equatable

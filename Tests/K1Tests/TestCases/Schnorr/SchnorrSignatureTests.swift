@@ -9,7 +9,6 @@ import Foundation
 import K1
 import XCTest
 import CryptoKit
-@testable import FFI
 
 final class SchnorrSignatureTests: XCTestCase {
     

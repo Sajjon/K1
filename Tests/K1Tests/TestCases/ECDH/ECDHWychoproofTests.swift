@@ -74,7 +74,7 @@ private extension ECDHWychoproofTests {
             }
             numberOfTestsRun += 1
             do {
-                let publicKey = try PublicKey(der: Data(hex: testVector.publicKey))
+                let publicKey = try PublicKey(derRepresentation: Data(hex: testVector.publicKey))
                 var privateBytes = [UInt8]()
                 privateBytes = try padKeyIfNecessary(vector: testVector.privateKey)
                 let privateKey = try PrivateKey(rawRepresentation: privateBytes)

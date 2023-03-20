@@ -18,7 +18,6 @@ import Foundation
 import XCTest
 import CryptoKit
 @testable import K1
-@testable import FFI
 
 final class ECDSA_Wycheproof_ASN_DER_EncodedSignaturesTests: XCTestCase {
     

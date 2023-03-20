@@ -6,11 +6,10 @@
 //
 
 import Foundation
-import FFI
 
 public struct SchnorrSignature: Sendable, Hashable {
     
-    typealias Wrapped = Bridge.Scnhorr.Wrapped
+    typealias Wrapped = FFI.Schnorr.Wrapped
     internal let wrapped: Wrapped
     internal init(wrapped: Wrapped) {
         self.wrapped = wrapped

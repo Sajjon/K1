@@ -7,11 +7,9 @@
 
 import Foundation
 import CryptoKit
-import FFI
-import Tagged
 
 public struct ECDSASignatureRecoverable: Sendable, Hashable {
-    typealias Wrapped = Bridge.ECDSA.Recovery.Wrapped
+    typealias Wrapped = FFI.ECDSA.Recovery.Wrapped
     private let wrapped: Wrapped
     
     internal init(wrapped: Wrapped) {
@@ -21,39 +19,27 @@ public struct ECDSASignatureRecoverable: Sendable, Hashable {
 
 // MARK: Init
 extension ECDSASignatureRecoverable {
-    public init(compactRepresentation: Data, recoveryID: Int32) throws {
-        // FIXME: Needed?
-        guard
-            compactRepresentation.count == ECDSASignatureNonRecoverable.byteCount
-         else {
-             throw Bridge.Error.incorrectByteCountOfRawSignature
-         }
-//        var recoverableSignature = secp256k1_ecdsa_recoverable_signature()
-//        let rs = [UInt8](compactRepresentation)
-//
-//        try Bridge.call(ifFailThrow: .failedToParseRecoverableSignatureFromCompactRepresentation) { context in
-//            secp256k1_ecdsa_recoverable_signature_parse_compact(
-//                context,
-//                &recoverableSignature,
-//                rs,
-//                recoveryID
-//            )
-//        }
-//        self.rawRepresentation = Data(
-//            bytes: &recoverableSignature.data,
-//            count: MemoryLayout.size(ofValue: recoverableSignature.data)
-//        )
-        fatalError()
-    }
-    
 
-    public init(rawRepresentation: some DataProtocol) throws {
+    public init(compact: Compact) throws {
         try self.init(
-            wrapped: Bridge.ECDSA.Recovery.from(rawRepresentation: rawRepresentation)
+            wrapped: FFI.ECDSA.Recovery.deserializeCompact(
+                rs: [UInt8](compact.rs),
+                recoveryID: compact.recoveryID.recid
+            )
         )
     }
     
-  
+    public init(rs: Data, recoveryID: RecoveryID) throws {
+        try self.init(compact: .init(rs: rs, recoveryID: recoveryID))
+    }
+
+    public init(
+        rawRepresentation: some DataProtocol
+    ) throws {
+        try self.init(
+            wrapped: FFI.ECDSA.Recovery.from(rawRepresentation: rawRepresentation)
+        )
+    }
 }
 
 // MARK: Serialize
@@ -64,11 +50,9 @@ extension ECDSASignatureRecoverable {
     }
     
     public func compact() throws -> Compact {
-        
-        let (rs, recid) = try Bridge.ECDSA.Recovery.serialize(
+        let (rs, recid) = try FFI.ECDSA.Recovery.serializeCompact(
             wrapped
         )
-        
         return try .init(
             rs: Data(rs),
             recoveryID: .init(recid: recid)
@@ -76,13 +60,13 @@ extension ECDSASignatureRecoverable {
     }
     
     public struct Compact: Sendable, Hashable {
-        public static let byteCount = Self.byteCountRS + 1
-        public static let byteCountRS = 2 * Curve.Field.byteCount
+      
         public let rs: Data
         public let recoveryID: RecoveryID
+      
         public init(rs: Data, recoveryID: RecoveryID) throws {
             guard rs.count == Self.byteCountRS else {
-                throw Bridge.Error.failedToDeserializeCompactRSRecoverableSignatureInvalidByteCount(got: rs.count, expected: Self.byteCountRS)
+                throw K1.Error.failedToDeserializeCompactRSRecoverableSignatureInvalidByteCount(got: rs.count, expected: Self.byteCountRS)
             }
             self.rs = rs
             self.recoveryID = recoveryID
@@ -93,12 +77,16 @@ extension ECDSASignatureRecoverable {
 
 extension ECDSASignatureRecoverable.Compact {
     
+    public static let byteCountRS = 2 * Curve.Field.byteCount
+    public static let byteCount = Self.byteCountRS + 1
+    
+    /// Takes either `R || S || V` data or `V || R || S` data, as per specification of `format`.
     public init(
         rawRepresentation: some DataProtocol,
         format: SerializationFormat
     ) throws {
         guard rawRepresentation.count == Self.byteCount else {
-            throw Bridge.Error.failedToDeserializeCompactRecoverableSignatureInvalidByteCount(got: rawRepresentation.count, expected: Self.byteCount
+            throw K1.Error.failedToDeserializeCompactRecoverableSignatureInvalidByteCount(got: rawRepresentation.count, expected: Self.byteCount
             )
         }
         switch format {
@@ -118,15 +106,18 @@ extension ECDSASignatureRecoverable.Compact {
     public enum SerializationFormat {
         
         /// `R || S || V` - the format `libsecp256k1` v0.3.0 uses as internal representation
+        /// This is the default value of this library.
         case rsv
+        
+        /// We use `R || S || V` as default values since `libsecp256k1` v0.3.0 uses it as its internal representation.
+        public static let `default`: Self = .rsv
         
         /// `V || R || S`.
         case vrs
     }
+    
     private var v: Data {
-        Data(
-            [UInt8(recoveryID.rawValue)]
-        )
+        recoveryID.vData
     }
     
     func serialize(format: SerializationFormat) -> Data {
@@ -138,6 +129,13 @@ extension ECDSASignatureRecoverable.Compact {
         }
     }
 }
+extension ECDSASignatureRecoverable.RecoveryID {
+    var vData: Data {
+        Data(
+            [UInt8(rawValue)]
+        )
+    }
+}
 
 // MARK: Recovery
 extension ECDSASignatureRecoverable {
@@ -145,7 +143,7 @@ extension ECDSASignatureRecoverable {
         message: some DataProtocol
     ) throws -> K1.PublicKey {
         try K1.PublicKey(
-            wrapped: Bridge.ECDSA.Recovery.recover(wrapped, message: [UInt8](message))
+            wrapped: FFI.ECDSA.Recovery.recover(wrapped, message: [UInt8](message))
         )
     }
 }
@@ -155,7 +153,7 @@ extension ECDSASignatureRecoverable {
 extension ECDSASignatureRecoverable {
     public func nonRecoverable() throws -> ECDSASignatureNonRecoverable {
         try ECDSASignatureNonRecoverable(
-            wrapped: Bridge.ECDSA.Recovery.nonRecoverable(self.wrapped)
+            wrapped: FFI.ECDSA.Recovery.nonRecoverable(self.wrapped)
         )
     }
 }
@@ -169,7 +167,6 @@ extension ECDSASignatureRecoverable {
             }
         }
     }
-    
 }
 
 // MARK: Hashable

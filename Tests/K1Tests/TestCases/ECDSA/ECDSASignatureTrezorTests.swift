@@ -90,6 +90,11 @@ private struct SignatureTrezorTestVector: SignatureTestVector {
             ].joined(separator: "")
         )
         
+        try XCTAssertEqual(
+            ECDSASignatureNonRecoverable(compactRepresentation: Data(hex: expected.r + expected.s)),
+            signature
+        )
+        
         return signature
     }
     

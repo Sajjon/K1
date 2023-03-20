@@ -16,7 +16,6 @@
 //===----------------------------------------------------------------------===//
 import XCTest
 import CryptoKit
-import FFI
 
 @testable import K1
 
@@ -73,7 +72,7 @@ extension XCTestCase {
     
     func doTestGroup<HF: HashFunction, TV: WycheproofTestVector>(
         group: ECDSAWycheTestGroup<TV>,
-        signatureValidationMode: Bridge.ECDSA.ValidationMode,
+        signatureValidationMode: K1.ECDSA.ValidationMode,
         hashFunction: HF.Type,
         skipIfContainsFlags: [String] = [],
         skipIfContainsComment: [String] = [],
@@ -86,6 +85,38 @@ extension XCTestCase {
         }
         let keyBytes = try Array(hex: group.key.uncompressed)
         let key = try PublicKey(x963Representation: keyBytes)
+        
+        let keyFromDER = try PublicKey(derRepresentation: Data(hex: group.keyDer))
+        XCTAssertEqual(key.derRepresentation.hex, group.keyDer)
+
+        XCTAssertEqual(keyFromDER, key)
+        
+        let compactXRaw = try Data(hex: group.key.wx)
+        let compactYRaw = try Data(hex: group.key.wy)
+        func ensure32Bytes(_ compactComponent: Data) throws -> Data {
+            if compactComponent.count == Curve.Field.byteCount {
+                return compactComponent
+            }
+            
+            var compactComponent = [UInt8](compactComponent)
+            while compactComponent.count < Curve.Field.byteCount {
+                compactComponent = [0x00] + compactComponent
+            }
+            while compactComponent.count > Curve.Field.byteCount {
+                guard compactComponent.first == 0x00 else {
+                    throw BadKeyComponent()
+                }
+                compactComponent = [UInt8](compactComponent.dropFirst())
+            }
+            return Data(compactComponent)
+        }
+        let compactX = try ensure32Bytes(compactXRaw)
+        let compactY = try ensure32Bytes(compactYRaw)
+        let compactData = compactX + compactY
+            
+        let fromCompact = try PublicKey(compactRepresentation: compactData)
+        XCTAssertEqual(fromCompact, key)
+        
         var numberOfTestsRun = 0
         var idsOfOmittedTests = Array<Int>()
     outerloop: for testVector in group.tests {
@@ -154,11 +185,14 @@ struct ECDSATestGroup<TV: SignatureTestVector>: Codable {
 struct ECDSAWycheTestGroup<TV: WycheproofTestVector>: Codable {
     let tests: [TV]
     let key: ECDSAKey
+    let keyDer: String
 }
 
 
 struct ECDSAKey: Codable {
     let uncompressed: String
+    let wx: String
+    let wy: String
     let curve: String
 }
 
@@ -185,3 +219,4 @@ typealias PrivateKey = K1.PrivateKey
 struct ECDSASignatureTestError: Swift.Error, CustomStringConvertible {
     let description: String
 }
+struct BadKeyComponent: Swift.Error {}
