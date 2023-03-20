@@ -12,15 +12,25 @@ import struct CryptoKit.SHA256
 // MARK: ECDSA Recoverable
 extension K1.PrivateKey {
     public func ecdsaSignRecoverable(
-        digest: some Digest,
+        hashed hashedMessage: some DataProtocol,
         mode: K1.ECDSA.SigningMode = .default
     ) throws -> ECDSASignatureRecoverable {
         try ECDSASignatureRecoverable(
             wrapped: FFI.ECDSA.Recovery.sign(
-                hashedMessage: [UInt8](digest),
+                hashedMessage: [UInt8](hashedMessage),
                 privateKey: wrapped,
                 mode: mode
             )
+        )
+    }
+    
+    public func ecdsaSignRecoverable(
+        digest: some Digest,
+        mode: K1.ECDSA.SigningMode = .default
+    ) throws -> ECDSASignatureRecoverable {
+        try ecdsaSignRecoverable(
+            hashed: Data(digest),
+            mode: mode
         )
     }
     
@@ -29,6 +39,9 @@ extension K1.PrivateKey {
         unhashed: some DataProtocol,
         mode: K1.ECDSA.SigningMode = .default
     ) throws -> ECDSASignatureRecoverable {
-        try ecdsaSignRecoverable(digest: SHA256.hash(data: unhashed), mode: mode)
+        try ecdsaSignRecoverable(
+            digest: SHA256.hash(data: unhashed),
+            mode: mode
+        )
     }
 }
