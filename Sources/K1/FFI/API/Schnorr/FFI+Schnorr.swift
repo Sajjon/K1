@@ -50,7 +50,7 @@ extension FFI.Schnorr {
     static func sign(
         hashedMessage message: [UInt8],
         privateKey: FFI.PrivateKey.Wrapped,
-        input: SchnorrInput?
+        input: SchnorrInput = .default
     ) throws -> FFI.Schnorr.Wrapped {
         guard message.count == Curve.Field.byteCount else {
             throw K1.Error.unableToSignMessageHasInvalidLength(got: message.count, expected: Curve.Field.byteCount)
@@ -65,13 +65,6 @@ extension FFI.Schnorr {
             secp256k1_keypair_create(context, &keyPair, privateKey.secureBytes.backing.bytes)
         }
         
-        var auxilaryRandomBytes: [UInt8]? = nil
-        if let auxilaryRandomData = input?.auxilaryRandomData {
-            guard auxilaryRandomData.count == Curve.Field.byteCount else {
-                throw K1.Error.failedToSchnorrSignDigestProvidedRandomnessInvalidLength
-            }
-            auxilaryRandomBytes = [UInt8](auxilaryRandomData)
-        }
         
         try FFI.call(
             ifFailThrow: .failedToSchnorrSignDigest
@@ -81,7 +74,7 @@ extension FFI.Schnorr {
                 &signatureOut,
                 message,
                 &keyPair,
-                auxilaryRandomBytes
+                input.auxilaryRandomData?.aux
             )
         }
         
@@ -91,11 +84,20 @@ extension FFI.Schnorr {
 }
 
 // MARK: SchnorrInput
-public struct SchnorrInput {
-    public let auxilaryRandomData: Data
-    public init(auxilaryRandomData: Data) {
+public struct SchnorrInput: Sendable, Hashable {
+    
+    public static let `default` = Self()
+    public let auxilaryRandomData: AuxilaryRandomData?
+    public init(auxilaryRandomData: AuxilaryRandomData? = nil) {
         self.auxilaryRandomData = auxilaryRandomData
     }
+    public struct AuxilaryRandomData: Sendable, Hashable {
+        public let aux: [UInt8]
+        public init(aux: some DataProtocol) throws {
+            guard aux.count == Curve.Field.byteCount else {
+                throw K1.Error.failedToSchnorrSignDigestProvidedRandomnessInvalidLength
+            }
+            self.aux = [UInt8](aux)
+        }
+    }
 }
-
-

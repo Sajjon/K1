@@ -14,7 +14,7 @@ extension K1.PrivateKey {
     
     public func schnorrSign(
         hashed: some DataProtocol,
-        input: SchnorrInput? = nil
+        input: SchnorrInput = .default
     ) throws -> SchnorrSignature {
         try SchnorrSignature(
             wrapped: FFI.Schnorr.sign(
@@ -27,22 +27,22 @@ extension K1.PrivateKey {
     
     public func schnorrSign(
         digest: some Digest,
-        input maybeInput: SchnorrInput? = nil
+        input: SchnorrInput = .default
     ) throws -> SchnorrSignature {
         try schnorrSign(
             hashed: [UInt8](digest),
-            input: maybeInput
+            input: input
         )
     }
     
     /// SHA256 hashes `unhashed` before signing it.
     public func schnorrSign(
         unhashed: some DataProtocol,
-        input maybeInput: SchnorrInput? = nil
+        input: SchnorrInput = .default
     ) throws -> SchnorrSignature {
         try schnorrSign(
             digest: SHA256.hash(data: unhashed),
-            input: maybeInput
+            input: input
         )
     }
 
