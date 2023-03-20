@@ -1,6 +1,5 @@
 import Foundation
 @testable import K1
-@testable import FFI
 import CryptoKit
 import XCTest
 

@@ -20,7 +20,6 @@ let package = Package(
     dependencies: [
          // Only used by tests
         .package(url: "https://github.com/filom/ASN1Decoder", from: "1.8.0"),
-        .package(url: "https://github.com/pointfreeco/swift-tagged.git", .upToNextMajor(from: "0.9.0")),
     ],
     targets: [
         
@@ -67,17 +66,9 @@ let package = Package(
             ]
         ),
         .target(
-            name: "FFI",
-            dependencies: [
-                // ECDSA, Schnorr, ECDH etc.
-                "secp256k1",
-            ]
-        ),
-        .target(
             name: "K1",
             dependencies: [
-                "FFI",
-                .productItem(name: "Tagged", package: "swift-tagged"),
+                "secp256k1",
             ]
         ),
         .testTarget(

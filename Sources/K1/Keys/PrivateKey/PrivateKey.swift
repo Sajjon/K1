@@ -5,7 +5,6 @@
 //  Created by Alexander Cyon on 2022-01-27.
 //
 
-@_spi(Internals) import FFI
 import CryptoKit
 import Foundation
 
@@ -14,7 +13,7 @@ extension K1 {
     
     public struct PrivateKey: Sendable, Hashable {
         
-        typealias Wrapped = Bridge.PrivateKey.Wrapped
+        typealias Wrapped = FFI.PrivateKey.Wrapped
         internal let wrapped: Wrapped
         
         public let publicKey: PublicKey
@@ -32,7 +31,7 @@ extension K1.PrivateKey {
     public init(
         rawRepresentation: some DataProtocol
     ) throws {
-        try self.init(wrapped: Bridge.PrivateKey.from(rawRepresentation: rawRepresentation))
+        try self.init(wrapped: FFI.PrivateKey.from(rawRepresentation: rawRepresentation))
     }
     
     public init() {
@@ -64,7 +63,7 @@ extension K1.PrivateKey {
         hashed: some DataProtocol,
         input: SchnorrInput? = nil
     ) throws -> SchnorrSignature {
-        let wrapped = try Bridge.Scnhorr.sign(
+        let wrapped = try FFI.Scnhorr.sign(
             hashedMessage: [UInt8](hashed),
             privateKey: wrapped,
             input: input
@@ -87,10 +86,10 @@ extension K1.PrivateKey {
 extension K1.PrivateKey {
     public func ecdsaSignNonRecoverable(
         digest: some Digest,
-        mode: Bridge.ECDSA.SigningMode = .default
+        mode: K1.ECDSA.SigningMode = .default
     ) throws -> ECDSASignatureNonRecoverable {
         try ECDSASignatureNonRecoverable(
-            wrapped: Bridge.ECDSA.NonRecovery.sign(
+            wrapped: FFI.ECDSA.NonRecovery.sign(
                 hashedMessage: [UInt8](digest),
                 privateKey: wrapped,
                 mode: mode
@@ -101,7 +100,7 @@ extension K1.PrivateKey {
     /// SHA256 hashes `unhashed` before signing it.
     public func ecdsaSignNonRecoverable(
         unhashed: some DataProtocol,
-        mode: Bridge.ECDSA.SigningMode = .default
+        mode: K1.ECDSA.SigningMode = .default
     ) throws -> ECDSASignatureNonRecoverable {
         try ecdsaSignNonRecoverable(digest: SHA256.hash(data: unhashed), mode: mode)
     }
@@ -111,10 +110,10 @@ extension K1.PrivateKey {
 extension K1.PrivateKey {
     public func ecdsaSignRecoverable(
         digest: some Digest,
-        mode: Bridge.ECDSA.SigningMode = .default
+        mode: K1.ECDSA.SigningMode = .default
     ) throws -> ECDSASignatureRecoverable {
         try ECDSASignatureRecoverable(
-            wrapped: Bridge.ECDSA.Recovery.sign(
+            wrapped: FFI.ECDSA.Recovery.sign(
                 hashedMessage: [UInt8](digest),
                 privateKey: wrapped,
                 mode: mode
@@ -124,7 +123,7 @@ extension K1.PrivateKey {
     
     public func ecdsaSignRecoverable<D: DataProtocol>(
         unhashed data: D,
-        mode: Bridge.ECDSA.SigningMode = .default
+        mode: K1.ECDSA.SigningMode = .default
     ) throws -> ECDSASignatureRecoverable {
         try ecdsaSignRecoverable(digest: SHA256.hash(data: data), mode: mode)
     }
@@ -160,7 +159,7 @@ extension K1.PrivateKey {
     public func sharedSecretFromKeyAgreement(
         with publicKey: K1.PublicKey
     ) throws -> SharedSecret {
-        let data = try Bridge.ECDH.keyExchange(
+        let data = try FFI.ECDH.keyExchange(
             publicKey: publicKey.wrapped,
             privateKey: self.wrapped,
             serializeOutputFunction: .ansiX963
@@ -194,7 +193,7 @@ extension K1.PrivateKey {
         with publicKey: K1.PublicKey,
         arbitraryData: Data? = nil
     ) throws -> SharedSecret {
-        let data = try Bridge.ECDH.keyExchange(
+        let data = try FFI.ECDH.keyExchange(
             publicKey: publicKey.wrapped,
             privateKey: self.wrapped,
             serializeOutputFunction: .libsecp256kDefault(arbitraryData: arbitraryData)
@@ -217,7 +216,7 @@ extension K1.PrivateKey {
     /// cryptographic functions, e.g. some ECIES scheme.
     ///
     public func ecdhPoint(with publicKey: K1.PublicKey) throws -> Data {
-        try Bridge.ECDH.keyExchange(
+        try FFI.ECDH.keyExchange(
             publicKey: publicKey.wrapped,
             privateKey: self.wrapped,
             serializeOutputFunction: .noHashWholePoint

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import FFI
 @testable import K1
 import XCTest
 
@@ -15,7 +14,7 @@ final class PublicKeyImportTests: XCTestCase {
         let raw = try Data(hex: "deadbeef")
         assert(
             try PublicKey.init(x963Representation: raw),
-            throws: Bridge.Error.incorrectByteCountOfPublicKey(providedByteCount: raw.count)
+            throws: K1.Error.incorrectByteCountOfPublicKey(providedByteCount: raw.count)
         )
     }
     
@@ -23,7 +22,7 @@ final class PublicKeyImportTests: XCTestCase {
         let raw = Data(repeating: 0xde, count: 66)
         assert(
             try PublicKey(x963Representation: raw),
-            throws: Bridge.Error.incorrectByteCountOfPublicKey(providedByteCount: raw.count)
+            throws: K1.Error.incorrectByteCountOfPublicKey(providedByteCount: raw.count)
         )
     }
     
@@ -31,7 +30,7 @@ final class PublicKeyImportTests: XCTestCase {
         let raw = Data(repeating: 0x04, count: 65)
         assert(
             try PublicKey(x963Representation: raw),
-            throws: Bridge.Error.failedToDeserializePublicKey
+            throws: K1.Error.failedToDeserializePublicKey
         )
     }
     
@@ -39,7 +38,7 @@ final class PublicKeyImportTests: XCTestCase {
         let raw = Data(repeating: 0x03, count: 33)
         assert(
             try PublicKey(x963Representation: raw),
-            throws: Bridge.Error.failedToDeserializePublicKey
+            throws: K1.Error.failedToDeserializePublicKey
         )
     }
     
@@ -65,7 +64,7 @@ final class PublicKeyImportTests: XCTestCase {
         
         assert(
             try PublicKey(x963Representation: raw),
-            throws: Bridge.Error.failedToDeserializePublicKey
+            throws: K1.Error.failedToDeserializePublicKey
         )
     }
 }

@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension Bridge {
-    public enum Error: Sendable, Swift.Error, Hashable {
+extension K1 {
+    enum Error: Sendable, Swift.Error, Hashable {
         case invalidPrivateKeyMustNotBeZero
         case invalidPrivateKeyMustBeSmallerThanOrder
         case failedToProduceSharedSecret
@@ -45,12 +45,12 @@ extension Bridge {
     }
 }
 
-extension Bridge.Error {
+extension K1.Error {
     
-    public static func incorrectByteCountOfPublicKey(providedByteCount: Int) -> Self {
+    static func incorrectByteCountOfPublicKey(providedByteCount: Int) -> Self {
           .incorrectByteCountOfPublicKey(
             got: providedByteCount,
-            acceptableLengths: Bridge.Format.allCases.map(\.length)
+            acceptableLengths: K1.Format.allCases.map(\.length)
           )
       }
 }

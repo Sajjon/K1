@@ -42,7 +42,7 @@ private func htoi(_ value: UInt8) throws -> UInt8 {
 }
 
 extension Array where Element == UInt8 {
-    public init(hex: String) throws {
+    init(hex: String) throws {
         var hex = hex.lowercased()
         if hex.starts(with: "0x") {
             hex = String(hex.dropFirst(2))
@@ -66,7 +66,7 @@ extension Array where Element == UInt8 {
 }
 
 extension DataProtocol {
-    public var hex: String {
+    var hex: String {
         get {
             let hexLen = self.count * 2
             let ptr = UnsafeMutablePointer<UInt8>.allocate(capacity: hexLen)
@@ -86,7 +86,7 @@ extension DataProtocol {
 }
 
 extension Data {
-    public init(hex: String) throws {
+    init(hex: String) throws {
         self.init()
 
         if hex.count % 2 != 0 || hex.count == 0 {

@@ -9,15 +9,15 @@ import Foundation
 import secp256k1
 
 
-extension Bridge {
-    public enum ECDH  {}
+extension FFI {
+    enum ECDH  {}
 }
 
 
 // MARK: SerializeFunction
-extension Bridge.ECDH {
+extension FFI.ECDH {
     
-    public enum SerializeFunction {
+    enum SerializeFunction {
         
         /// Using the `libsecp256k1` default behaviour.
         ///
@@ -51,17 +51,17 @@ extension Bridge.ECDH {
             switch self {
             case .libsecp256kDefault: return Curve.Field.byteCount
             case .ansiX963: return Curve.Field.byteCount
-            case .noHashWholePoint: return Bridge.Format.uncompressed.length
+            case .noHashWholePoint: return K1.Format.uncompressed.length
             }
         }
     }
 }
 
 // MARK: ECDH
-extension Bridge.ECDH {
-    public static func keyExchange(
-        publicKey: Bridge.PublicKey.Wrapped,
-        privateKey: Bridge.PrivateKey.Wrapped,
+extension FFI.ECDH {
+    static func keyExchange(
+        publicKey: FFI.PublicKey.Wrapped,
+        privateKey: FFI.PrivateKey.Wrapped,
         serializeOutputFunction hashFp: SerializeFunction
     ) throws -> Data {
         
@@ -76,7 +76,7 @@ extension Bridge.ECDH {
             case .ansiX963, .noHashWholePoint: return nil
             }
         }()
-        try Bridge.call(
+        try FFI.call(
             ifFailThrow: .failedToPerformDiffieHellmanKeyExchange
         ) { context in
             secp256k1_ecdh(

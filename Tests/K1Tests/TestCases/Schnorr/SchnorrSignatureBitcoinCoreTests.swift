@@ -6,7 +6,6 @@
 //
 
 import XCTest
-import FFI
 import Foundation
 @testable import K1
 
@@ -126,8 +125,8 @@ private extension SchnorrSignatureBitcoinCoreTests {
         }
         guard !vector.invalidPublicKey else {
             XCTAssertThrowsError(try parsePublicKey(), "") { anyError in
-                if let error = anyError as? Bridge.Error {
-                    XCTAssertEqual(error, Bridge.Error.failedToDeserializePublicKey)
+                if let error = anyError as? K1.Error {
+                    XCTAssertEqual(error, K1.Error.failedToDeserializePublicKey)
                 } else {
                     XCTFail("Failed to cast error")
                 }

@@ -7,7 +7,6 @@
 
 import Foundation
 import K1
-import FFI
 import XCTest
 import CryptoKit
 
@@ -29,10 +28,14 @@ extension K1.PublicKey {
     public func isValidECDSASignature(
         _ signature: ECDSASignatureRecoverable,
         unhashed: some DataProtocol,
-        mode: Bridge.ECDSA.ValidationMode = .default
+        mode: K1.ECDSA.ValidationMode = .default
     ) -> Bool {
         do {
-            return try isValidECDSASignature(signature.nonRecoverable(), unhashed: unhashed, mode: mode)
+            return try isValidECDSASignature(
+                signature.nonRecoverable(),
+                unhashed: unhashed,
+                mode: mode
+            )
         } catch {
             return false
         }
@@ -43,7 +46,7 @@ extension K1.PublicKey {
     public func isValidECDSASignature(
         _ signature: ECDSASignatureNonRecoverable,
         unhashed: some DataProtocol,
-        mode: Bridge.ECDSA.ValidationMode = .default
+        mode: K1.ECDSA.ValidationMode = .default
     ) -> Bool {
         isValidECDSASignature(
             signature,

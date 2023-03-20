@@ -19,7 +19,7 @@ extension Raw {
         guard
             rawRepresentation.count == expected
         else {
-            throw Bridge.Error.incorrectByteCountOfRawRecoverableSignature(
+            throw K1.Error.incorrectByteCountOfRawRecoverableSignature(
                 got: rawRepresentation.count,
                 expected: expected
             )
@@ -39,7 +39,7 @@ extension Raw {
        
         var raw = secp256k1_ecdsa_signature()
        
-        try Bridge.call(ifFailThrow: .failedToParseNonRecoverableSignatureFromCompactRepresentation) { context in
+        try FFI.call(ifFailThrow: .failedToParseNonRecoverableSignatureFromCompactRepresentation) { context in
             secp256k1_ecdsa_signature_parse_compact(
                 context,
                 &raw,
@@ -56,7 +56,7 @@ extension Raw {
        
         var raw = secp256k1_ecdsa_signature()
        
-        try Bridge.call(ifFailThrow: .failedToParseNonRecoverableSignatureFromCompactRepresentation) { context in
+        try FFI.call(ifFailThrow: .failedToParseNonRecoverableSignatureFromCompactRepresentation) { context in
             secp256k1_ecdsa_signature_parse_der(
                 context,
                 &raw,

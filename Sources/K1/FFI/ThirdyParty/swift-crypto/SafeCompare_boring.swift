@@ -20,7 +20,7 @@ import Foundation
 /// This function performs a safe comparison between two buffers of bytes. It exists as a temporary shim until we refactor
 /// some of the usage sites to pass better data structures to us.
 @inlinable
-public func safeCompare<LHS: ContiguousBytes, RHS: ContiguousBytes>(_ lhs: LHS, _ rhs: RHS) -> Bool {
+func safeCompare<LHS: ContiguousBytes, RHS: ContiguousBytes>(_ lhs: LHS, _ rhs: RHS) -> Bool {
     lhs.withUnsafeBytes { lhsPtr in
         rhs.withUnsafeBytes { rhsPtr in
             constantTimeCompare(lhsPtr, rhsPtr)

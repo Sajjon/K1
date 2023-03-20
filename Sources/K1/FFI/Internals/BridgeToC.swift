@@ -9,15 +9,15 @@
 import CryptoKit
 import secp256k1
 
-public final class Bridge {
+final class FFI {
     
     let context: OpaquePointer
     init() throws {
         guard
             /* "Create a secp256k1 context object." */
-            let context = secp256k1_context_create(Context.sign.rawValue | Bridge.Context.verify.rawValue)
+            let context = secp256k1_context_create(Context.sign.rawValue | Context.verify.rawValue)
         else {
-            throw Bridge.Error.failedToCreateContextForSecp256k1
+            throw K1.Error.failedToCreateContextForSecp256k1
         }
         
         self.context = context
@@ -29,31 +29,31 @@ public final class Bridge {
     }
 }
 
-extension Bridge {
+extension FFI {
     
-    public static func toC<T>(
-        _ closure: (Bridge) throws -> T
+    static func toC<T>(
+        _ closure: (FFI) throws -> T
     ) throws -> T {
-        let bridge = try Bridge()
-        return try closure(bridge)
+        let ffi = try FFI()
+        return try closure(ffi)
     }
     
     /// Returns `true` iff result code is `1`
-    public func validate(
+    func validate(
         _ method: (OpaquePointer) -> Int32
     ) -> Bool {
         method(context) == 1
     }
     
-    public func callWithResultCode(
+    func callWithResultCode(
         _ method: (OpaquePointer) -> Int32
     ) -> Int {
         let result = method(context)
         return Int(result)
     }
     
-    public func call(
-        ifFailThrow error: Bridge.Error,
+    func call(
+        ifFailThrow error: K1.Error,
         _ method: (OpaquePointer) -> Int32
     ) throws {
       let result = callWithResultCode(method)
@@ -63,12 +63,12 @@ extension Bridge {
         }
     }
     
-    public static func call(
-        ifFailThrow error: Bridge.Error,
+    static func call(
+        ifFailThrow error: K1.Error,
         _ method: (OpaquePointer) -> Int32
     ) throws {
-        try toC { bridge in
-            try bridge.call(ifFailThrow: error, method)
+        try toC { ffi in
+            try ffi.call(ifFailThrow: error, method)
         }
     }
 }

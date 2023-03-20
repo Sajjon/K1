@@ -16,7 +16,6 @@
 //===----------------------------------------------------------------------===//
 import XCTest
 import CryptoKit
-import FFI
 
 @testable import K1
 
@@ -73,7 +72,7 @@ extension XCTestCase {
     
     func doTestGroup<HF: HashFunction, TV: WycheproofTestVector>(
         group: ECDSAWycheTestGroup<TV>,
-        signatureValidationMode: Bridge.ECDSA.ValidationMode,
+        signatureValidationMode: K1.ECDSA.ValidationMode,
         hashFunction: HF.Type,
         skipIfContainsFlags: [String] = [],
         skipIfContainsComment: [String] = [],

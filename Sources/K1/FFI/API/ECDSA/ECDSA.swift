@@ -8,11 +8,10 @@
 import Foundation
 import secp256k1
 
-extension Bridge {
+extension K1 {
     public enum ECDSA {}
 }
-extension Bridge.ECDSA {
-    
+extension K1.ECDSA {
     /// Whether or not to consider malleable signatures valid.
     ///
     /// [more]: https://github.com/bitcoin-core/secp256k1/blob/2e5e4b67dfb67950563c5f0ab2a62e25eb1f35c5/include/secp256k1.h#L510-L550
@@ -30,13 +29,21 @@ extension Bridge.ECDSA {
         }
         public static let `default` = Self()
     }
+}
+
+
+extension FFI {
+    public enum ECDSA {}
+}
+extension FFI.ECDSA {
+    
     
     
     public enum Recovery {}
     public enum NonRecovery {}
 }
 
-extension Bridge.ECDSA.ValidationMode {
+extension K1.ECDSA.ValidationMode {
     public static let `default`: Self = .acceptSignatureMalleability
 }
 
@@ -55,29 +62,29 @@ protocol WrappedECDSASignature {
 }
 
 // MARK: ECDSA Shared
-extension Bridge.ECDSA {
+extension FFI.ECDSA {
     
     private static func _sign<WrappedSignature>(
         message: [UInt8],
-        privateKey: Bridge.PrivateKey.Wrapped,
-        mode: Bridge.ECDSA.SigningMode
+        privateKey: FFI.PrivateKey.Wrapped,
+        mode: K1.ECDSA.SigningMode
     ) throws -> WrappedSignature where WrappedSignature: WrappedECDSASignature {
         guard message.count == Curve.Field.byteCount else {
-            throw Bridge.Error.unableToSignMessageHasInvalidLength(got: message.count, expected: Curve.Field.byteCount)
+            throw K1.Error.unableToSignMessageHasInvalidLength(got: message.count, expected: Curve.Field.byteCount)
         }
         
         
         var nonceFunctionArbitraryBytes: [UInt8]? = nil
         if let nonceFunctionArbitraryData = mode.nonceFunctionArbitraryData {
             guard nonceFunctionArbitraryData.count == Curve.Field.byteCount else {
-                throw Bridge.Error.incorrectByteCountOfArbitraryDataForNonceFunction
+                throw K1.Error.incorrectByteCountOfArbitraryDataForNonceFunction
             }
             nonceFunctionArbitraryBytes = [UInt8](nonceFunctionArbitraryData)
         }
         
         var raw = WrappedSignature.Raw()
         
-        try Bridge.call(
+        try FFI.call(
             ifFailThrow: .failedToECDSASignDigest
         ) { context in
             WrappedSignature.sign()(context, &raw, message, privateKey.secureBytes.backing.bytes, secp256k1_nonce_function_rfc6979, nonceFunctionArbitraryBytes)
@@ -89,16 +96,16 @@ extension Bridge.ECDSA {
 }
     
 // MARK: ECDSA Recoverable
-extension Bridge.ECDSA.Recovery {
+extension FFI.ECDSA.Recovery {
     
     /// Produces a **recoverable** ECDSA signature from a hashed `message`
-    public static func sign(
+    static func sign(
         hashedMessage: [UInt8],
-        privateKey: Bridge.PrivateKey.Wrapped,
-        mode: Bridge.ECDSA.SigningMode
-    ) throws -> Bridge.ECDSA.Recovery.Wrapped {
+        privateKey: K1.PrivateKey.Wrapped,
+        mode: K1.ECDSA.SigningMode
+    ) throws -> FFI.ECDSA.Recovery.Wrapped {
        
-        try Bridge.ECDSA._sign(
+        try FFI.ECDSA._sign(
             message: hashedMessage,
             privateKey: privateKey,
             mode: mode
@@ -107,16 +114,16 @@ extension Bridge.ECDSA.Recovery {
 }
 
 // MARK: ECDSA Non-Recoverable
-extension Bridge.ECDSA.NonRecovery {
+extension FFI.ECDSA.NonRecovery {
     
     /// Produces a **non recoverable** ECDSA signature from a hashed `message`
-    public static func sign(
+    static func sign(
         hashedMessage: [UInt8],
-        privateKey: Bridge.PrivateKey.Wrapped,
-        mode: Bridge.ECDSA.SigningMode
-    ) throws -> Bridge.ECDSA.NonRecovery.Wrapped {
+        privateKey: FFI.PrivateKey.Wrapped,
+        mode: K1.ECDSA.SigningMode
+    ) throws -> FFI.ECDSA.NonRecovery.Wrapped {
         
-        try Bridge.ECDSA._sign(
+        try FFI.ECDSA._sign(
             message: hashedMessage,
             privateKey: privateKey,
             mode: mode

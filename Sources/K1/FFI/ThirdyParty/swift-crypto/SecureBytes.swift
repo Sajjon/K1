@@ -76,7 +76,7 @@ extension SecureBytes {
 
 // MARK: - Equatable conformance, constant-time
 extension SecureBytes: Equatable {
-    public static func == (lhs: SecureBytes, rhs: SecureBytes) -> Bool {
+    static func == (lhs: SecureBytes, rhs: SecureBytes) -> Bool {
         return safeCompare(lhs, rhs)
     }
 }

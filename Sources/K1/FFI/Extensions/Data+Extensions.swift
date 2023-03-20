@@ -12,7 +12,7 @@ import Foundation
 extension ContiguousBytes {
 
     @inlinable
-    public var bytes: [UInt8] {
+    var bytes: [UInt8] {
         withUnsafeBytes { pointer in
             Array(pointer)
         }

@@ -8,23 +8,23 @@
 import Foundation
 import secp256k1
 
-extension Bridge {
-    public enum PrivateKey {
-        public final class Wrapped: @unchecked Sendable {
+extension FFI {
+    enum PrivateKey {
+        final class Wrapped: @unchecked Sendable {
             
-            public let publicKey: Bridge.PublicKey.Wrapped
+            let publicKey: FFI.PublicKey.Wrapped
             internal let secureBytes: SecureBytes
             
             fileprivate init(secureBytes: SecureBytes) throws {
                 guard secureBytes.count == Curve.Field.byteCount else {
-                    throw Error.failedToInitializePrivateKeyIncorrectByteCount(
+                    throw K1.Error.failedToInitializePrivateKeyIncorrectByteCount(
                         got: secureBytes.count,
                         expected: Curve.Field.byteCount
                     )
                 }
                 
                 if secureBytes.allSatisfy({ $0 == .zero }) {
-                    throw Bridge.Error.invalidPrivateKeyMustNotBeZero
+                    throw K1.Error.invalidPrivateKeyMustNotBeZero
                 }
                 
                 self.secureBytes = secureBytes
@@ -32,11 +32,11 @@ extension Bridge {
                 self.publicKey = try secureBytes.withUnsafeMutableBytes { seckey in
                     var raw = secp256k1_pubkey()
                     
-                    try Bridge.call(ifFailThrow: .invalidPrivateKeyMustBeSmallerThanOrder) { context in
+                    try FFI.call(ifFailThrow: .invalidPrivateKeyMustBeSmallerThanOrder) { context in
                         secp256k1_ec_pubkey_create(context, &raw, seckey.baseAddress!)
                     }
                     
-                    return Bridge.PublicKey.Wrapped(raw: raw)
+                    return FFI.PublicKey.Wrapped(raw: raw)
                 }
             }
         }
@@ -44,12 +44,12 @@ extension Bridge {
 }
 
 // MARK: Init
-extension Bridge.PrivateKey.Wrapped {
+extension FFI.PrivateKey.Wrapped {
     fileprivate convenience init(bytes: [UInt8]) throws {
         try self.init(secureBytes: .init(bytes: bytes))
     }
     
-    public convenience init() {
+    convenience init() {
         func generateNew() -> SecureBytes {
             var attempt = 0
             
@@ -57,7 +57,7 @@ extension Bridge.PrivateKey.Wrapped {
                 defer { attempt += 1 }
                 do {
                     let secureBytes = SecureBytes(count: Curve.Field.byteCount)
-                    let _ = try Bridge.PrivateKey.Wrapped(secureBytes: secureBytes)
+                    let _ = try FFI.PrivateKey.Wrapped(secureBytes: secureBytes)
                     return secureBytes
                 } catch {
                     // Failure (due to unlikely scenario that the private key scalar > order of the curve) => retry
@@ -79,8 +79,8 @@ extension Bridge.PrivateKey.Wrapped {
     }
 }
 
-extension Bridge.PrivateKey {
-    public static func from(
+extension FFI.PrivateKey {
+    static func from(
         rawRepresentation: some DataProtocol
     ) throws -> Wrapped {
         try Wrapped(bytes: [UInt8](rawRepresentation))

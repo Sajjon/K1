@@ -12,8 +12,7 @@ import struct CryptoKit.SharedSecret
 
 /// A Key Agreement Result
 /// A SharedSecret has to go through a Key Derivation Function before being able to use by a symmetric key operation.
-@_spi(Internals)
-public struct __SharedSecret {
+struct __SharedSecret {
     var ss: SecureBytes
     
     internal init(ss: SecureBytes) {
@@ -23,12 +22,11 @@ public struct __SharedSecret {
 
 
 extension CryptoKit.SharedSecret {
-    @_spi(Internals)
-    public init(data: Data) throws {
+    init(data: Data) throws {
         let __sharedSecret = __SharedSecret(ss: .init(bytes: data))
         let sharedSecret = unsafeBitCast(__sharedSecret, to: SharedSecret.self)
         guard sharedSecret.withUnsafeBytes({ Data($0).count == data.count }) else {
-            throw Bridge.Error.failedToProduceSharedSecret
+            throw K1.Error.failedToProduceSharedSecret
         }
         
         self = sharedSecret

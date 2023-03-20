@@ -6,14 +6,13 @@
 //
 
 import Foundation
-import FFI
 import CryptoKit
 
 extension K1 {
     
     public struct PublicKey: Sendable, Hashable {
         
-        typealias Wrapped = Bridge.PublicKey.Wrapped
+        typealias Wrapped = FFI.PublicKey.Wrapped
         internal let wrapped: Wrapped
         
         internal init(wrapped: Wrapped) {
@@ -26,13 +25,13 @@ extension K1 {
 extension K1.PublicKey {
     
     public init(x963Representation: some ContiguousBytes) throws  {
-        try self.init(wrapped: Bridge.PublicKey.from(x963Representation: x963Representation))
+        try self.init(wrapped: FFI.PublicKey.from(x963Representation: x963Representation))
     }
 }
 
 // MARK: Serialize
 extension K1.PublicKey {
-    public func rawRepresentation(format: Bridge.Format) throws -> Data {
+    public func rawRepresentation(format: K1.Format) throws -> Data {
         try wrapped.rawRepresentation(format: format)
     }
     
@@ -50,7 +49,7 @@ extension K1.PublicKey {
     public func isValidECDSASignature(
         _ signature: ECDSASignatureNonRecoverable,
         hashed: some DataProtocol,
-        mode: Bridge.ECDSA.ValidationMode = .default
+        mode: K1.ECDSA.ValidationMode = .default
     ) -> Bool {
         do {
             return try wrapped.isValid(
@@ -72,7 +71,7 @@ extension K1.PublicKey {
     public func isValidECDSASignature(
         _ signature: ECDSASignatureNonRecoverable,
         digest: some Digest,
-        mode: Bridge.ECDSA.ValidationMode = .default
+        mode: K1.ECDSA.ValidationMode = .default
     ) -> Bool {
         isValidECDSASignature(
             signature,
@@ -92,7 +91,7 @@ extension K1.PublicKey {
     public func isValidECDSASignature(
         _ signature: ECDSASignatureRecoverable,
         hashed: some DataProtocol,
-        mode: Bridge.ECDSA.ValidationMode = .default
+        mode: K1.ECDSA.ValidationMode = .default
     ) -> Bool {
         do {
             return try isValidECDSASignature(
@@ -111,7 +110,7 @@ extension K1.PublicKey {
     public func isValidECDSASignature(
         _ signature: ECDSASignatureRecoverable,
         digest: some Digest,
-        mode: Bridge.ECDSA.ValidationMode = .default
+        mode: K1.ECDSA.ValidationMode = .default
     ) -> Bool {
         do {
             return try isValidECDSASignature(

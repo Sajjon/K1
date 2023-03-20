@@ -7,7 +7,6 @@
 
 import Foundation
 @testable import K1
-import FFI
 import XCTest
 
 final class PrivateKeyImportTests: XCTestCase {
@@ -16,7 +15,7 @@ final class PrivateKeyImportTests: XCTestCase {
         let raw = try Data(hex: "deadbeef")
         assert(
             try PrivateKey(rawRepresentation: raw),
-            throws: Bridge.Error.failedToInitializePrivateKeyIncorrectByteCount(got: 4, expected: 32)
+            throws: K1.Error.failedToInitializePrivateKeyIncorrectByteCount(got: 4, expected: 32)
         )
     }
     
@@ -24,7 +23,7 @@ final class PrivateKeyImportTests: XCTestCase {
         let raw = Data(repeating: 0xba, count: 33)
         assert(
             try PrivateKey(rawRepresentation: raw),
-            throws: Bridge.Error.failedToInitializePrivateKeyIncorrectByteCount(got: 33, expected: 32)
+            throws: K1.Error.failedToInitializePrivateKeyIncorrectByteCount(got: 33, expected: 32)
         )
     }
     
@@ -32,7 +31,7 @@ final class PrivateKeyImportTests: XCTestCase {
         let raw = Data(repeating: 0x00, count: 32)
         assert(
             try PrivateKey(rawRepresentation: raw),
-            throws: Bridge.Error.invalidPrivateKeyMustNotBeZero
+            throws: K1.Error.invalidPrivateKeyMustNotBeZero
         )
     }
     
@@ -40,7 +39,7 @@ final class PrivateKeyImportTests: XCTestCase {
         let raw = try Data(hex: "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141")
         assert(
             try PrivateKey(rawRepresentation: raw),
-            throws: Bridge.Error.invalidPrivateKeyMustBeSmallerThanOrder
+            throws: K1.Error.invalidPrivateKeyMustBeSmallerThanOrder
         )
     }
     
@@ -48,7 +47,7 @@ final class PrivateKeyImportTests: XCTestCase {
         let raw = Data(repeating: 0xff, count: 32)
         assert(
             try PrivateKey(rawRepresentation: raw),
-            throws: Bridge.Error.invalidPrivateKeyMustBeSmallerThanOrder
+            throws: K1.Error.invalidPrivateKeyMustBeSmallerThanOrder
         )
     }
     

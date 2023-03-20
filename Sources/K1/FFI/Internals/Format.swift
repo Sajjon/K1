@@ -7,29 +7,30 @@
 
 import Foundation
 
-extension Bridge {
-    /// Bridging type for: `secp256k1_ec_pubkey_serialize`
+extension K1 {
+    
+    // Bridging type for: `secp256k1_ec_pubkey_serialize`
     public enum Format: UInt32, CaseIterable {
         case compressed, uncompressed
     }
 }
 
-extension Bridge.Format {
+extension K1.Format {
     
-    public var length: Int {
+    var length: Int {
         switch self {
         case .compressed: return 33
         case .uncompressed: return 65
         }
     }
     
-    public init(byteCount: Int) throws {
+    init(byteCount: Int) throws {
         if byteCount == Self.uncompressed.length {
             self = .uncompressed
         } else if byteCount == Self.compressed.length {
             self = .compressed
         } else {
-            throw Bridge.Error.incorrectByteCountOfPublicKey(providedByteCount: byteCount)
+            throw K1.Error.incorrectByteCountOfPublicKey(providedByteCount: byteCount)
         }
     }
 }

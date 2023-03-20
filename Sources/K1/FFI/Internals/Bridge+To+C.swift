@@ -5,15 +5,15 @@
 //  Created by Alexander Cyon on 2022-01-27.
 //
 
-// Bridge to C
+// FFI to C
 import secp256k1
 
 // MARK: Context
-extension Bridge.Context {
+extension FFI.Context {
     
     /// Bridging value used by libsecp256k1 methods that requires info about
     /// how the context is used, e.g. for signing or verification (validate).
-    public var rawValue: UInt32 {
+    var rawValue: UInt32 {
         let value: Int32
 
         switch self {
@@ -27,10 +27,10 @@ extension Bridge.Context {
 }
 
 // MARK: Format
-extension Bridge.Format {
+extension K1.Format {
     
-    /// Bridging value used by libsecp256k1 public key specifying the format
-    /// of the imported public key, i.e. how many bytes.
+    /// Bridging value used by libsecp256k1 key specifying the format
+    /// of the imported key, i.e. how many bytes.
     public var rawValue: UInt32 {
         let value: Int32
         switch self {

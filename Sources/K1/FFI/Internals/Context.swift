@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Bridge {
+extension FFI {
     
     ///  Bridging type used for underlying libsecp256k1 methods:
     ///  - `secp256k1_context_create`

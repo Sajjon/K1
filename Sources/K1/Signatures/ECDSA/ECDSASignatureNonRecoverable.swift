@@ -7,11 +7,10 @@
 
 import Foundation
 import CryptoKit
-import FFI
 
 public struct ECDSASignatureNonRecoverable: Sendable, Hashable {
     
-    typealias Wrapped = Bridge.ECDSA.NonRecovery.Wrapped
+    typealias Wrapped = FFI.ECDSA.NonRecovery.Wrapped
     
     internal let wrapped: Wrapped
     
@@ -27,7 +26,7 @@ extension ECDSASignatureNonRecoverable {
         //        guard
         //            rawRepresentation.count == Self.byteCount
         //        else {
-        //            throw Bridge.Error.incorrectByteCountOfRawSignature
+        //            throw K1.Error.incorrectByteCountOfRawSignature
         //        }
         //
         //        self.rawRepresentation = Data(rawRepresentation)
@@ -36,12 +35,12 @@ extension ECDSASignatureNonRecoverable {
     
     public init(compactRepresentation: some DataProtocol) throws {
         
-        try self.init(wrapped: Bridge.ECDSA.NonRecovery.from(compactBytes: [UInt8](compactRepresentation)))
+        try self.init(wrapped: FFI.ECDSA.NonRecovery.from(compactBytes: [UInt8](compactRepresentation)))
     }
     
     public init(derRepresentation: some DataProtocol) throws {
         try self.init(
-            wrapped: Bridge.ECDSA.NonRecovery.from(derRepresentation: [UInt8](derRepresentation))
+            wrapped: FFI.ECDSA.NonRecovery.from(derRepresentation: [UInt8](derRepresentation))
         )
     }
 }
@@ -54,11 +53,11 @@ extension ECDSASignatureNonRecoverable {
     }
     
     public func compactRepresentation() throws -> Data {
-        try Bridge.ECDSA.NonRecovery.compact(wrapped)
+        try FFI.ECDSA.NonRecovery.compact(wrapped)
     }
     
     public func derRepresentation() throws -> Data {
-        try Bridge.ECDSA.NonRecovery.der(wrapped)
+        try FFI.ECDSA.NonRecovery.der(wrapped)
     }
 }
 
@@ -70,7 +69,7 @@ extension ECDSASignatureNonRecoverable {
         message: some DataProtocol
     ) throws -> K1.PublicKey {
         try K1.PublicKey(
-            wrapped: Bridge.ECDSA.NonRecovery.recoverPublicKey(
+            wrapped: FFI.ECDSA.NonRecovery.recoverPublicKey(
                 self.wrapped,
                 recoveryID: recoveryID.recid,
                 message: [UInt8](message)
@@ -83,7 +82,7 @@ extension ECDSASignatureNonRecoverable {
 }
 
 extension ECDSASignatureNonRecoverable {
-    internal static let byteCount = Bridge.ECDSA.Recovery.byteCount
+    internal static let byteCount = FFI.ECDSA.Recovery.byteCount
     
 }
 
