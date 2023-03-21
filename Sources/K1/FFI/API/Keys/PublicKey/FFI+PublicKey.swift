@@ -15,7 +15,7 @@ extension FFI.PublicKey {
     public static let compactByteCount = 64
     public static let compressedByteCount = 33
     
-    static func from(
+    static func deserialize(
         x963Representation contiguousBytes: some ContiguousBytes
     ) throws -> Wrapped {
         try contiguousBytes.withUnsafeBytes { bufferPointer throws -> Wrapped in
@@ -23,11 +23,11 @@ extension FFI.PublicKey {
             guard bufferPointer.count == expected  else {
                 throw K1.Error.incorrectByteCountOfX963PublicKey(got: bufferPointer.count, expected: expected)
             }
-            return try Self.from(bytes: [UInt8](bufferPointer))
+            return try Self._deserialize(bytes: [UInt8](bufferPointer))
         }
     }
     
-    static func from(
+    static func deserialize(
         compactRepresentation contiguousBytes: some ContiguousBytes
     ) throws -> Wrapped {
         
@@ -38,16 +38,16 @@ extension FFI.PublicKey {
             }
             let bytes = [UInt8](bufferPointer)
             do {
-                return try Self.from(bytes: bytes)
+                return try Self._deserialize(bytes: bytes)
             } catch {
                 // failed to parse 64 bytes => prepend with `04` and parse as `x963`
-                return try Self.from(bytes: [0x04] + bytes)
+                return try Self._deserialize(bytes: [0x04] + bytes)
             }
         }
         
     }
     
-    static func from(
+    static func deserialize(
         compressedRepresentation contiguousBytes: some ContiguousBytes
     ) throws -> Wrapped {
         
@@ -56,12 +56,12 @@ extension FFI.PublicKey {
             guard bufferPointer.count == expected  else {
                 throw K1.Error.incorrectByteCountOfCompressedPublicKey(got: bufferPointer.count, expected: expected)
             }
-            return try Self.from(bytes: [UInt8](bufferPointer))
+            return try Self._deserialize(bytes: [UInt8](bufferPointer))
         }
         
     }
     
-    internal static func from(bytes: [UInt8]) throws -> Wrapped {
+    private static func _deserialize(bytes: [UInt8]) throws -> Wrapped {
         var raw = secp256k1_pubkey()
         try FFI.call(
             ifFailThrow: .failedToDeserializePublicKey
@@ -81,7 +81,7 @@ extension FFI.PublicKey {
 // MARK: Serialize
 extension FFI.PublicKey {
     
-    static func rawRepresentation(
+    static func serialize(
         _ wrapped: Wrapped,
         format: K1.Format
     ) throws -> Data {

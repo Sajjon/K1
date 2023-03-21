@@ -25,7 +25,9 @@ extension K1.PublicKey {
     
     /// `04 || X || Y` 65 bytes
     public init(x963Representation: some ContiguousBytes) throws {
-        try self.init(wrapped: FFI.PublicKey.from(x963Representation: x963Representation))
+        try self.init(
+            wrapped: FFI.PublicKey.deserialize(x963Representation: x963Representation)
+        )
     }
     
     /// `DER`
@@ -37,12 +39,16 @@ extension K1.PublicKey {
     
     /// `X || Y` as 64 bytes
     public init(compactRepresentation: some ContiguousBytes) throws {
-        try self.init(wrapped: FFI.PublicKey.from(compactRepresentation: compactRepresentation))
+        try self.init(
+            wrapped: FFI.PublicKey.deserialize(compactRepresentation: compactRepresentation)
+        )
     }
     
     /// `02|03 || X` as 33 bytes
     public init(compressedRepresentation: some ContiguousBytes) throws {
-        try self.init(wrapped: FFI.PublicKey.from(compressedRepresentation: compressedRepresentation))
+        try self.init(
+            wrapped: FFI.PublicKey.deserialize(compressedRepresentation: compressedRepresentation)
+        )
     }
 }
 
@@ -51,12 +57,12 @@ extension K1.PublicKey {
     
     /// `04 || X || Y` 65 bytes
     public var x963Representation: Data {
-        try! FFI.PublicKey.rawRepresentation(wrapped, format: .uncompressed)
+        try! FFI.PublicKey.serialize(wrapped, format: .uncompressed)
     }
     
     /// `02|03 || X` as 33 bytes
     public var compressedRepresentation: Data {
-        try! FFI.PublicKey.rawRepresentation(wrapped, format: .compressed)
+        try! FFI.PublicKey.serialize(wrapped, format: .compressed)
     }
     
     public var derRepresentation: Data {
