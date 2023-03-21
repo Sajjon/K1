@@ -84,8 +84,8 @@ extension FFI.PrivateKey.Wrapped {
 // MARK: Deserialize
 extension FFI.PrivateKey {
     static func deserialize(
-        rawRepresentation: some DataProtocol
+        rawRepresentation: some ContiguousBytes
     ) throws -> Wrapped {
-        try Wrapped(bytes: [UInt8](rawRepresentation))
+        try Wrapped(bytes: rawRepresentation.bytes)
     }
 }

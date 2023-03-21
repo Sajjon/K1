@@ -9,6 +9,7 @@ import Foundation
 
 extension K1 {
     enum Error: Sendable, Swift.Error, Hashable {
+        case invalidPEMDocument
         case invalidPrivateKeyMustNotBeZero
         case invalidPrivateKeyMustBeSmallerThanOrder
         case failedToProduceSharedSecret

@@ -28,9 +28,24 @@ extension K1 {
 // MARK: Inits
 extension K1.PrivateKey {
     
+    /// Creates a `secp256k1` private key from a Privacy-Enhanced Mail (PEM) representation.
+    public init(pemRepresentation: String) throws {
+        let pem = try ASN1.PEMDocument(pemString: pemRepresentation)
+
+        switch pem.type {
+        case "EC PRIVATE KEY":
+            let parsed = try ASN1.SEC1PrivateKey(asn1Encoded: Array(pem.derBytes))
+            self = try .init(rawRepresentation: parsed.privateKey)
+        case "PRIVATE KEY":
+            let parsed = try ASN1.PKCS8PrivateKey(asn1Encoded: Array(pem.derBytes))
+            self = try .init(rawRepresentation: parsed.privateKey.privateKey)
+        default:
+            throw K1.Error.invalidPEMDocument
+        }
+    }
    
     public init(
-        rawRepresentation: some DataProtocol
+        rawRepresentation: some ContiguousBytes
     ) throws {
         try self.init(
             wrapped: FFI.PrivateKey.deserialize(rawRepresentation: rawRepresentation)
@@ -74,7 +89,6 @@ extension K1.PrivateKey {
     public var x963Representation: Data {
         // The x9.63 private key format is a discriminator byte (0x4) concatenated with the X and Y points
         // of the public key, and the K value of the secret scalar. Let's load that in.
-        let pointByteCount = Curve.Field.byteCount
         var bytes = Data()
         bytes.reserveCapacity(Self.x963ByteCount)
         bytes.append(contentsOf: publicKey.x963Representation)

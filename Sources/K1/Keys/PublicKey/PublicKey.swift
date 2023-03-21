@@ -54,6 +54,16 @@ extension K1.PublicKey {
             wrapped: FFI.PublicKey.deserialize(compressedRepresentation: compressedRepresentation)
         )
     }
+
+    /// Creates a `secp256k1` public key from a Privacy-Enhanced Mail (PEM) representation.
+    public init(pemRepresentation: String) throws {
+        let pem = try ASN1.PEMDocument(pemString: pemRepresentation)
+        guard pem.type == "PUBLIC KEY" else {
+            throw K1.Error.invalidPEMDocument
+        }
+        self = try .init(derRepresentation: pem.derBytes)
+    }
+
 }
 
 // MARK: Serialize
@@ -79,6 +89,12 @@ extension K1.PublicKey {
         // Serializing these keys can't throw
         try! serializer.serialize(spki)
         return Data(serializer.serializedBytes)
+    }
+    
+    /// A Privacy-Enhanced Mail (PEM) representation of the public key.
+    public var pemRepresentation: String {
+        let pemDocument = ASN1.PEMDocument(type: "PUBLIC KEY", derBytes: self.derRepresentation)
+        return pemDocument.pemString
     }
 }
 

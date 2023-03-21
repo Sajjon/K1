@@ -66,8 +66,6 @@ struct ResultOfTestGroup {
     let idsOmittedTests: [Int]
 }
 
-
-
 extension XCTestCase {
     
     func doTestGroup<HF: HashFunction, TV: WycheproofTestVector>(
@@ -88,8 +86,12 @@ extension XCTestCase {
         
         let keyFromDER = try PublicKey(derRepresentation: Data(hex: group.keyDer))
         XCTAssertEqual(key.derRepresentation.hex, group.keyDer)
-
         XCTAssertEqual(keyFromDER, key)
+        
+        let keyFromPEM = try PublicKey(pemRepresentation: group.keyPem)
+        XCTAssertEqual(key.pemRepresentation, group.keyPem)
+        XCTAssertEqual(keyFromPEM, key)
+
         
         let compactXRaw = try Data(hex: group.key.wx)
         let compactYRaw = try Data(hex: group.key.wy)
@@ -186,6 +188,7 @@ struct ECDSAWycheTestGroup<TV: WycheproofTestVector>: Codable {
     let tests: [TV]
     let key: ECDSAKey
     let keyDer: String
+    let keyPem: String
 }
 
 
