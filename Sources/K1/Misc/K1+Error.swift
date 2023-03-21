@@ -19,6 +19,11 @@ extension K1 {
         case failedToDeserializePublicKey
         case failedToSerializePublicKey
         case failedToSchnorrVerifyGettingXFromPubKey
+        case incorrectByteCountOfX963PrivateKey(got: Int, expected: Int)
+        
+        /// The public key encoded in the x963 privateKey representation does not match the derived public key from the private key.
+        case invalidPrivateX963RepresentationPublicKeyDiscrepancy
+        
         case incorrectByteCountOfX963PublicKey(got: Int, expected: Int)
         case incorrectByteCountOfCompactPublicKey(got: Int, expected: Int)
         case incorrectByteCountOfCompressedPublicKey(got: Int, expected: Int)
@@ -32,6 +37,7 @@ extension K1 {
         case failedToInitSchnorrSignatureInvalidByteCount(got: Int, expected: Int)
         case failedToSchnorrSignMessageInvalidLength
         case incorrectByteCountOfArbitraryDataForNonceFunction
+        case invalidByteCount
         case failedToECDSASignDigest
         case unableToRecoverMessageHasInvalidLength(got: Int, expected: Int)
         case failedToComparePublicKeys

@@ -23,6 +23,10 @@ extension K1 {
 // MARK: Init
 extension K1.PublicKey {
     
+    public static let x963ByteCount = FFI.PublicKey.x963ByteCount
+    public static let compactByteCount = FFI.PublicKey.compactByteCount
+    public static let compressedByteCount = FFI.PublicKey.compressedByteCount
+    
     /// `04 || X || Y` 65 bytes
     public init(x963Representation: some ContiguousBytes) throws {
         try self.init(

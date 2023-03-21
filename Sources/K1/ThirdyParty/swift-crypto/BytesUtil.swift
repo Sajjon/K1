@@ -52,17 +52,17 @@ extension Array where Element == UInt8 {
         guard hex.count.isMultiple(of: 2), !hex.isEmpty else {
             throw ByteHexEncodingErrors.incorrectString
         }
-
+        
         let stringBytes: [UInt8] = Array(hex.data(using: String.Encoding.utf8)!)
-
+        
         for i in 0...((hex.count / 2) - 1) {
             let char1 = stringBytes[2 * i]
             let char2 = stringBytes[2 * i + 1]
-
+            
             try self.append(htoi(char1) << 4 + htoi(char2))
         }
     }
-
+    
 }
 
 extension DataProtocol {
@@ -71,7 +71,7 @@ extension DataProtocol {
             let hexLen = self.count * 2
             let ptr = UnsafeMutablePointer<UInt8>.allocate(capacity: hexLen)
             var offset = 0
-
+            
             self.regions.forEach { (_) in
                 for i in self {
                     ptr[Int(offset * 2)] = itoh((i >> 4) & 0xF)
@@ -79,7 +79,7 @@ extension DataProtocol {
                     offset += 1
                 }
             }
-
+            
             return String(bytesNoCopy: ptr, length: hexLen, encoding: .utf8, freeWhenDone: true)!
         }
     }
@@ -88,19 +88,19 @@ extension DataProtocol {
 extension Data {
     init(hex: String) throws {
         self.init()
-
+        
         if hex.count % 2 != 0 || hex.count == 0 {
             throw ByteHexEncodingErrors.incorrectString
         }
-
+        
         let stringBytes: [UInt8] = Array(hex.lowercased().data(using: String.Encoding.utf8)!)
-
+        
         for i in 0...((hex.count / 2) - 1) {
             let char1 = stringBytes[2 * i]
             let char2 = stringBytes[2 * i + 1]
-
+            
             try self.append(htoi(char1) << 4 + htoi(char2))
         }
     }
-
+    
 }
