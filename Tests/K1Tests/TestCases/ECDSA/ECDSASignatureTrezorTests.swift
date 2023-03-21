@@ -15,7 +15,7 @@ final class ECDSASignatureTrezorsTests: XCTestCase {
     
     func testTrezorSecp256k1() throws {
         let result: TestResult = try testSuite(
-            jsonName: "ecdsa_secp256k1_sha256_rfc6979_trezor_test",
+            jsonName: "trezor_ecdsa_sign_rfc6979",
             testFunction: { group in
                 try doTestGroup(
                     group: group

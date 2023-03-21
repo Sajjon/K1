@@ -24,7 +24,7 @@ final class ECDSA_Wycheproof_ASN_DER_EncodedSignaturesTests: XCTestCase {
     func testWycheProofSecp256k1_DER() throws {
         let result: TestResult = try testSuite(
             /* https://github.com/google/wycheproof/blob/master/testvectors/ecdsa_secp256k1_sha256_test.json */
-            jsonName: "ecdsa_secp256k1_sha256_der_test",
+            jsonName: "wycheproof_ecdsa_verify_der",
             testFunction: { (group: ECDSAWycheTestGroup<SignatureWycheproofDERTestVector>) in
                 
                 try doTestGroup(

@@ -52,7 +52,7 @@ final class TwoVariantsOfECDHWithKDFTests: XCTestCase {
         continueAfterFailure = false
     }
     func testTwoVariantsOfECDHWithKDF_vectors() throws {
-        let fileURL = Bundle.module.url(forResource: "ecdh_secp256k1_two_variants_with_kdf_test", withExtension: ".json")
+        let fileURL = Bundle.module.url(forResource: "cyon_ecdh_two_variants_with_kdf", withExtension: ".json")
         let data = try Data(contentsOf: fileURL!)
         let suite = try JSONDecoder().decode(ECDHX963Suite.self, from: data)
         try suite.vectors.forEach(doTest)

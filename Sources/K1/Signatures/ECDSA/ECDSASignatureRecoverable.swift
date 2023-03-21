@@ -20,24 +20,27 @@ public struct ECDSASignatureRecoverable: Sendable, Hashable {
 // MARK: Init
 extension ECDSASignatureRecoverable {
 
+    /// Compact aka `IEEE P1363` aka `R||S`.
     public init(compact: Compact) throws {
         try self.init(
-            wrapped: FFI.ECDSA.Recovery.deserializeCompact(
-                rs: [UInt8](compact.rs),
+            wrapped: FFI.ECDSA.Recovery.deserialize(
+                compact: [UInt8](compact.compact),
                 recoveryID: compact.recoveryID.recid
             )
         )
     }
     
-    public init(rs: Data, recoveryID: RecoveryID) throws {
-        try self.init(compact: .init(rs: rs, recoveryID: recoveryID))
+    /// Compact aka `IEEE P1363` aka `R||S`.
+    public init(compact: Data, recoveryID: RecoveryID) throws {
+        try self.init(compact: .init(compact: compact, recoveryID: recoveryID))
     }
 
+    
     public init(
         rawRepresentation: some DataProtocol
     ) throws {
         try self.init(
-            wrapped: FFI.ECDSA.Recovery.from(rawRepresentation: rawRepresentation)
+            wrapped: FFI.ECDSA.Recovery.deserialize(rawRepresentation: rawRepresentation)
         )
     }
 }
@@ -49,26 +52,36 @@ extension ECDSASignatureRecoverable {
         Data(wrapped.bytes)
     }
     
+    /// Compact aka `IEEE P1363` aka `R||S` with `RecoveryID`
     public func compact() throws -> Compact {
         let (rs, recid) = try FFI.ECDSA.Recovery.serializeCompact(
             wrapped
         )
         return try .init(
-            rs: Data(rs),
+            compact: Data(rs),
             recoveryID: .init(recid: recid)
         )
     }
     
     public struct Compact: Sendable, Hashable {
       
-        public let rs: Data
+        /// Compact aka `IEEE P1363` aka `R||S`.
+        public let compact: Data
+        
         public let recoveryID: RecoveryID
       
-        public init(rs: Data, recoveryID: RecoveryID) throws {
-            guard rs.count == Self.byteCountRS else {
-                throw K1.Error.failedToDeserializeCompactRSRecoverableSignatureInvalidByteCount(got: rs.count, expected: Self.byteCountRS)
+        /// Compact aka `IEEE P1363` aka `R||S`.
+        public init(
+            compact: Data,
+            recoveryID: RecoveryID
+        ) throws {
+            guard compact.count == Self.byteCountRS else {
+                throw K1.Error.failedToDeserializeCompactRSRecoverableSignatureInvalidByteCount(
+                    got: compact.count,
+                    expected: Self.byteCountRS
+                )
             }
-            self.rs = rs
+            self.compact = compact
             self.recoveryID = recoveryID
         }
         
@@ -92,12 +105,12 @@ extension ECDSASignatureRecoverable.Compact {
         switch format {
         case .vrs:
             try self.init(
-                rs: Data(rawRepresentation.suffix(Self.byteCountRS)),
+                compact: Data(rawRepresentation.suffix(Self.byteCountRS)),
                 recoveryID: .init(byte: rawRepresentation.first!) // force unwrap OK since we have checked length above.
             )
         case .rsv:
             try self.init(
-                rs: Data(rawRepresentation.prefix(Self.byteCountRS)),
+                compact: Data(rawRepresentation.prefix(Self.byteCountRS)),
                 recoveryID: .init(byte: rawRepresentation.last!) // force unwrap OK since we have checked length above.
             )
         }
@@ -118,6 +131,9 @@ extension ECDSASignatureRecoverable.Compact {
     
     private var v: Data {
         recoveryID.vData
+    }
+    private var rs: Data {
+        compact
     }
     
     func serialize(format: SerializationFormat) -> Data {

@@ -21,7 +21,7 @@ final class ECDASignaturePublicKeyRecoveryTests: XCTestCase {
     
     func test_recovery_test_vectors() throws {
         let result: TestResult = try testSuite(
-            jsonName: "publickey_recovery",
+            jsonName: "warta_cyon_publickey_recovery",
             testFunction: { (group: RecoveryTestGroup) in
                 try doTestGroup(group: group)
             }
@@ -50,14 +50,14 @@ final class ECDASignaturePublicKeyRecoveryTests: XCTestCase {
         
         let compactRecoverableSigRSHex = "74b5efbb980029d7f07cc3fa119b1b95ff178887b919b60ef4f294e095e1f9ac566e3d0c0ee77fa15cd1a8bf3b26366908dfa42e5f0481c73f1a23a2816260f8"
         let recid = try ECDSASignatureRecoverable.RecoveryID(recid: 1)
-        XCTAssertEqual(compactRecoverableSig.rs.hex, compactRecoverableSigRSHex)
+        XCTAssertEqual(compactRecoverableSig.compact.hex, compactRecoverableSigRSHex)
         XCTAssertEqual(compactRecoverableSig.recoveryID, recid)
         
         let compactRecoverableSigRS = try Data(hex: compactRecoverableSigRSHex)
-        try XCTAssertEqual(ECDSASignatureRecoverable(rs: compactRecoverableSigRS, recoveryID: recid), ECDSASignatureRecoverable(compact: compactRecoverableSig))
-        try XCTAssertEqual(ECDSASignatureRecoverable.Compact.init(rs: compactRecoverableSigRS, recoveryID: recid), compactRecoverableSig)
+        try XCTAssertEqual(ECDSASignatureRecoverable(compact: compactRecoverableSigRS, recoveryID: recid), ECDSASignatureRecoverable(compact: compactRecoverableSig))
+        try XCTAssertEqual(ECDSASignatureRecoverable.Compact.init(compact: compactRecoverableSigRS, recoveryID: recid), compactRecoverableSig)
    
-        let nonRecoverable = try ECDSASignatureNonRecoverable(compactRepresentation: compactRecoverableSig.rs)
+        let nonRecoverable = try ECDSASignatureNonRecoverable(compactRepresentation: compactRecoverableSig.compact)
         
         try XCTAssertEqual(nonRecoverable, recoverableSig.nonRecoverable())
         let nonRecovDer = try nonRecoverable.derRepresentation()

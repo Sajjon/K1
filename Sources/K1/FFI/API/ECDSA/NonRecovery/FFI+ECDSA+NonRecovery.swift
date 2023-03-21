@@ -5,6 +5,7 @@ import secp256k1
 extension FFI.ECDSA.NonRecovery {
     static let byteCount = 2 * Curve.Field.byteCount
     
+    /// Compact aka `IEEE P1363` aka `R||S`.
     static func from(
         compactBytes: [UInt8]
     ) throws -> Wrapped {

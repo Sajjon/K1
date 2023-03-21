@@ -22,8 +22,9 @@ public struct ECDSASignatureNonRecoverable: Sendable, Hashable {
 extension ECDSASignatureNonRecoverable {
     
     public init(compactRepresentation: some DataProtocol) throws {
-        
-        try self.init(wrapped: FFI.ECDSA.NonRecovery.from(compactBytes: [UInt8](compactRepresentation)))
+        try self.init(
+            wrapped: FFI.ECDSA.NonRecovery.from(compactBytes: [UInt8](compactRepresentation))
+        )
     }
     
     public init(derRepresentation: some DataProtocol) throws {

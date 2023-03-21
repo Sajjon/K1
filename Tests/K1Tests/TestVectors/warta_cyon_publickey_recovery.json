@@ -1,5 +1,7 @@
 {
     "algorithm": "ecdsa public key recovery",
+    "authors": ["Simon Warta", "Alexander Cyon"],
+    "origin": "",
     "numberOfTests": 10,
     "testGroups": [
         {

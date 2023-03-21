@@ -22,7 +22,7 @@ final class ECDHWychoproofTests: XCTestCase {
     
     func testECDHWycheproof() throws {
         let result =  try testSuite(
-            jsonName: "ecdh_secp256k1_test",
+            jsonName: "wycheproof_ecdh_ASN1x963",
             testFunction: { (group: ECDHTestGroup) in
                 testGroup(group: group)
             })

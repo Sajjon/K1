@@ -5,14 +5,15 @@ import secp256k1
 extension FFI.ECDSA.Recovery {
     static let byteCount = FFI.ECDSA.NonRecovery.byteCount + 1
     
-    static func from(
+    static func deserialize(
         rawRepresentation: some DataProtocol
     ) throws -> Wrapped {
         try Wrapped(raw: Raw.recoverableSignature(rawRepresentation))
     }
     
-    static func deserializeCompact(
-        rs: [UInt8],
+    /// Compact aka `IEEE P1363` aka `R||S`.
+    static func deserialize(
+        compact rs: [UInt8],
         recoveryID recid: Int32
     ) throws -> Wrapped {
         var raw = Wrapped.Raw()

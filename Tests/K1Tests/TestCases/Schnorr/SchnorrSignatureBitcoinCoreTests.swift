@@ -60,7 +60,7 @@ final class SchnorrSignatureBitcoinCoreTests: XCTestCase {
     func testSchnorrSignBitcoinVectors() throws {
         let result: TestResult = try testSuite(
             /* https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv */
-            jsonName: "schnorr_secp256k1_sign_sha256_test",
+            jsonName: "bip340_schnorr_sign",
             testFunction: { (group: SchnorrTestGroup<SchnorrTestSignVector>) in
                 var numberOfTestsRun = 0
                 try group.tests.forEach(doTestSchnorrSign)
@@ -75,7 +75,7 @@ final class SchnorrSignatureBitcoinCoreTests: XCTestCase {
         let result: TestResult =
         try testSuite(
             /* https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv */
-            jsonName: "schnorr_secp256k1_verify_sha256_test",
+            jsonName: "bip340_schnorr_verify",
             testFunction: { (group: SchnorrTestGroup<SchnorrTestVerifyVector>) in
                 var numberOfTestsRun = 0
                 try group.tests.forEach(doTestSchnorrVerify)
