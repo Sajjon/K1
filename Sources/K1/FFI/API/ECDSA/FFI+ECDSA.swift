@@ -123,9 +123,43 @@ extension K1.ECDSA.SigningInput.NonceFunction {
     fileprivate func function() -> Optional<@convention(c) (Optional<UnsafeMutablePointer<UInt8>>, Optional<UnsafePointer<UInt8>>, Optional<UnsafePointer<UInt8>>, Optional<UnsafePointer<UInt8>>, Optional<UnsafeMutableRawPointer>, UInt32) -> Int32> {
         switch self {
         case .deterministic: return secp256k1_nonce_function_rfc6979
-        case .random: fatalError()
+        case .random: return secureRandomNonce
         }
     }
 }
     
 
+/** A pointer to a function to deterministically generate a nonce.
+ *
+ * Returns: 1 if a nonce was successfully generated. 0 will cause signing to fail.
+ * Out:     nonce32:   pointer to a 32-byte array to be filled by the function.
+ * In:      msg32:     the 32-byte message hash being verified (will not be NULL)
+ *          key32:     pointer to a 32-byte secret key (will not be NULL)
+ *          algo16:    pointer to a 16-byte array describing the signature
+ *                     algorithm (will be NULL for ECDSA for compatibility).
+ *          data:      Arbitrary data pointer that is passed through.
+ *          attempt:   how many iterations we have tried to find a nonce.
+ *                     This will almost always be 0, but different attempt values
+ *                     are required to result in a different nonce.
+ *
+ * Except for test cases, this function should compute some cryptographic hash of
+ * the message, the algorithm, the key and the attempt.
+ */
+var secureRandomNonce: (@convention(c)(
+    _ out: UnsafeMutablePointer<UInt8>?,
+    _ msg: UnsafePointer<UInt8>?,
+    _ key32: UnsafePointer<UInt8>?,
+    _ algo16: UnsafePointer<UInt8>?,
+    _ data: UnsafeMutableRawPointer?,
+    _ attempt: UInt32
+) -> Int32)? {
+    return { target, msg, key, algo, data, attempt in
+     
+        let secureBytes = SecureBytes(count: 32)
+        secureBytes.withUnsafeBytes { sourceBytes in
+            target?.assign(from: sourceBytes.baseAddress!
+                .assumingMemoryBound(to: UInt8.self), count: 32)
+        }
+        return Int32(1)
+    }
+}
