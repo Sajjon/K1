@@ -5,4 +5,4 @@
 #include "../libsecp256k1/include/secp256k1_schnorrsig.h"
 #include "../libsecp256k1/include/secp256k1.h"
 
-#include "../src/ecdh_no_hashfp.h"
+#include "../src/ecdh_variants.h"
