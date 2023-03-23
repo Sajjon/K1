@@ -114,6 +114,7 @@ extension FFI.ECDSA.NonRecovery {
         input: K1.ECDSA.ValidationInput = .default
     ) throws -> Bool {
         try FFI.toC { ffi -> Bool in
+            var publicKeyRaw = publicKey.raw
             var maybeMalleable = ecdsaSignature.raw
             var normalized = secp256k1_ecdsa_signature()
             
@@ -127,7 +128,7 @@ extension FFI.ECDSA.NonRecovery {
                     context,
                     &normalized,
                     message,
-                    &publicKey.raw
+                    &publicKeyRaw
                 )
             }
             let acceptMalleableSignatures = input.malleabilityStrictness == .accepted

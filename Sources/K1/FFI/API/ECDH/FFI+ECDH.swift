@@ -76,13 +76,14 @@ extension FFI.ECDH {
             case .ansiX963, .noHashWholePoint: return nil
             }
         }()
+        var publicKeyRaw = publicKey.raw
         try FFI.call(
             ifFailThrow: .failedToPerformDiffieHellmanKeyExchange
         ) { context in
             secp256k1_ecdh(
                 context,
                 &sharedPublicPointBytes, // output
-                &publicKey.raw, // pubkey
+                &publicKeyRaw, // pubkey
                 privateKey.secureBytes.backing.bytes, // seckey
                 hashFp.hashfp(), // hashfp
                 &arbitraryData // arbitrary data pointer that is passed through to hashfp

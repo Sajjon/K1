@@ -93,12 +93,13 @@ extension FFI.PublicKey {
     ) throws -> Data {
         var byteCount = format.length
         var out = [UInt8](repeating: 0x00, count: byteCount)
+        var publicKeyRaw = wrapped.raw
         try FFI.call(ifFailThrow: .failedToSerializePublicKey) { context in
             secp256k1_ec_pubkey_serialize(
                 context,
                 &out,
                 &byteCount,
-                &wrapped.raw,
+                &publicKeyRaw,
                 format.rawValue
             )
         }

@@ -15,9 +15,9 @@ extension FFI {
 // MARK: PublicKey Wrapped
 extension FFI.PublicKey {
     
-    final class Wrapped: @unchecked Sendable, ContiguousBytes {
+    struct Wrapped: @unchecked Sendable, ContiguousBytes {
         typealias Raw = secp256k1_pubkey
-        var raw: Raw
+        let raw: Raw
         init(raw: Raw) {
             self.raw = raw
         }
@@ -27,7 +27,8 @@ extension FFI.PublicKey {
 // MARK: ContiguousBytes
 extension FFI.PublicKey.Wrapped {
     func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
-        try Swift.withUnsafeBytes(of: &raw.data) { pointer in
+        var rawData = raw.data
+        return try Swift.withUnsafeBytes(of: &rawData) { pointer in
             try body(pointer)
         }
     }
@@ -36,9 +37,14 @@ extension FFI.PublicKey.Wrapped {
 // MARK: Comparison
 extension FFI.PublicKey.Wrapped {
     func compare(to other: FFI.PublicKey.Wrapped) throws -> Bool {
-        return try FFI().callWithResultCode { context in
-            secp256k1_ec_pubkey_cmp(context, &self.raw, &other.raw)
-        } == 0
+        var selfRaw = self.raw
+        var otherRaw = other.raw
+        return try FFI.toC { ffi in
+            ffi.callWithResultCode { context in
+                secp256k1_ec_pubkey_cmp(context, &selfRaw, &otherRaw)
+            } == 0
+        }
+         
     }
 }
 
