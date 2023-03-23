@@ -30,9 +30,6 @@ extension K1.PublicKey {
     /// `X || Y` (64 bytes)
     public static let rawByteCount = FFI.PublicKey.rawByteCount
 
-    /// `X` only (32 bytes)
-    public static let compactByteCount = FFI.PublicKey.compactByteCount
-    
     /// `02|03 || X` (33 bytes)
     public static let compressedByteCount = FFI.PublicKey.compressedByteCount
     
@@ -55,13 +52,6 @@ extension K1.PublicKey {
         let bytes = [UInt8](derRepresentation)
         let parsed = try ASN1.SubjectPublicKeyInfo(asn1Encoded: bytes)
         self = try .init(x963Representation: parsed.key)
-    }
-    
-    /// `X` only (32 bytes)
-    public init(compactRepresentation: some ContiguousBytes) throws {
-        try self.init(
-            wrapped: FFI.PublicKey.deserialize(compactRepresentation: compactRepresentation)
-        )
     }
     
     /// `02|03 || X` (33 bytes)
@@ -93,14 +83,6 @@ extension K1.PublicKey {
     /// `02|03 || X` (33 bytes)
     public var compressedRepresentation: Data {
         try! FFI.PublicKey.serialize(wrapped, format: .compressed)
-    }
-    
-    /// `X` only (32 bytes)
-    public var compactRepresentation: Data {
-        // drop first byte from `compressed` -> leaves us with only x
-        let compact = Data(compressedRepresentation.dropFirst())
-        assert(compact.count == Curve.Field.byteCount)
-        return compact
     }
     
     public var derRepresentation: Data {

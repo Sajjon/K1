@@ -17,8 +17,6 @@ extension FFI.PublicKey {
     /// `X || Y` (64 bytes)
     public static let rawByteCount = 2 * Curve.Field.byteCount
 
-    /// `X` only (32 bytes)
-    public static let compactByteCount = Curve.Field.byteCount
     
     /// `02|03 || X` (33 bytes)
     public static let compressedByteCount = 1 + Curve.Field.byteCount
@@ -52,33 +50,6 @@ extension FFI.PublicKey {
                 throw K1.Error.unableToDeserializePublicKeyFromRawRepresentation
             }
         }
-    }
-    
-    /// `X` only (32 bytes)
-    static func deserialize(
-        compactRepresentation contiguousBytes: some ContiguousBytes
-    ) throws -> Wrapped {
-        
-        try contiguousBytes.withUnsafeBytes { bufferPointer throws -> Wrapped in
-            let expected = Self.compactByteCount
-            guard bufferPointer.count == expected  else {
-                throw K1.Error.incorrectByteCountOfCompactPublicKey(got: bufferPointer.count, expected: expected)
-            }
-
-            var raw = secp256k1_pubkey()
-            try FFI.call(
-                ifFailThrow: .unableToDeserializePublicKeyFromCompactRepresentation
-            ) { context in
-                publickey_from_xonly(
-                    context,
-                    &raw,
-                    [UInt8](bufferPointer)
-                )
-
-            }
-            return .init(raw: raw)
-        }
-        
     }
     
     /// `02|03 || X` (33 bytes)

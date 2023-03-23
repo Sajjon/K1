@@ -118,9 +118,6 @@ extension XCTestCase {
         let fromRaw = try PublicKey(rawRepresentation: xOnly + yOnly)
         XCTAssertEqual(fromRaw, key)
         
-        let fromCompact = try PublicKey(compactRepresentation: xOnly)
-        XCTAssertEqual(fromCompact.compressedRepresentation.hex, key.compressedRepresentation.hex)
-        
         var numberOfTestsRun = 0
         var idsOfOmittedTests = Array<Int>()
     outerloop: for testVector in group.tests {
