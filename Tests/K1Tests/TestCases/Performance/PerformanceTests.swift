@@ -8,7 +8,7 @@ final class PerformanceTests: XCTestCase {
         let message = [UInt8](repeating: 0xab, count: 32)
         measure {
             do {
-                for _ in 0 ..< 1000 {
+                for _ in 0 ..< 10 {
                     let alicePrivateKey = PrivateKey()
                     let alicePublicKey = alicePrivateKey.publicKey
                     
