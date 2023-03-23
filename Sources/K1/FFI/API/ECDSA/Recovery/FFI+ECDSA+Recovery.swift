@@ -39,7 +39,7 @@ extension FFI.ECDSA.Recovery {
     ) throws -> (rs: [UInt8], recoveryID: Int32) {
         var rs = [UInt8](repeating: 0, count: FFI.ECDSA.NonRecovery.byteCount)
         var recoveryID: Int32 = 0
-        
+        var rawSignature = wrapped.raw
         try FFI.call(
             ifFailThrow: .failedSignatureToConvertRecoverableSignatureToCompact
         ) { context in
@@ -47,7 +47,7 @@ extension FFI.ECDSA.Recovery {
                 context,
                 &rs,
                 &recoveryID,
-                &wrapped.raw
+                &rawSignature
             )
         }
         return (rs, recoveryID)
@@ -61,19 +61,20 @@ extension FFI.ECDSA.Recovery {
     ) throws -> FFI.ECDSA.NonRecovery.Wrapped {
         
         
-        var raw = secp256k1_ecdsa_signature()
+        var nonRecoverable = secp256k1_ecdsa_signature()
+        var recoverable = wrapped.raw
         
         try FFI.call(
             ifFailThrow: .failedToConvertRecoverableSignatureToNonRecoverable
         ) { context in
             secp256k1_ecdsa_recoverable_signature_convert(
                 context,
-                &raw,
-                &wrapped.raw
+                &nonRecoverable,
+                &recoverable
             )
         }
         
-        return .init(raw: raw)
+        return .init(raw: nonRecoverable)
     }
 }
 
@@ -86,13 +87,19 @@ extension FFI.ECDSA.Recovery {
         guard message.count == Curve.Field.byteCount else {
             throw K1.Error.unableToRecoverMessageHasInvalidLength(got: message.count, expected: Curve.Field.byteCount)
         }
-        var raw = secp256k1_pubkey()
+        var rawSignature = wrapped.raw
+        var rawPublicKey = secp256k1_pubkey()
         try FFI.call(
             ifFailThrow: .failedToRecoverPublicKey
         ) { context in
-            secp256k1_ecdsa_recover(context, &raw, &wrapped.raw, message)
+            secp256k1_ecdsa_recover(
+                context,
+                &rawPublicKey,
+                &rawSignature,
+                message
+            )
         }
-        return FFI.PublicKey.Wrapped(raw: raw)
+        return FFI.PublicKey.Wrapped(raw: rawPublicKey)
     }
 }
 

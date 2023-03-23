@@ -4,9 +4,9 @@ import secp256k1
 
 // MARK: ECDSA Recovery Wrapped
 extension FFI.ECDSA.Recovery {
-    final class Wrapped: @unchecked Sendable, ContiguousBytes, WrappedECDSASignature {
+    struct Wrapped: @unchecked Sendable, ContiguousBytes, WrappedECDSASignature {
         typealias Raw = secp256k1_ecdsa_recoverable_signature
-        var raw: Raw
+        let raw: Raw
         init(raw: Raw) {
             self.raw = raw
         }
@@ -25,7 +25,8 @@ extension FFI.ECDSA.Recovery.Wrapped {
 extension FFI.ECDSA.Recovery.Wrapped {
     
     func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
-        try Swift.withUnsafeBytes(of: &raw.data) { pointer in
+        var rawData = raw.data
+        return try Swift.withUnsafeBytes(of: &rawData) { pointer in
             try body(pointer)
         }
     }
