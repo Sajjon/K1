@@ -10,7 +10,7 @@ import secp256k1
 
 extension FFI {
     enum PrivateKey {
-        final class Wrapped: @unchecked Sendable {
+        struct Wrapped: @unchecked Sendable {
             
             let publicKey: FFI.PublicKey.Wrapped
             internal let secureBytes: SecureBytes
@@ -46,11 +46,11 @@ extension FFI {
 // MARK: Init
 extension FFI.PrivateKey.Wrapped {
     
-    fileprivate convenience init(bytes: [UInt8]) throws {
+    fileprivate init(bytes: [UInt8]) throws {
         try self.init(secureBytes: .init(bytes: bytes))
     }
     
-    convenience init() {
+    init() {
         func generateNew() -> SecureBytes {
             var attempt = 0
             
