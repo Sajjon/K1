@@ -8,7 +8,7 @@
 import Foundation
 import CryptoKit
 
-public struct ECDSASignatureRecoverable: Sendable, Hashable {
+public struct ECDSASignatureRecoverable: Sendable, Hashable, ContiguousBytes {
     typealias Wrapped = FFI.ECDSA.Recovery.Wrapped
     private let wrapped: Wrapped
     
@@ -42,6 +42,13 @@ extension ECDSASignatureRecoverable {
         try self.init(
             wrapped: FFI.ECDSA.Recovery.deserialize(rawRepresentation: rawRepresentation)
         )
+    }
+}
+
+// MARK: ContiguousBytes
+extension ECDSASignatureRecoverable {
+    public func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
+        try wrapped.withUnsafeBytes(body)
     }
 }
 

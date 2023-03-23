@@ -98,8 +98,7 @@ assert(ab.count == 65) // pass
 Stand in root and run
 
 ```sh
-git submodule init
-git submodule update
+./scripts/build.sh
 ```
 
 To clone the dependency [libsecp256k1][lib], using commit [427bc3cdcfbc74778070494daab1ae5108c71368](https://github.com/bitcoin-core/secp256k1/commit/427bc3cdcfbc74778070494daab1ae5108c71368) (semver 0.3.0)

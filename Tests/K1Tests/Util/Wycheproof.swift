@@ -112,12 +112,11 @@ extension XCTestCase {
             }
             return Data(compactComponent)
         }
-        let compactX = try ensure32Bytes(compactXRaw)
-        let compactY = try ensure32Bytes(compactYRaw)
-        let compactData = compactX + compactY
+        let xOnly = try ensure32Bytes(compactXRaw)
+        let yOnly = try ensure32Bytes(compactYRaw)
             
-        let fromCompact = try PublicKey(compactRepresentation: compactData)
-        XCTAssertEqual(fromCompact, key)
+        let fromRaw = try PublicKey(rawRepresentation: xOnly + yOnly)
+        XCTAssertEqual(fromRaw, key)
         
         var numberOfTestsRun = 0
         var idsOfOmittedTests = Array<Int>()

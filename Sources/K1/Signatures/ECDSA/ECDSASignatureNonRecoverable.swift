@@ -8,7 +8,7 @@
 import Foundation
 import CryptoKit
 
-public struct ECDSASignatureNonRecoverable: Sendable, Hashable {
+public struct ECDSASignatureNonRecoverable: Sendable, Hashable, ContiguousBytes {
     
     typealias Wrapped = FFI.ECDSA.NonRecovery.Wrapped
     internal let wrapped: Wrapped
@@ -31,6 +31,13 @@ extension ECDSASignatureNonRecoverable {
         try self.init(
             wrapped: FFI.ECDSA.NonRecovery.from(derRepresentation: [UInt8](derRepresentation))
         )
+    }
+}
+
+// MARK: ContiguousBytes
+extension ECDSASignatureNonRecoverable {
+    public func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
+        try wrapped.withUnsafeBytes(body)
     }
 }
 

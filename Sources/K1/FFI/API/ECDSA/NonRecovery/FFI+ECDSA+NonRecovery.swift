@@ -83,7 +83,7 @@ extension FFI.ECDSA.NonRecovery {
         }
         var compact = [UInt8](nonRecoverableCompact)
         var recoverable = secp256k1_ecdsa_recoverable_signature()
-        try FFI.call(ifFailThrow: .failedToParseRecoverableSignatireFromCompact) { context in
+        try FFI.call(ifFailThrow: .failedToParseRecoverableSignatureFromCompact) { context in
             secp256k1_ecdsa_recoverable_signature_parse_compact(
                 context,
                 &recoverable,
