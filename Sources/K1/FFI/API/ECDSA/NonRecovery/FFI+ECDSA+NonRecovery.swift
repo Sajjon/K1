@@ -27,8 +27,9 @@ extension FFI.ECDSA.NonRecovery {
 extension FFI.ECDSA.NonRecovery {
     static func compact(_ wrapped: Wrapped) throws -> Data {
         var out = [UInt8](repeating: 0, count: Self.byteCount)
+        var rawSignature = wrapped.raw
         try FFI.call(ifFailThrow: .failedToSerializeSignature) { context in
-            secp256k1_ecdsa_signature_serialize_compact(context, &out, &wrapped.raw)
+            secp256k1_ecdsa_signature_serialize_compact(context, &out, &rawSignature)
         }
         return Data(out)
     }
@@ -38,13 +39,13 @@ extension FFI.ECDSA.NonRecovery {
     ) throws -> Data {
         var derMaxLength = 75 // in fact max is 73, but we can have some margin.
         var derSignature = [UInt8](repeating: 0, count: derMaxLength)
-        
+        var rawSignature = wrapped.raw
         try FFI.call(ifFailThrow: .failedToSerializeDERSignature) { context in
             secp256k1_ecdsa_signature_serialize_der(
                 context,
                 &derSignature,
                 &derMaxLength,
-                &wrapped.raw
+                &rawSignature
             )
         }
         return Data(derSignature.prefix(derMaxLength))
@@ -114,6 +115,7 @@ extension FFI.ECDSA.NonRecovery {
         input: K1.ECDSA.ValidationInput = .default
     ) throws -> Bool {
         try FFI.toC { ffi -> Bool in
+            var publicKeyRaw = publicKey.raw
             var maybeMalleable = ecdsaSignature.raw
             var normalized = secp256k1_ecdsa_signature()
             
@@ -127,7 +129,7 @@ extension FFI.ECDSA.NonRecovery {
                     context,
                     &normalized,
                     message,
-                    &publicKey.raw
+                    &publicKeyRaw
                 )
             }
             let acceptMalleableSignatures = input.malleabilityStrictness == .accepted

@@ -26,13 +26,13 @@ extension FFI.Schnorr {
         
         try FFI.toC { ffi -> Bool in
             var publicKeyX = secp256k1_xonly_pubkey()
-            
+            var publicKeyRaw = publicKey.raw
             try FFI.call(ifFailThrow: .failedToSchnorrVerifyGettingXFromPubKey) { context in
                 secp256k1_xonly_pubkey_from_pubkey(
                     context,
                     &publicKeyX,
                     nil,
-                    &publicKey.raw
+                    &publicKeyRaw
                 )
             }
             

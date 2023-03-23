@@ -8,7 +8,7 @@
 import Foundation
 
 extension FFI.Schnorr {
-    final class Wrapped: @unchecked Sendable, Hashable {
+    struct Wrapped: @unchecked Sendable, Hashable {
         static let byteCount = 2 * Curve.Field.byteCount
         
         internal let bytes: [UInt8]
