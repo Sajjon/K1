@@ -23,11 +23,27 @@ extension K1 {
 // MARK: Init
 extension K1.PublicKey {
     
+
+    /// `04 || X || Y` (65 bytes)
     public static let x963ByteCount = FFI.PublicKey.x963ByteCount
+    
+    /// `X || Y` (64 bytes)
+    public static let rawByteCount = FFI.PublicKey.rawByteCount
+
+    /// `X` only (32 bytes)
     public static let compactByteCount = FFI.PublicKey.compactByteCount
+    
+    /// `02|03 || X` (33 bytes)
     public static let compressedByteCount = FFI.PublicKey.compressedByteCount
     
-    /// `04 || X || Y` 65 bytes
+    /// `X || Y` (64 bytes)
+    public init(rawRepresentation: some ContiguousBytes) throws {
+        try self.init(
+            wrapped: FFI.PublicKey.deserialize(rawRepresentation: rawRepresentation)
+        )
+    }
+    
+    /// `04 || X || Y` (65 bytes)
     public init(x963Representation: some ContiguousBytes) throws {
         try self.init(
             wrapped: FFI.PublicKey.deserialize(x963Representation: x963Representation)
@@ -41,14 +57,14 @@ extension K1.PublicKey {
         self = try .init(x963Representation: parsed.key)
     }
     
-    /// `X || Y` as 64 bytes
+    /// `X` only (32 bytes)
     public init(compactRepresentation: some ContiguousBytes) throws {
         try self.init(
             wrapped: FFI.PublicKey.deserialize(compactRepresentation: compactRepresentation)
         )
     }
     
-    /// `02|03 || X` as 33 bytes
+    /// `02|03 || X` (33 bytes)
     public init(compressedRepresentation: some ContiguousBytes) throws {
         try self.init(
             wrapped: FFI.PublicKey.deserialize(compressedRepresentation: compressedRepresentation)
@@ -69,14 +85,22 @@ extension K1.PublicKey {
 // MARK: Serialize
 extension K1.PublicKey {
     
-    /// `04 || X || Y` 65 bytes
+    /// `04 || X || Y` (65 bytes)
     public var x963Representation: Data {
         try! FFI.PublicKey.serialize(wrapped, format: .uncompressed)
     }
     
-    /// `02|03 || X` as 33 bytes
+    /// `02|03 || X` (33 bytes)
     public var compressedRepresentation: Data {
         try! FFI.PublicKey.serialize(wrapped, format: .compressed)
+    }
+    
+    /// `X` only (32 bytes)
+    public var compactRepresentation: Data {
+        // drop first byte from `compressed` -> leaves us with only x
+        let compact = Data(compressedRepresentation.dropFirst())
+        assert(compact.count == Curve.Field.byteCount)
+        return compact
     }
     
     public var derRepresentation: Data {

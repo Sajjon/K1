@@ -26,7 +26,10 @@ extension K1 {
         case invalidPrivateX963RepresentationPublicKeyDiscrepancy
         
         case incorrectByteCountOfX963PublicKey(got: Int, expected: Int)
+        case incorrectByteCountOfRawPublicKey(got: Int, expected: Int)
         case incorrectByteCountOfCompactPublicKey(got: Int, expected: Int)
+        case unableToDeserializePublicKeyFromCompactRepresentation
+        case unableToDeserializePublicKeyFromRawRepresentation
         case incorrectByteCountOfCompressedPublicKey(got: Int, expected: Int)
         case failedSignatureToConvertRecoverableSignatureToCompact
         case failedToConvertRecoverableSignatureToNonRecoverable
