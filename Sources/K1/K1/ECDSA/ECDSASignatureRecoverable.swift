@@ -270,9 +270,11 @@ extension K1.ECDSA.Recoverable.Signature.RecoveryID {
 extension K1.ECDSA.Recoverable.Signature {
     public func recoverPublicKey(
         message: some DataProtocol
-    ) throws -> K1.PublicKey {
-        try K1.PublicKey(
-            wrapped: FFI.ECDSA.Recovery.recover(wrapped, message: [UInt8](message))
+    ) throws -> K1.ECDSA.Recoverable.PublicKey {
+        let wrapped = try FFI.ECDSA.Recovery.recover(wrapped, message: [UInt8](message))
+        let impl = K1.PublicKey(wrapped: wrapped)
+        return K1.ECDSA.Recoverable.PublicKey(
+            impl: impl
         )
     }
 }

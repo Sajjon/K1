@@ -80,7 +80,7 @@ private extension ECDASignaturePublicKeyRecoveryTests {
         var numberOfTestsRun = 0
         for vector in group.tests {
             let publicKeyUncompressed = try [UInt8](hex: vector.publicKeyUncompressed)
-            let expectedPublicKey =  try K1.PublicKey.init(x963Representation: publicKeyUncompressed)
+            let expectedPublicKey =  try K1.ECDSA.Recoverable.PublicKey.init(x963Representation: publicKeyUncompressed)
          
             XCTAssertEqual(
                 try Data(hex: vector.publicKeyCompressed),
@@ -91,26 +91,23 @@ private extension ECDASignaturePublicKeyRecoveryTests {
             let recoverableSig = try vector.recoverableSignature()
             try XCTAssertEqual(recoverableSig.compact().recoveryID, vector.recoveryID)
             
-//            let hashedMessage = try Data(hex: vector.hashMessage)
-//            XCTAssertTrue(expectedPublicKey.isValidSignature(recoverableSig, hashed: hashedMessage))
-//            try XCTAssertTrue(expectedPublicKey.isValidSignature(recoverableSig.nonRecoverable(), hashed: hashedMessage))
-//            try XCTAssertEqual(vector.recoveryID, recoverableSig.compact().recoveryID)
-//            
-//            let recoveredPublicKey = try recoverableSig.recoverPublicKey(
-//                message: hashedMessage
-//            )
-//            
-//            XCTAssertEqual(expectedPublicKey, recoveredPublicKey)
-//            
-//            XCTAssertTrue(recoveredPublicKey.isValidSignature(recoverableSig, hashed: hashedMessage))
-//            try XCTAssertTrue(recoveredPublicKey.isValidSignature(recoverableSig.nonRecoverable(), hashed: hashedMessage))
-//                   
-//            let recoveredWithID = try recoverableSig.nonRecoverable().recoverPublicKey(
-//                recoveryID: vector.recoveryID,
-//                message: hashedMessage
-//            )
-//            XCTAssertEqual(expectedPublicKey, recoveredWithID)
-            
+            let hashedMessage = try Data(hex: vector.hashMessage)
+            XCTAssertTrue(expectedPublicKey.isValidSignature(recoverableSig, hashed: hashedMessage))
+            try XCTAssertEqual(vector.recoveryID, recoverableSig.compact().recoveryID)
+
+            let recoveredPublicKey = try recoverableSig.recoverPublicKey(
+                message: hashedMessage
+            )
+
+            XCTAssertEqual(expectedPublicKey, recoveredPublicKey)
+
+            XCTAssertTrue(recoveredPublicKey.isValidSignature(recoverableSig, hashed: hashedMessage))
+
+            let recoveredWithID = try recoverableSig.nonRecoverable().recoverPublicKey(
+                recoveryID: vector.recoveryID,
+                message: hashedMessage
+            )
+            try XCTAssertEqual(expectedPublicKey, .init(x963Representation: recoveredWithID.x963Representation))
             
             numberOfTestsRun += 1
         }

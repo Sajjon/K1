@@ -45,22 +45,22 @@ private extension XCTestCase {
             let messageDigest = try vector.messageDigest()
             XCTAssertTrue(publicKey.isValidSignature(expectedSignature, digest: messageDigest))
             
-//            let signatureFromMessage = try privateKey.sign(digest: messageDigest)
-//            XCTAssertEqual(signatureFromMessage, expectedSignature)
-//
-//            let signatureRandom = try privateKey.sign(
-//                digest: messageDigest,
-//                input: .init(nonceFunction: .random)
-//            )
-//
-//            XCTAssertNotEqual(signatureRandom, expectedSignature)
-//            XCTAssertTrue(publicKey.isValidSignature(signatureRandom, digest: messageDigest))
-//
-//
-//            let signatureRecoverableFromMessage = try privateKey.sign(digest: messageDigest)
-//            try XCTAssertEqual(signatureRecoverableFromMessage.nonRecoverable(), expectedSignature)
-//            let recid = try signatureRecoverableFromMessage.compact().recoveryID
-//            XCTAssertEqual(signatureRecoverableFromMessage.rawRepresentation.hex, expectedSignature.rawRepresentation.hex + "\(Data([UInt8(recid.rawValue)]).hex)")
+            let signatureFromMessage = try privateKey.signature(for: messageDigest)
+            XCTAssertEqual(signatureFromMessage, expectedSignature)
+
+            let signatureRandom = try privateKey.signature(
+                for: messageDigest,
+                options: .init(nonceFunction: .random)
+            )
+
+            XCTAssertNotEqual(signatureRandom, expectedSignature)
+            XCTAssertTrue(publicKey.isValidSignature(signatureRandom, digest: messageDigest))
+
+            let privateKeyRecoverable = try K1.ECDSA.Recoverable.PrivateKey(rawRepresentation: privateKey.rawRepresentation)
+            let signatureRecoverableFromMessage = try privateKeyRecoverable.signature(for: messageDigest)
+            try XCTAssertEqual(signatureRecoverableFromMessage.nonRecoverable(), expectedSignature)
+            let recid = try signatureRecoverableFromMessage.compact().recoveryID
+            XCTAssertEqual(signatureRecoverableFromMessage.rawRepresentation.hex, expectedSignature.rawRepresentation.hex + "\(Data([UInt8(recid.rawValue)]).hex)")
             numberOfTestsRun += 1
         }
         return .init(numberOfTestsRun: numberOfTestsRun, idsOmittedTests: [])
