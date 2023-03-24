@@ -44,8 +44,9 @@ public struct PrivateKeyOf<Feature: K1Feature>: Sendable, Hashable, K1PrivateKey
         impl.pemRepresentation
     }
     
-    internal let impl: K1.PrivateKey
-    internal let publicKeyImpl: K1.PublicKey
+    typealias Impl = K1.PrivateKeyImpl
+    internal let impl: Impl
+    internal let publicKeyImpl: K1.PublicKeyImpl
     
     public typealias PublicKey = Feature.PublicKey
     
@@ -53,7 +54,7 @@ public struct PrivateKeyOf<Feature: K1Feature>: Sendable, Hashable, K1PrivateKey
         try! .init(rawRepresentation: publicKeyImpl.rawRepresentation)
     }
     
-    public init(impl: K1.PrivateKey) {
+    init(impl: Impl) {
         self.impl = impl
         self.publicKeyImpl = impl.publicKey
     }

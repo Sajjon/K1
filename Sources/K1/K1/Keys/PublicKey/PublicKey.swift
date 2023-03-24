@@ -14,7 +14,7 @@ public protocol K1PublicKeyProtocol: K1KeyPortable {
 
 extension K1 {
     
-    public struct PublicKey: Sendable, Hashable, K1PublicKeyProtocol {
+    struct PublicKeyImpl: Sendable, Hashable, K1PublicKeyProtocol {
         
         typealias Wrapped = FFI.PublicKey.Wrapped
         internal let wrapped: Wrapped
@@ -26,50 +26,50 @@ extension K1 {
 }
 
 // MARK: Init
-extension K1.PublicKey {
+extension K1.PublicKeyImpl {
     
 
     /// `04 || X || Y` (65 bytes)
-    public static let x963ByteCount = FFI.PublicKey.x963ByteCount
+    static let x963ByteCount = FFI.PublicKey.x963ByteCount
     
     /// `X || Y` (64 bytes)
-    public static let rawByteCount = FFI.PublicKey.rawByteCount
+    static let rawByteCount = FFI.PublicKey.rawByteCount
 
     /// `02|03 || X` (33 bytes)
-    public static let compressedByteCount = FFI.PublicKey.compressedByteCount
+    static let compressedByteCount = FFI.PublicKey.compressedByteCount
     
     /// `X || Y` (64 bytes)
-    public init(rawRepresentation: some ContiguousBytes) throws {
+    init(rawRepresentation: some ContiguousBytes) throws {
         try self.init(
             wrapped: FFI.PublicKey.deserialize(rawRepresentation: rawRepresentation)
         )
     }
     
     /// `04 || X || Y` (65 bytes)
-    public init(x963Representation: some ContiguousBytes) throws {
+    init(x963Representation: some ContiguousBytes) throws {
         try self.init(
             wrapped: FFI.PublicKey.deserialize(x963Representation: x963Representation)
         )
     }
     
     /// `DER`
-    public init(derRepresentation: some RandomAccessCollection<UInt8>) throws {
+    init(derRepresentation: some RandomAccessCollection<UInt8>) throws {
         let bytes = [UInt8](derRepresentation)
         let parsed = try ASN1.SubjectPublicKeyInfo(asn1Encoded: bytes)
         self = try .init(x963Representation: parsed.key)
     }
     
     /// `02|03 || X` (33 bytes)
-    public init(compressedRepresentation: some ContiguousBytes) throws {
+    init(compressedRepresentation: some ContiguousBytes) throws {
         try self.init(
             wrapped: FFI.PublicKey.deserialize(compressedRepresentation: compressedRepresentation)
         )
     }
 
-    /// Creates a `secp256k1` public key from a Privacy-Enhanced Mail (PEM) representation.
-    public init(pemRepresentation: String) throws {
+    /// Creates a `secp256k1` key from a Privacy-Enhanced Mail (PEM) representation.
+    init(pemRepresentation: String) throws {
         let pem = try ASN1.PEMDocument(pemString: pemRepresentation)
-        guard pem.type == "PUBLIC KEY" else {
+        guard pem.type == Self.pemType else {
             throw K1.Error.invalidPEMDocument
         }
         self = try .init(derRepresentation: pem.derBytes)
@@ -77,27 +77,31 @@ extension K1.PublicKey {
 
 }
 
+extension K1.PublicKeyImpl {
+    static let pemType = "PUBLIC KEY"
+}
+
 // MARK: Serialize
-extension K1.PublicKey {
+extension K1.PublicKeyImpl {
     
     /// `X || Y` (64 bytes)
-    public var rawRepresentation: Data {
+    var rawRepresentation: Data {
         Data(x963Representation.dropFirst())
     }
     
     
     /// `04 || X || Y` (65 bytes)
-    public var x963Representation: Data {
+    var x963Representation: Data {
         try! FFI.PublicKey.serialize(wrapped, format: .uncompressed)
     }
     
     /// `02|03 || X` (33 bytes)
-    public var compressedRepresentation: Data {
+    var compressedRepresentation: Data {
         try! FFI.PublicKey.serialize(wrapped, format: .compressed)
     }
     
     /// `DER`
-    public var derRepresentation: Data {
+    var derRepresentation: Data {
         let spki = ASN1.SubjectPublicKeyInfo(
             algorithmIdentifier: .secp256k1,
             key: Array(self.x963Representation)
@@ -111,14 +115,14 @@ extension K1.PublicKey {
     
     /// A Privacy-Enhanced Mail (PEM) representation of the public key.
     public var pemRepresentation: String {
-        let pemDocument = ASN1.PEMDocument(type: "PUBLIC KEY", derBytes: self.derRepresentation)
+        let pemDocument = ASN1.PEMDocument(type: Self.pemType, derBytes: self.derRepresentation)
         return pemDocument.pemString
     }
 }
 
 // MARK: Equatable
-extension K1.PublicKey {
-    public static func == (lhsSelf: Self, rhsSelf: Self) -> Bool {
+extension K1.PublicKeyImpl {
+    static func == (lhsSelf: Self, rhsSelf: Self) -> Bool {
         let lhs = lhsSelf.wrapped
         let rhs = rhsSelf.wrapped
         do {
@@ -134,8 +138,8 @@ extension K1.PublicKey {
 }
 
 // MARK: Hashable
-extension K1.PublicKey {
-    public func hash(into hasher: inout Hasher) {
+extension K1.PublicKeyImpl {
+    func hash(into hasher: inout Hasher) {
         wrapped.withUnsafeBytes {
             hasher.combine(bytes: $0)
         }

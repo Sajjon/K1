@@ -175,14 +175,14 @@ extension K1.ECDSA.NonRecoverable.Signature {
     public func recoverPublicKey(
         recoveryID: K1.ECDSA.Recoverable.Signature.RecoveryID,
         message: some DataProtocol
-    ) throws -> K1.PublicKey {
-        try K1.PublicKey(
-            wrapped: FFI.ECDSA.NonRecovery.recoverPublicKey(
-                self.wrapped,
-                recoveryID: recoveryID.recid,
-                message: [UInt8](message)
-            )
+    ) throws -> K1.ECDSA.NonRecoverable.PublicKey {
+        let wrapped = try FFI.ECDSA.NonRecovery.recoverPublicKey(
+            self.wrapped,
+            recoveryID: recoveryID.recid,
+            message: [UInt8](message)
         )
+        let impl = K1.PublicKeyImpl(wrapped: wrapped)
+        return K1.ECDSA.NonRecoverable.PublicKey(impl: impl)
     }
 }
 

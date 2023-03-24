@@ -49,8 +49,9 @@ public struct PublicKeyOf<Feature>: Sendable, Hashable, K1PublicKeyProtocol {
         impl.pemRepresentation
     }
     
-    internal let impl: K1.PublicKey
-    public init(impl: K1.PublicKey) {
+    typealias Impl = K1.PublicKeyImpl
+    internal let impl: Impl
+    internal init(impl: Impl) {
         self.impl = impl
     }
 }
