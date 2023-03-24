@@ -7,6 +7,7 @@
 
 import Foundation
 
+// TODO: Replace typealiases and this single existential to use existentials generated with GYB.
 public struct PublicKeyOf<Feature>: Sendable, Hashable, K1PublicKeyProtocol {
     
     public init(rawRepresentation: some ContiguousBytes) throws {

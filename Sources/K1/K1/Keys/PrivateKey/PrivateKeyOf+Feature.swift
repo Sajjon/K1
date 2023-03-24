@@ -7,6 +7,7 @@
 
 import Foundation
 
+// TODO: Replace typealiases and this single existential to use existentials generated with GYB.
 public struct PrivateKeyOf<Feature: K1Feature>: Sendable, Hashable, K1PrivateKeyProtocol {
     public init() {
         self.init(impl: .init())
