@@ -9,5 +9,5 @@ import Foundation
 import K1
 
 public protocol ECSignature {}
-extension ECDSASignatureNonRecoverable: ECSignature {}
+extension K1.ECDSA.NonRecoverable.Signature: ECSignature {}
 extension ECDSASignatureRecoverable: ECSignature {}

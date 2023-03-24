@@ -205,7 +205,7 @@ protocol SignatureTestVector: Codable {
     func messageDigest() throws -> MessageDigest
     func expectedSignature() throws -> Signature
 }
-protocol WycheproofTestVector: SignatureTestVector where Signature == ECDSASignatureNonRecoverable {
+protocol WycheproofTestVector: SignatureTestVector where Signature == K1.ECDSA.NonRecoverable.Signature {
     var flags: [String] { get }
     var tcId: Int { get }
     var result: String { get }

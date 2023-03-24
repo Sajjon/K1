@@ -27,7 +27,7 @@ final class ECDSASignatureTests: XCTestCase {
         let message = "Send Bob 3 BTC".data(using: .utf8)!
        
         let requestedNumberOfSignatures = 1000
-        var signatures = Set<ECDSASignatureNonRecoverable>()
+        var signatures = Set<K1.ECDSA.NonRecoverable.Signature>()
        
         for i in 0..<requestedNumberOfSignatures {
             let signature = try alice.ecdsaSignNonRecoverable(

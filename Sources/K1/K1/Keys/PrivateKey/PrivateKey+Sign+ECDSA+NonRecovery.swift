@@ -16,8 +16,8 @@ extension K1.PrivateKey {
     public func ecdsaSignNonRecoverable(
         hashed: some DataProtocol,
         input: K1.ECDSA.SigningOptions = .default
-    ) throws -> ECDSASignatureNonRecoverable {
-        try ECDSASignatureNonRecoverable(
+    ) throws -> K1.ECDSA.NonRecoverable.Signature {
+        try K1.ECDSA.NonRecoverable.Signature(
             wrapped: FFI.ECDSA.NonRecovery.sign(
                 hashedMessage: [UInt8](hashed),
                 privateKey: wrapped,
@@ -30,7 +30,7 @@ extension K1.PrivateKey {
     public func ecdsaSignNonRecoverable(
         digest: some Digest,
         input: K1.ECDSA.SigningOptions = .default
-    ) throws -> ECDSASignatureNonRecoverable {
+    ) throws -> K1.ECDSA.NonRecoverable.Signature {
         try ecdsaSignNonRecoverable(
             hashed: Data(digest),
             input: input
@@ -41,7 +41,7 @@ extension K1.PrivateKey {
     public func ecdsaSignNonRecoverable(
         unhashed: some DataProtocol,
         input: K1.ECDSA.SigningOptions = .default
-    ) throws -> ECDSASignatureNonRecoverable {
+    ) throws -> K1.ECDSA.NonRecoverable.Signature {
         try ecdsaSignNonRecoverable(
             digest: SHA256.hash(data: unhashed),
             input: input

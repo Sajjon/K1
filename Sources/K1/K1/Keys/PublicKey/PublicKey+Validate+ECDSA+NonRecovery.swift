@@ -19,7 +19,7 @@ extension K1.PublicKey {
     ///   - options: Whether or not to consider malleable signatures valid.
     /// - Returns: A Boolean value that’s true if the signature is valid for the given _hashed_ data.
     public func isValidECDSASignature(
-        _ signature: ECDSASignatureNonRecoverable,
+        _ signature: K1.ECDSA.NonRecoverable.Signature,
         hashed: some DataProtocol,
         options: K1.ECDSA.ValidationOptions = .default
     ) -> Bool {
@@ -42,7 +42,7 @@ extension K1.PublicKey {
     ///   - options: Whether or not to consider malleable signatures valid.
     /// - Returns: A Boolean value that’s true if the signature is valid for the given digest.
     public func isValidECDSASignature(
-        _ signature: ECDSASignatureNonRecoverable,
+        _ signature: K1.ECDSA.NonRecoverable.Signature,
         digest: some Digest,
         options: K1.ECDSA.ValidationOptions = .default
     ) -> Bool {
@@ -58,7 +58,7 @@ extension K1.PublicKey {
     /// The function computes an SHA-256 hash from the data before verifying the signature. If you separately hash the data to be signed, use `isValidECDSASignature(_:digest:input)` with the created digest. Or if you have access to a digest just as `some DataProtocol`, use
     /// `isValidECDSASignature(_:hashed:input)`.
     public func isValidECDSASignature(
-        _ signature: ECDSASignatureNonRecoverable,
+        _ signature: K1.ECDSA.NonRecoverable.Signature,
         unhashed: some DataProtocol,
         options: K1.ECDSA.ValidationOptions = .default
     ) -> Bool {

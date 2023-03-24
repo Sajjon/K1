@@ -8,18 +8,29 @@
 import Foundation
 import CryptoKit
 
-public struct ECDSASignatureNonRecoverable: Sendable, Hashable, ContiguousBytes {
-    
-    typealias Wrapped = FFI.ECDSA.NonRecovery.Wrapped
-    internal let wrapped: Wrapped
-    
-    init(wrapped: Wrapped) {
-        self.wrapped = wrapped
+extension K1.ECDSA {
+    public enum NonRecoverable {
+        public typealias PrivateKey = PrivateKeyOf<Self>
+        public typealias PublicKey = PrivateKey.PublicKey
     }
 }
 
+extension K1.ECDSA.NonRecoverable {
+    public struct Signature: Sendable, Hashable, ContiguousBytes {
+        
+        typealias Wrapped = FFI.ECDSA.NonRecovery.Wrapped
+        internal let wrapped: Wrapped
+        
+        init(wrapped: Wrapped) {
+            self.wrapped = wrapped
+        }
+    }
+}
+
+
+
 // MARK: Inits
-extension ECDSASignatureNonRecoverable {
+extension K1.ECDSA.NonRecoverable.Signature {
     
     public init(compactRepresentation: some DataProtocol) throws {
         try self.init(
@@ -35,14 +46,14 @@ extension ECDSASignatureNonRecoverable {
 }
 
 // MARK: ContiguousBytes
-extension ECDSASignatureNonRecoverable {
+extension K1.ECDSA.NonRecoverable.Signature {
     public func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
         try wrapped.withUnsafeBytes(body)
     }
 }
 
 // MARK: Serialize
-extension ECDSASignatureNonRecoverable {
+extension K1.ECDSA.NonRecoverable.Signature {
     
     internal var rawRepresentation: Data {
         Data(wrapped.bytes)
@@ -59,7 +70,7 @@ extension ECDSASignatureNonRecoverable {
 
 
 // MARK: Recover
-extension ECDSASignatureNonRecoverable {
+extension K1.ECDSA.NonRecoverable.Signature {
     public func recoverPublicKey(
         recoveryID: ECDSASignatureRecoverable.RecoveryID,
         message: some DataProtocol
@@ -74,12 +85,12 @@ extension ECDSASignatureNonRecoverable {
     }
 }
 
-extension ECDSASignatureNonRecoverable {
+extension K1.ECDSA.NonRecoverable.Signature {
     internal static let byteCount = FFI.ECDSA.Recovery.byteCount
 }
 
 // MARK: Equatable
-extension ECDSASignatureNonRecoverable {
+extension K1.ECDSA.NonRecoverable.Signature {
     
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.wrapped.withUnsafeBytes { lhsBytes in
@@ -91,7 +102,7 @@ extension ECDSASignatureNonRecoverable {
 }
 
 // MARK: Hashable
-extension ECDSASignatureNonRecoverable {
+extension K1.ECDSA.NonRecoverable.Signature {
     
     public func hash(into hasher: inout Hasher) {
         wrapped.withUnsafeBytes {

@@ -174,8 +174,8 @@ extension ECDSASignatureRecoverable {
 
 // MARK: Conversion
 extension ECDSASignatureRecoverable {
-    public func nonRecoverable() throws -> ECDSASignatureNonRecoverable {
-        try ECDSASignatureNonRecoverable(
+    public func nonRecoverable() throws -> K1.ECDSA.NonRecoverable.Signature {
+        try K1.ECDSA.NonRecoverable.Signature(
             wrapped: FFI.ECDSA.Recovery.nonRecoverable(self.wrapped)
         )
     }

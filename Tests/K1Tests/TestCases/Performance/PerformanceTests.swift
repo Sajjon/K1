@@ -45,11 +45,11 @@ final class PerformanceTests: XCTestCase {
                         ecdsa
                     )
                     try XCTAssertEqual(
-                        ECDSASignatureNonRecoverable(compactRepresentation: ecdsa.nonRecoverable().compactRepresentation()),
+                        K1.ECDSA.NonRecoverable.Signature(compactRepresentation: ecdsa.nonRecoverable().compactRepresentation()),
                         ecdsa.nonRecoverable()
                     )
                     try XCTAssertEqual(
-                        ECDSASignatureNonRecoverable(derRepresentation: ecdsa.nonRecoverable().derRepresentation()),
+                        K1.ECDSA.NonRecoverable.Signature(derRepresentation: ecdsa.nonRecoverable().derRepresentation()),
                         ecdsa.nonRecoverable()
                     )
                     

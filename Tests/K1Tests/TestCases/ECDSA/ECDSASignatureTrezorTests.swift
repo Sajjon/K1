@@ -71,7 +71,7 @@ private extension XCTestCase {
 private struct SignatureTrezorTestVector: SignatureTestVector {
     
     typealias MessageDigest = SHA256.Digest
-    typealias Signature = ECDSASignatureNonRecoverable
+    typealias Signature = K1.ECDSA.NonRecoverable.Signature
     
     let msg: String
     let privateKey: String
@@ -90,7 +90,7 @@ private struct SignatureTrezorTestVector: SignatureTestVector {
     }
     func expectedSignature() throws -> Signature {
         let derData = try Data(hex: expected.der)
-        let signature = try ECDSASignatureNonRecoverable(derRepresentation: derData)
+        let signature = try K1.ECDSA.NonRecoverable.Signature(derRepresentation: derData)
         try XCTAssertEqual(signature.derRepresentation().hex, expected.der)
         try XCTAssertEqual(
             signature.compactRepresentation().hex,
@@ -101,7 +101,7 @@ private struct SignatureTrezorTestVector: SignatureTestVector {
         )
         
         try XCTAssertEqual(
-            ECDSASignatureNonRecoverable(compactRepresentation: Data(hex: expected.r + expected.s)),
+            K1.ECDSA.NonRecoverable.Signature(compactRepresentation: Data(hex: expected.r + expected.s)),
             signature
         )
         
