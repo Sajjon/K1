@@ -9,11 +9,11 @@ final class ECDSA_Wycheproof_IEEE_P1364_RS_EncodedSignaturesTests: XCTestCase {
         let result: TestResult =
         try testSuite(
             /* https://github.com/google/wycheproof/blob/master/testvectors/ecdsa_secp256k1_sha256_test.json */
-            jsonName: "ecdsa_secp256k1_sha256_p1363_RS_test",
+            jsonName: "wycheproof_ecdsa_verify_p1363",
             testFunction: { (group: ECDSAWycheTestGroup<SignatureWycheproofP1364TestVector>) in
                 try doTestGroup(
                     group: group,
-                    signatureValidationMode: .acceptSignatureMalleability,
+                    signatureValidationMode: .init(malleabilityStrictness: .accepted),
                     hashFunction: SHA256.self,
                     skipIfContainsFlags: .init(["MissingZero", "BER", "SigSize"]),
                     skipIfContainsComment: ["r too large"]
@@ -29,7 +29,7 @@ final class ECDSA_Wycheproof_IEEE_P1364_RS_EncodedSignaturesTests: XCTestCase {
 private struct SignatureWycheproofP1364TestVector: WycheproofTestVector {
     
     typealias MessageDigest = SHA256.Digest
-    typealias Signature = ECDSASignatureNonRecoverable
+    typealias Signature = K1.ECDSA.NonRecoverable.Signature
     
     let comment: String
     let msg: String

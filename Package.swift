@@ -3,6 +3,21 @@
 
 import PackageDescription
 
+let cSettings: [CSetting] = [
+    // Basic config values that are universal and require no dependencies.
+    // https://github.com/bitcoin-core/secp256k1/blob/master/src/basic-config.h#L12-L13
+    .define("ECMULT_WINDOW_SIZE", to: "15"),
+    .define("ECMULT_GEN_PREC_BITS", to: "4"),
+
+    // Enable modules in secp256k1.
+    // See bottom of: Sources/secp256k1/libsecp256k1/src/secp256k1.c
+    // For list
+    .define("ENABLE_MODULE_ECDH"),
+    .define("ENABLE_MODULE_RECOVERY"),
+    .define("ENABLE_MODULE_SCHNORRSIG"),
+    .define("ENABLE_MODULE_EXTRAKEYS"),
+]
+
 let package = Package(
     name: "K1",
     platforms: [
@@ -17,10 +32,7 @@ let package = Package(
             ]
         ),
     ],
-    dependencies: [
-         // Only used by tests
-        .package(url: "https://github.com/filom/ASN1Decoder", from: "1.8.0")
-    ],
+    dependencies: [],
     targets: [
         
         // Target `libsecp256k1` https://github.com/bitcoin-core/secp256k1
@@ -50,37 +62,21 @@ let package = Package(
                 "libsecp256k1/README.md",
                 "libsecp256k1/SECURITY.md"
             ],
-            cSettings: [
-                // Basic config values that are universal and require no dependencies.
-                // https://github.com/bitcoin-core/secp256k1/blob/master/src/basic-config.h#L12-L13
-                .define("ECMULT_WINDOW_SIZE", to: "15"),
-                .define("ECMULT_GEN_PREC_BITS", to: "4"),
-
-                // Enable modules in secp256k1.
-                // See bottom of: Sources/secp256k1/libsecp256k1/src/secp256k1.c
-                // For list
-                .define("ENABLE_MODULE_ECDH"),
-                .define("ENABLE_MODULE_RECOVERY"),
-                .define("ENABLE_MODULE_SCHNORRSIG"),
-                .define("ENABLE_MODULE_EXTRAKEYS"),
-            ]
+            cSettings: cSettings
         ),
-
         .target(
             name: "K1",
             dependencies: [
-                // ECDSA, Schnorr, ECDH etc.
                 "secp256k1",
+            ],
+            swiftSettings: [
+                .define("CRYPTO_IN_SWIFTPM_FORCE_BUILD_API"),
             ]
         ),
-
         .testTarget(
             name: "K1Tests",
             dependencies: [
                 "K1",
-                
-                // DER decoding of public keys from test vectors
-                "ASN1Decoder"
             ],
             resources: [
                 .process("TestVectors/"),

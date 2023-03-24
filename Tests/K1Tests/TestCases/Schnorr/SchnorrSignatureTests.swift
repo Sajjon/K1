@@ -8,14 +8,15 @@
 import Foundation
 import K1
 import XCTest
+import CryptoKit
 
 final class SchnorrSignatureTests: XCTestCase {
     
     func testSchnorr() throws {
-        let alice = try K1.PrivateKey.generateNew()
+        let alice = K1.Schnorr.PrivateKey()
         let message = "Send Bob 3 BTC".data(using: .utf8)!
-        let signature = try alice.schnorrSign(unhashed: message)
-        let isSignatureValid = try alice.publicKey.isValidSchnorrSignature(signature, unhashed: message)
+        let signature = try alice.signature(forUnhashed: message)
+        let isSignatureValid = alice.publicKey.isValidSignature(signature, unhashed: message)
         XCTAssertTrue(isSignatureValid, "Signature should be valid.")
     }
     

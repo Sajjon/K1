@@ -60,7 +60,7 @@ final class SchnorrSignatureBitcoinCoreTests: XCTestCase {
     func testSchnorrSignBitcoinVectors() throws {
         let result: TestResult = try testSuite(
             /* https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv */
-            jsonName: "schnorr_secp256k1_sign_sha256_test",
+            jsonName: "bip340_schnorr_sign",
             testFunction: { (group: SchnorrTestGroup<SchnorrTestSignVector>) in
                 var numberOfTestsRun = 0
                 try group.tests.forEach(doTestSchnorrSign)
@@ -75,7 +75,7 @@ final class SchnorrSignatureBitcoinCoreTests: XCTestCase {
         let result: TestResult =
         try testSuite(
             /* https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv */
-            jsonName: "schnorr_secp256k1_verify_sha256_test",
+            jsonName: "bip340_schnorr_verify",
             testFunction: { (group: SchnorrTestGroup<SchnorrTestVerifyVector>) in
                 var numberOfTestsRun = 0
                 try group.tests.forEach(doTestSchnorrVerify)
@@ -90,43 +90,43 @@ final class SchnorrSignatureBitcoinCoreTests: XCTestCase {
 private extension SchnorrSignatureBitcoinCoreTests {
     func doTestSchnorrSign(vector: SchnorrTestSignVector) throws {
         
-        let privateKey = try K1.PrivateKey.import(
+        let privateKey = try K1.Schnorr.PrivateKey(
             rawRepresentation: Data(hex: vector.privateKeyHex)
         )
         
         let publicKey = privateKey.publicKey
-        let expectedPublicKey = try K1.PublicKey.import(from: Data(hex: vector.publicKeyHex))
+        let expectedPublicKey = try K1.Schnorr.PublicKey(compressedRepresentation: Data(hex: vector.publicKeyHex))
         XCTAssertEqual(publicKey, expectedPublicKey)
 
         XCTAssertEqual(
-            try! publicKey.rawRepresentation(format: .compressed).hex.lowercased(),
-            try! expectedPublicKey.rawRepresentation(format: .compressed).hex.lowercased()
-            )
-
-        let message = try Data(hex: vector.messageHex)
-        let signature = try privateKey.schnorrSign(
-            hashed: message,
-            input: .init(auxilaryRandomData: Data(hex: vector.auxDataHex))
+            publicKey.compressedRepresentation,
+            expectedPublicKey.compressedRepresentation
         )
 
-        let expectedSig = try SchnorrSignature(rawRepresentation: Data(hex: vector.signatureCompact))
+        let message = try Data(hex: vector.messageHex)
+        let signature = try privateKey.signature(
+            for: message,
+            options: .init(auxilaryRandomData: .init(aux: Data(hex: vector.auxDataHex)))
+        )
 
-        XCTAssertEqual(signature, expectedSig)
+        let expectedSig = try K1.Schnorr.Signature(rawRepresentation: Data(hex: vector.signatureCompact))
+
+        XCTAssertEqual(signature.rawRepresentation.hex, vector.signatureCompact)
 
         XCTAssertEqual(
-            try publicKey.isValidSchnorrSignature(expectedSig, hashed: message),
+            publicKey.isValidSignature(expectedSig, hashed: message),
             vector.isValid
         )
     }
     
     func doTestSchnorrVerify(vector: SchnorrTestVector) throws {
-        func parsePublicKey() throws -> PublicKey {
-            try PublicKey.import(from: Data(hex: vector.publicKeyHex))
+        func parsePublicKey() throws -> K1.Schnorr.PublicKey {
+            try .init(compressedRepresentation: Data(hex: vector.publicKeyHex))
         }
         guard !vector.invalidPublicKey else {
             XCTAssertThrowsError(try parsePublicKey(), "") { anyError in
                 if let error = anyError as? K1.Error {
-                    XCTAssertEqual(error, K1.Error.failedToParsePublicKeyFromBytes)
+                    XCTAssertEqual(error, K1.Error.failedToDeserializePublicKey)
                 } else {
                     XCTFail("Failed to cast error")
                 }
@@ -135,9 +135,9 @@ private extension SchnorrSignatureBitcoinCoreTests {
         }
         let publicKey = try parsePublicKey()
         
-        let signature =  try SchnorrSignature(rawRepresentation: Data(hex: vector.signatureCompact))
+        let signature =  try K1.Schnorr.Signature(rawRepresentation: Data(hex: vector.signatureCompact))
         
-        let validSignature = try publicKey.isValidSchnorrSignature(
+        let validSignature = try publicKey.isValidSignature(
             signature, hashed: Data(hex: vector.messageHex)
         )
         

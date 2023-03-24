@@ -16,6 +16,7 @@
 //===----------------------------------------------------------------------===//
 import XCTest
 import CryptoKit
+
 @testable import K1
 
 struct TestSuite<T: Decodable>: Decodable {
@@ -65,13 +66,11 @@ struct ResultOfTestGroup {
     let idsOmittedTests: [Int]
 }
 
-
-
 extension XCTestCase {
     
     func doTestGroup<HF: HashFunction, TV: WycheproofTestVector>(
         group: ECDSAWycheTestGroup<TV>,
-        signatureValidationMode: SignatureValidationMode,
+        signatureValidationMode: K1.ECDSA.ValidationOptions = .default,
         hashFunction: HF.Type,
         skipIfContainsFlags: [String] = [],
         skipIfContainsComment: [String] = [],
@@ -83,7 +82,42 @@ extension XCTestCase {
             throw ECDSASignatureTestError(description: errorMessage)
         }
         let keyBytes = try Array(hex: group.key.uncompressed)
-        let key = try PublicKey(x963Representation: keyBytes)
+        let key = try K1.ECDSA.NonRecoverable.PublicKey(x963Representation: keyBytes)
+        
+        let keyFromDER = try K1.ECDSA.NonRecoverable.PublicKey(derRepresentation: Data(hex: group.keyDer))
+        XCTAssertEqual(key.derRepresentation.hex, group.keyDer)
+        XCTAssertEqual(keyFromDER, key)
+        
+        let keyFromPEM = try K1.ECDSA.NonRecoverable.PublicKey(pemRepresentation: group.keyPem)
+        XCTAssertEqual(key.pemRepresentation, group.keyPem)
+        XCTAssertEqual(keyFromPEM, key)
+
+        
+        let compactXRaw = try Data(hex: group.key.wx)
+        let compactYRaw = try Data(hex: group.key.wy)
+        func ensure32Bytes(_ compactComponent: Data) throws -> Data {
+            if compactComponent.count == Curve.Field.byteCount {
+                return compactComponent
+            }
+            
+            var compactComponent = [UInt8](compactComponent)
+            while compactComponent.count < Curve.Field.byteCount {
+                compactComponent = [0x00] + compactComponent
+            }
+            while compactComponent.count > Curve.Field.byteCount {
+                guard compactComponent.first == 0x00 else {
+                    throw BadKeyComponent()
+                }
+                compactComponent = [UInt8](compactComponent.dropFirst())
+            }
+            return Data(compactComponent)
+        }
+        let xOnly = try ensure32Bytes(compactXRaw)
+        let yOnly = try ensure32Bytes(compactYRaw)
+            
+        let fromRaw = try K1.ECDSA.NonRecoverable.PublicKey(rawRepresentation: xOnly + yOnly)
+        XCTAssertEqual(fromRaw, key)
+        
         var numberOfTestsRun = 0
         var idsOfOmittedTests = Array<Int>()
     outerloop: for testVector in group.tests {
@@ -106,10 +140,10 @@ extension XCTestCase {
             let signature = try testVector.expectedSignature()
             let messageDigest = try testVector.messageDigest()
             
-            isValid = try key.isValidECDSASignature(
+            isValid = key.isValidSignature(
                 signature,
                 digest: messageDigest,
-                mode: signatureValidationMode
+                options: signatureValidationMode
             )
         } catch {
             let expectedFailure = testVector.result == "invalid" || testVector.result == "acceptable"
@@ -152,13 +186,18 @@ struct ECDSATestGroup<TV: SignatureTestVector>: Codable {
 struct ECDSAWycheTestGroup<TV: WycheproofTestVector>: Codable {
     let tests: [TV]
     let key: ECDSAKey
+    let keyDer: String
+    let keyPem: String
 }
 
 
 struct ECDSAKey: Codable {
     let uncompressed: String
+    let wx: String
+    let wy: String
     let curve: String
 }
+
 
 protocol SignatureTestVector: Codable {
     associatedtype MessageDigest: Digest
@@ -166,7 +205,7 @@ protocol SignatureTestVector: Codable {
     func messageDigest() throws -> MessageDigest
     func expectedSignature() throws -> Signature
 }
-protocol WycheproofTestVector: SignatureTestVector where Signature == ECDSASignatureNonRecoverable {
+protocol WycheproofTestVector: SignatureTestVector where Signature == K1.ECDSA.NonRecoverable.Signature {
     var flags: [String] { get }
     var tcId: Int { get }
     var result: String { get }
@@ -175,15 +214,8 @@ protocol WycheproofTestVector: SignatureTestVector where Signature == ECDSASigna
 }
 
 
-typealias PublicKey = K1.PublicKey
-extension PublicKey {
-    init(x963Representation: [UInt8]) throws {
-        self = try Self.import(from: x963Representation)
-    }
-}
-typealias PrivateKey = K1.PrivateKey
-
 
 struct ECDSASignatureTestError: Swift.Error, CustomStringConvertible {
     let description: String
 }
+struct BadKeyComponent: Swift.Error {}
