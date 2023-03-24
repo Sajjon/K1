@@ -12,14 +12,10 @@ extension FFI {
     enum Schnorr {}
 }
 
-extension K1 {
-    public enum Schnorr {}
-}
-
 // MARK: Schnorr Validate
 extension FFI.Schnorr {
     static func isValid(
-        schnorrSignature: FFI.Schnorr.Wrapped,
+        signature: FFI.Schnorr.Wrapped,
         publicKey: FFI.PublicKey.Wrapped,
         message: [UInt8]
     ) throws -> Bool {
@@ -39,7 +35,7 @@ extension FFI.Schnorr {
             return ffi.validate { context in
                 secp256k1_schnorrsig_verify(
                     context,
-                    schnorrSignature.bytes,
+                    signature.bytes,
                     message,
                     message.count,
                     &publicKeyX
@@ -54,7 +50,7 @@ extension FFI.Schnorr {
     static func sign(
         hashedMessage message: [UInt8],
         privateKey: FFI.PrivateKey.Wrapped,
-        input: K1.Schnorr.Input = .default
+        input: K1.Schnorr.SigningOptions = .default
     ) throws -> FFI.Schnorr.Wrapped {
         guard message.count == Curve.Field.byteCount else {
             throw K1.Error.unableToSignMessageHasInvalidLength(got: message.count, expected: Curve.Field.byteCount)
@@ -85,25 +81,4 @@ extension FFI.Schnorr {
         return try FFI.Schnorr.Wrapped(bytes: signatureOut)
     }
 
-}
-
-// MARK: SchnorrInput
-extension K1.Schnorr {
-    public struct Input: Sendable, Hashable {
-        
-        public static let `default` = Self()
-        public let auxilaryRandomData: AuxilaryRandomData?
-        public init(auxilaryRandomData: AuxilaryRandomData? = nil) {
-            self.auxilaryRandomData = auxilaryRandomData
-        }
-        public struct AuxilaryRandomData: Sendable, Hashable {
-            public let aux: [UInt8]
-            public init(aux: some DataProtocol) throws {
-                guard aux.count == Curve.Field.byteCount else {
-                    throw K1.Error.failedToSchnorrSignDigestProvidedRandomnessInvalidLength
-                }
-                self.aux = [UInt8](aux)
-            }
-        }
-    }
 }

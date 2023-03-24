@@ -9,21 +9,33 @@ final class PerformanceTests: XCTestCase {
         measure {
             do {
                 for _ in 0 ..< 10 {
-                    let privateKey = PrivateKey()
-                    let publicKey = privateKey.publicKey
+                    let schnorrPrivateKey = K1.Schnorr.PrivateKey()
+                    let schnorrPublicKey = schnorrPrivateKey.publicKey
                     
                     try XCTAssertEqual(
-                        PublicKey(compressedRepresentation: publicKey.compressedRepresentation),
-                        publicKey
+                        K1.Schnorr.PublicKey(compressedRepresentation: schnorrPublicKey.compressedRepresentation),
+                        schnorrPublicKey
                     )
                     try XCTAssertEqual(
-                        PublicKey(x963Representation: publicKey.x963Representation),
-                        publicKey
+                        K1.Schnorr.PublicKey(x963Representation: schnorrPublicKey.x963Representation),
+                        schnorrPublicKey
                     )
                     
-                    let ecdsa = try privateKey.ecdsaSignRecoverable(hashed: message)
+                    let ecdsaPrivateKey = K1.PrivateKey()
+                    let ecdsaPublicKey = ecdsaPrivateKey.publicKey
+                    
+                    try XCTAssertEqual(
+                        K1.PublicKey(compressedRepresentation: ecdsaPublicKey.compressedRepresentation),
+                        ecdsaPublicKey
+                    )
+                    try XCTAssertEqual(
+                        K1.PublicKey(x963Representation: ecdsaPublicKey.x963Representation),
+                        ecdsaPublicKey
+                    )
+                    
+                    let ecdsa = try ecdsaPrivateKey.ecdsaSignRecoverable(hashed: message)
                     XCTAssertTrue(
-                        publicKey.isValidECDSASignature(
+                        ecdsaPublicKey.isValidECDSASignature(
                             ecdsa,
                             hashed: message
                         )
@@ -41,19 +53,19 @@ final class PerformanceTests: XCTestCase {
                         ecdsa.nonRecoverable()
                     )
                     
-                    let schnorr = try privateKey.schnorrSign(hashed: message)
+                    let schnorr = try schnorrPrivateKey.sign(hashed: message)
                     XCTAssertTrue(
-                        publicKey.isValidSchnorrSignature(
+                        schnorrPublicKey.isValidSignature(
                             schnorr,
                             hashed: message
                         )
                     )
                     try XCTAssertEqual(
-                        SchnorrSignature(rawRepresentation: schnorr.rawRepresentation),
+                        K1.Schnorr.Signature(rawRepresentation: schnorr.rawRepresentation),
                         schnorr
                     )
                     
-                    let alicePrivateKey = try K1.KeyAgreement.PrivateKey(x963Representation: privateKey.x963Representation)
+                    let alicePrivateKey = try K1.KeyAgreement.PrivateKey(x963Representation: ecdsaPrivateKey.x963Representation)
                     let alicePublicKey = alicePrivateKey.publicKey
                     let bobPrivateKey = K1.KeyAgreement.PrivateKey()
                     let bobPublicKey = bobPrivateKey.publicKey
