@@ -66,8 +66,8 @@ extension TwoVariantsOfECDHWithKDFTests {
         let outputByteCount = 32
         let hash = SHA256.self
         
-        let alice = try PrivateKey(hex: vector.alicePrivateKey)
-        let bob = try PrivateKey(hex: vector.bobPrivateKey)
+        let alice = try K1.KeyAgreement.PrivateKey(hex: vector.alicePrivateKey)
+        let bob = try K1.KeyAgreement.PrivateKey(hex: vector.bobPrivateKey)
         XCTAssertEqual(alice.publicKey.x963Representation.hex, vector.alicePublicKeyUncompressed)
         XCTAssertEqual(bob.publicKey.x963Representation.hex, vector.bobPublicKeyUncompressed)
         

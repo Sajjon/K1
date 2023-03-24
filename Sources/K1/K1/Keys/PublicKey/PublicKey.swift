@@ -7,9 +7,14 @@
 
 import Foundation
 
+protocol K1PublicKeyProtocol: K1KeyPortable {
+    init(compressedRepresentation: some ContiguousBytes) throws
+    var compressedRepresentation: Data { get }
+}
+
 extension K1 {
     
-    public struct PublicKey: Sendable, Hashable {
+    public struct PublicKey: Sendable, Hashable, K1PublicKeyProtocol {
         
         typealias Wrapped = FFI.PublicKey.Wrapped
         internal let wrapped: Wrapped

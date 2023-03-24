@@ -2,14 +2,120 @@
 //  File.swift
 //  
 //
-//  Created by Alexander Cyon on 2023-03-20.
+//  Created by Alexander Cyon on 2023-03-24.
 //
 
 import Foundation
 import struct CryptoKit.SharedSecret
 
-// MARK: ECDH
-extension K1.PrivateKey {
+public struct PublicKeyOf<Feature>: Sendable, Hashable, K1PublicKeyProtocol {
+    
+    public init(rawRepresentation: some ContiguousBytes) throws {
+        try self.init(impl: .init(rawRepresentation: rawRepresentation))
+    }
+    
+    public init(compressedRepresentation: some ContiguousBytes) throws {
+        try self.init(impl: .init(compressedRepresentation: compressedRepresentation))
+    }
+    
+    public init(x963Representation: some ContiguousBytes) throws {
+        try self.init(impl: .init(x963Representation: x963Representation))
+    }
+    
+    public init(derRepresentation: some RandomAccessCollection<UInt8>) throws {
+        try self.init(impl: .init(derRepresentation: derRepresentation))
+    }
+    
+    public init(pemRepresentation: String) throws {
+        try self.init(impl: .init(pemRepresentation: pemRepresentation))
+    }
+    
+    public var rawRepresentation: Data {
+        impl.rawRepresentation
+    }
+    
+    public var x963Representation: Data {
+        impl.x963Representation
+    }
+    
+    public var derRepresentation: Data {
+        impl.derRepresentation
+    }
+    
+    public var compressedRepresentation: Data {
+        impl.compressedRepresentation
+    }
+    
+    public var pemRepresentation: String {
+        impl.pemRepresentation
+    }
+    
+    internal let impl: K1.PublicKey
+    public init(impl: K1.PublicKey) {
+        self.impl = impl
+    }
+}
+
+
+public struct PrivateKeyOf<Feature>: Sendable, Hashable, K1PrivateKeyProtocol {
+    public init() {
+        self.init(impl: .init())
+    }
+    
+    public init(rawRepresentation: some ContiguousBytes) throws {
+        try self.init(impl: .init(rawRepresentation: rawRepresentation))
+    }
+    
+    public init(x963Representation: some ContiguousBytes) throws {
+        try self.init(impl: .init(x963Representation: x963Representation))
+    }
+    
+    public init(derRepresentation: some RandomAccessCollection<UInt8>) throws {
+        try self.init(impl: .init(derRepresentation: derRepresentation))
+    }
+    
+    public init(pemRepresentation: String) throws {
+        try self.init(impl: .init(pemRepresentation: pemRepresentation))
+    }
+    
+    public var rawRepresentation: Data {
+        impl.rawRepresentation
+    }
+    
+    public var x963Representation: Data {
+        impl.x963Representation
+    }
+    
+    public var derRepresentation: Data {
+        impl.derRepresentation
+    }
+    
+    public var pemRepresentation: String {
+        impl.pemRepresentation
+    }
+    
+    internal let impl: K1.PrivateKey
+    internal let publicKeyImpl: K1.PublicKey
+    
+    public typealias PublicKey = PublicKeyOf<K1.KeyAgreement>
+    public var publicKey: PublicKey {
+        .init(impl: publicKeyImpl)
+    }
+    
+    public init(impl: K1.PrivateKey) {
+        self.impl = impl
+        self.publicKeyImpl = impl.publicKey
+    }
+}
+
+extension K1 {
+    public enum KeyAgreement {
+        public typealias PrivateKey = PrivateKeyOf<Self>
+        public typealias PublicKey = PrivateKey.PublicKey
+    }
+}
+
+extension K1.KeyAgreement.PrivateKey {
     /// Computes a shared secret with the provided public key from another party,
     /// returning only the `X` coordinate of the point, following [ANSI X9.63][ansix963] standards.
     ///
@@ -36,16 +142,16 @@ extension K1.PrivateKey {
     /// [ansix963]: https://webstore.ansi.org/standards/ascx9/ansix9632011r2017
     /// [cryptostackexchange]: https://crypto.stackexchange.com/a/57727
     public func sharedSecretFromKeyAgreement(
-        with publicKey: K1.PublicKey
+        with publicKey: PublicKey
     ) throws -> SharedSecret {
         let data = try FFI.ECDH.keyExchange(
-            publicKey: publicKey.wrapped,
-            privateKey: self.wrapped,
+            publicKey: publicKey.impl.wrapped,
+            privateKey: self.impl.wrapped,
             serializeOutputFunction: .ansiX963
         )
-        return try SharedSecret.init(data: data)
-        
+        return try SharedSecret(data: data)
     }
+    
     
     /// Computes a shared secret with the provided public key from another party,
     /// using `libsecp256k1` default behaviour, returning a hashed of the compressed point.
@@ -69,12 +175,12 @@ extension K1.PrivateKey {
     /// [cryptostackexchange]: https://crypto.stackexchange.com/a/57727
     ///
     public func ecdh(
-        with publicKey: K1.PublicKey,
+        with publicKey: PublicKey,
         arbitraryData: Data? = nil
     ) throws -> SharedSecret {
         let data = try FFI.ECDH.keyExchange(
-            publicKey: publicKey.wrapped,
-            privateKey: self.wrapped,
+            publicKey: publicKey.impl.wrapped,
+            privateKey: self.impl.wrapped,
             serializeOutputFunction: .libsecp256kDefault(arbitraryData: arbitraryData)
         )
         return try SharedSecret(data: data)
@@ -93,10 +199,10 @@ extension K1.PrivateKey {
     /// **This is not following any standard at all**, but might be useful if you want to write your
     /// cryptographic functions, e.g. some ECIES scheme.
     ///
-    public func ecdhPoint(with publicKey: K1.PublicKey) throws -> Data {
+    public func ecdhPoint(with publicKey: PublicKey) throws -> Data {
         try FFI.ECDH.keyExchange(
-            publicKey: publicKey.wrapped,
-            privateKey: self.wrapped,
+            publicKey: publicKey.impl.wrapped,
+            privateKey: self.impl.wrapped,
             serializeOutputFunction: .noHashWholePoint
         )
     }
