@@ -9,10 +9,17 @@ import Foundation
 import protocol CryptoKit.Digest
 import struct CryptoKit.SHA256
 
-
 extension K1 {
+    
+    /// A mechanism used to create or verify a cryptographic signature using the `secp256k1` and Schnorr signature scheme.
     public enum Schnorr: K1Feature {
+        
+        /// A `secp256k1` private key used to create cryptographic signatures,
+        /// more specifically Schnorr signatures.
         public typealias PrivateKey = PrivateKeyOf<Self>
+        
+        /// A `secp256k1` public key used to verify cryptographic signatures,
+        /// more specifically Schnorr signatures.
         public typealias PublicKey = PublicKeyOf<Self>
     }
 }
@@ -96,7 +103,8 @@ extension K1.Schnorr.PublicKey {
     /// Verifies a Schnorr signature on a block of data over the `secp256k1` elliptic curve.
     ///
     /// The function computes an SHA-256 hash from the data before verifying the signature. If you separately hash the data to be signed, use `isValidSignature(_:digest:input)` with the created digest. Or if you have access to a digest just as `some DataProtocol`, use
-    /// `isValidSignature(_:hashed:input)`.
+    /// `isValidSignature(_:hashed:input)`
+    /// .
     /// - Parameters:
     ///   - signature: The Schnorr signature to check against the block of data.
     ///   - unhashed: The block of data covered by the signature.

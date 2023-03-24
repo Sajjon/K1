@@ -13,8 +13,14 @@ public protocol K1Feature {
 }
 
 extension K1 {
+    
+    /// A mechanism used to create a shared secret between two users by performing `secp256k1` elliptic curve Diffie Hellman (ECDH) key exchange.
     public enum KeyAgreement: K1Feature {
+        
+        /// A `secp256k1` private key used for key agreement.
         public typealias PrivateKey = PrivateKeyOf<Self>
+        
+        /// A `secp256k1` public key used for key agreement.
         public typealias PublicKey = PublicKeyOf<Self>
     }
 }
