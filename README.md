@@ -3,38 +3,76 @@
 
 _K1_ is Swift wrapper around [libsecp256k1 (bitcoin-core/secp256k1)][lib], offering ECDSA, Schnorr ([BIP340][bip340]) and ECDH features.
 
-# Features
 
-## ECDSA Signatures
+# ECDSA (Elliptic Curve Digital Signature Algorithm)
+
+## Sign
+
+There exists two ECDSA signature versions, one which produces `ECDSASignatureNonRecoverable` and the other `ECDSASignatureRecoverable`.
+
+Given a private key and message:
 
 ```swift
-let alice = try K1.PrivateKey()
+let alice = K1.PrivateKey()
 let message = "Send Bob 3 BTC".data(using: .utf8)!
+```
+
+### Non Recovery 
+
+```swift
 let signature = try alice.ecdsaSign(unhashed: message)
-let isSignatureValid = try alice.publicKey.isValidECDSASignature(signature, unhashed: message)
-assert(isSignatureValid, "Signature should be valid.")
 ```
 
+Which SHA256 hashes the message before signing it. Alternatively you can also use `ecdsaSign:hashed` or `ecdsaSign:digest` if you already have hashed the message yourself.
 
-## Schnorr Signatures
-
+### Recovery 
 
 ```swift
-let alice = try K1.PrivateKey()
-let message = "Send Bob 3 BTC".data(using: .utf8)!
-let signature = try alice.schnorrSign(unhashed: message)
-let isSignatureValid = try alice.publicKey.isValidSchnorrSignature(signature, unhashed: message)
-assert(isSignatureValid, "Signature should be valid.")
+let signature = try alice.ecdsaSignRecoverable(unhashed: message)
 ```
 
-### Schnorr Scheme
+Which SHA256 hashes the message before signing it. Alternatively you can also use `ecdsaSignRecoverable:hashed` or `ecdsaSignRecoverable:digest` if you already have hashed the message yourself.
+
+### Options
+Both recovery and non-recovery signature methods takes a `SigningInput` struct, which by default specifies [`RFC6979`][rfc6979] deterministic signing, as per Bitcoin standard, however, you can change to use secure random nonce instead.
+
+## Validate
+
+Both `ECDSASignatureNonRecoverable` and `ECDSASignatureRecoverable` share the same validation interface `isValidECDSASignature`.
+
+```swift
+assert(alice.publicKey.isValidECDSASignature(signature, unhashed: message)) // PASS
+```
+
+Or alternatively `isValidECDSASignature:digest` or `isValidECDSASignature:hashed`. All variants takes a `ValidationInput` struct, which specifies if [malleaable signatures][mall] should be accepted or rejected.
+
+
+# Schnorr Signature Scheme
+
+## Sign
+
+```swift
+let signature = try alice.schnorrSign(unhashed: message)
+```
+
+There exists other sign variants, `schnorrSign:digest` and `schnorrSign:hashed` if you already have a signed message. All three variants accepts a `Schnorr.Input` struct where you can pass `auxiliaryRandomData` to be signed.
+
+## Validate
+
+```swift
+assert(alice.publicKey.isValidSchnorrSignature(signature, unhashed: message)) // PASS
+```
+
+Or alternatively `isValidSchnorrSignature:digest` or `isValidSchnorrSignature:hashed`.
+
+#### Schnorr Scheme
 
 The Schnorr signature implementation is [BIP340][bip340], since we use _libsecp256k1_ which only provides the [BIP340][bip340] Schnorr scheme. 
 
 It is worth noting that some Schnorr implementations are incompatible with [BIP340][bip340] and thus this library, e.g. [Zilliqa's](https://github.com/Zilliqa/schnorr/blob/master/src/libSchnorr/src/Schnorr.cpp#L86-L242) ([kudelski report](https://docs.zilliqa.com/zilliqa-schnorr-audit-by-kudelski_public-release.pdf), [libsecp256k1 proposal](https://github.com/bitcoin-core/secp256k1/issues/1070), [Twitter thread](https://twitter.com/AmritKummer/status/1489645007699066886?s=20&t=eDgd5221qEPOVyStY0A8SA)).
 
 
-## ECDH
+# ECDH
 
 This library vendors three different EC Diffie-Hellman (ECDH) key exchange functions:
 1. `ASN1 x9.63` - No hash, return only the `X` coordinate of the point - `sharedSecretFromKeyAgreement -> SharedSecret`
@@ -46,7 +84,7 @@ let alice = try K1.PrivateKey()
 let bob = try K1.PrivateKey()
 ```
 
-### `ASN1 x9.63` ECDH
+## `ASN1 x9.63` ECDH
 Returning only the `X` coordinate of the point, following [ANSI X9.63][x963] standards, embedded in a [`CryptoKit.SharedSecret`][ckss], which is useful since you can use `CryptoKit` key derivation functions on this SharedSecret, e.g. [`x963DerivedSymmetricKey`](https://developer.apple.com/documentation/cryptokit/sharedsecret/x963derivedsymmetrickey(using:sharedinfo:outputbytecount:)) or [`hkdfDerivedSymmetricKey`](https://developer.apple.com/documentation/cryptokit/sharedsecret/hkdfderivedsymmetrickey(using:salt:sharedinfo:outputbytecount:)).
 
 You can retrieve the `X` coordinate as raw data using `withUnsafeBytes` if you need to.
@@ -62,13 +100,13 @@ ab.withUnsafeBytes {
 }
 ```
 
-### `libsecp256k1` ECDH
+## `libsecp256k1` ECDH
 
-Using `libsecp256k1` default behaviour, returning a SHA-256 hash of the **compressed** point.
+Using `libsecp256k1` default behaviour, returning a SHA-256 hash of the **compressed** point, embedded in a [`CryptoKit.SharedSecret`][ckss], which is useful since you can use `CryptoKit` key derivation functions.
 
 ```swift
-let ab: Data = try alice.ecdh(with: bob.publicKey) 
-let ba: Data = try bob.ecdh(with: alice.publicKey)
+let ab: CryptoKit.SharedSecret = try alice.ecdh(with: bob.publicKey) 
+let ba: CryptoKit.SharedSecret = try bob.ecdh(with: alice.publicKey)
 assert(ab == ba) // pass
 
 ab.withUnsafeBytes {
@@ -76,7 +114,7 @@ ab.withUnsafeBytes {
 }
 ```
 
-### Custom ECDH
+## Custom ECDH
 
 Returns an entire uncompresed EC point, without hashing it. Might be useful if you wanna construct your own cryptographic functions, e.g. some custom ECIES.
 
@@ -118,3 +156,5 @@ To clone the dependency [libsecp256k1][lib], using commit [427bc3cdcfbc747780704
 [x963]: https://webstore.ansi.org/standards/ascx9/ansix9632011r2017
 [ckss]: https://developer.apple.com/documentation/cryptokit/sharedsecret
 [swc]: https://github.com/apple/swift-crypto
+[rfc6979]: https://www.rfc-editor.org/rfc/rfc6979
+[mall]: https://en.bitcoin.it/wiki/Transaction_malleability

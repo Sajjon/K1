@@ -21,12 +21,3 @@ final class SchnorrSignatureTests: XCTestCase {
     }
     
 }
-
-extension K1.PublicKey {
-    public func isValidSchnorrSignature<M: DataProtocol>(
-        _ signature: SchnorrSignature,
-        unhashed: M
-    ) -> Bool {
-        isValidSchnorrSignature(signature, digest: SHA256.hash(data: unhashed))
-    }
-}
