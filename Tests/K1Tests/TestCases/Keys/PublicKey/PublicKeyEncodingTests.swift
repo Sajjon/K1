@@ -12,6 +12,20 @@ import XCTest
 
 final class PublicKeyEncodingTests: XCTestCase {
     
+    func test_pubkey_raw_is_x963_minus_prefix() throws {
+        let privateKey = K1.PrivateKey()
+        let publicKey = privateKey.publicKey
+        
+        XCTAssertEqual(publicKey.rawRepresentation.hex, Data(publicKey.x963Representation.dropFirst()).hex)
+    }
+    
+    func testRawRoundtrip() throws {
+        try doTest(
+            serialize: \.rawRepresentation,
+            deserialize: PublicKey.init(rawRepresentation:)
+        )
+    }
+    
     func testCompressedRoundtrip() throws {
         try doTest(
             serialize: \.compressedRepresentation,
@@ -42,7 +56,7 @@ final class PublicKeyEncodingTests: XCTestCase {
 }
 
 private extension PublicKeyEncodingTests {
-    func doTest<Enc>(
+    func doTest<Enc: Equatable>(
         serialize: KeyPath<K1.PublicKey, Enc>,
         deserialize: (Enc) throws -> K1.PublicKey
     ) throws {
@@ -64,11 +78,14 @@ public func doTestSerializationRoundtrip<T, Enc>(
     original makeOriginal: @autoclosure () -> T,
     serialize: KeyPath<T, Enc>,
     deserialize: (Enc) throws -> T
-) throws where T: Equatable{
+) throws where T: Equatable, Enc: Equatable {
     for _ in 0 ..< 100 {
         let original = makeOriginal()
         let serialized = original[keyPath: serialize]
         let deserialized = try deserialize(serialized)
         XCTAssertEqual(deserialized, original)
+        let reserialized = deserialized[keyPath: serialize]
+        XCTAssertEqual(reserialized, serialized)
+        
     }
 }

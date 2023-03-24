@@ -5,22 +5,50 @@
 //  Created by Alexander Cyon on 2023-03-21.
 //
 import Foundation
-import K1
+@testable import K1
 import XCTest
+
 
 final class PrivateKeyEncodingTests: XCTestCase {
     
-    func testEncodingsPrivateKeyTests() {
-        let keyKA = K1.PrivateKey()
-        let raw = keyKA.rawRepresentation
-        let keyKA_x963 = keyKA.x963Representation
-       
-        try XCTAssertEqual(
-            K1.PrivateKey(rawRepresentation: raw),
-            K1.PrivateKey(x963Representation: keyKA_x963)
+    func testRawRoundtrip() throws {
+        try doTest(
+            serialize: \.rawRepresentation,
+            deserialize: PrivateKey.init(rawRepresentation:)
         )
-        
     }
-
+    
+    func testx963Roundtrip() throws {
+        try doTest(
+            serialize: \.x963Representation,
+            deserialize: PrivateKey.init(x963Representation:)
+        )
+    }
+    
+    func testDERRoundtrip() throws {
+        try doTest(
+            serialize: \.derRepresentation,
+            deserialize: PrivateKey.init(derRepresentation:)
+        )
+    }
+    
+    func testPEMRoundtrip() throws {
+        try doTest(
+            serialize: \.pemRepresentation,
+            deserialize: PrivateKey.init(pemRepresentation:)
+        )
+    }
 }
 
+private extension PrivateKeyEncodingTests {
+    func doTest<Enc: Equatable>(
+        serialize: KeyPath<K1.PrivateKey, Enc>,
+        deserialize: (Enc) throws -> K1.PrivateKey
+    ) throws {
+        try doTestSerializationRoundtrip(
+            original: K1.PrivateKey(),
+            serialize: serialize,
+            deserialize: deserialize
+        )
+    }
+}

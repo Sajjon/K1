@@ -29,7 +29,9 @@ extension K1 {
 extension K1.PrivateKey {
     
     /// Creates a `secp256k1` private key from a Privacy-Enhanced Mail (PEM) representation.
-    public init(pemRepresentation: String) throws {
+    public init(
+        pemRepresentation: String
+    ) throws {
         let pem = try ASN1.PEMDocument(pemString: pemRepresentation)
 
         switch pem.type {
@@ -52,6 +54,40 @@ extension K1.PrivateKey {
         )
     }
     
+    public init(
+        x963Representation: some ContiguousBytes
+    ) throws {
+        let length = x963Representation.withUnsafeBytes { $0.count }
+        guard length == Self.x963ByteCount else {
+            throw K1.Error.incorrectByteCountOfX963PrivateKey(got: length, expected: Self.x963ByteCount)
+        }
+        
+        let publicKeyX963 = x963Representation.bytes.prefix(K1.PublicKey.x963ByteCount)
+        let publicKeyFromX963 = try K1.PublicKey.init(x963Representation: publicKeyX963)
+        let privateKeyRaw = x963Representation.bytes.suffix(Self.rawByteCount)
+        try self.init(rawRepresentation: privateKeyRaw)
+        guard self.publicKey == publicKeyFromX963 else {
+            throw K1.Error.invalidPrivateX963RepresentationPublicKeyDiscrepancy
+        }
+        // All good
+    }
+    
+    
+    /// `DER`
+    public init(derRepresentation: some RandomAccessCollection<UInt8>) throws {
+        let bytes = Array(derRepresentation)
+        
+        // We have to try to parse this twice because we have no informaton about what kind of key this is.
+        // We try with PKCS#8 first, and then fall back to SEC.1.
+        do {
+            let key = try ASN1.PKCS8PrivateKey(asn1Encoded: bytes)
+            self = try .init(rawRepresentation: key.privateKey.privateKey)
+        } catch {
+            let key = try ASN1.SEC1PrivateKey(asn1Encoded: bytes)
+            self = try .init(rawRepresentation: key.privateKey)
+        }
+    }
+    
     public init() {
         self.init(wrapped: .init())
     }
@@ -60,7 +96,7 @@ extension K1.PrivateKey {
 // MARK: Serialize
 extension K1.PrivateKey {
 
-    /// A data representation of the private key.
+    /// A raw representation of the private key.
     public var rawRepresentation: Data {
         Data(wrapped.secureBytes.bytes)
     }
@@ -96,24 +132,7 @@ extension K1.PrivateKey {
         return bytes
     }
     
-    public init(
-        x963Representation: some ContiguousBytes
-    ) throws {
-        let length = x963Representation.withUnsafeBytes { $0.count }
-        guard length == Self.x963ByteCount else {
-            throw K1.Error.incorrectByteCountOfX963PrivateKey(got: length, expected: Self.x963ByteCount)
-        }
-        
-        let publicKeyX963 = x963Representation.bytes.prefix(K1.PublicKey.x963ByteCount)
-        let publicKeyFromX963 = try K1.PublicKey.init(x963Representation: publicKeyX963)
-        let privateKeyRaw = x963Representation.bytes.suffix(Self.rawByteCount)
-        try self.init(rawRepresentation: privateKeyRaw)
-        guard self.publicKey == publicKeyFromX963 else {
-            throw K1.Error.invalidPrivateX963RepresentationPublicKeyDiscrepancy
-        }
-        // All good
-    }
-    
+
     public static let rawByteCount = Curve.Field.byteCount
     public static let x963ByteCount = K1.PublicKey.x963ByteCount + K1.PrivateKey.rawByteCount
 }
