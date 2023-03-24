@@ -74,10 +74,10 @@ private extension ECDHWychoproofTests {
             }
             numberOfTestsRun += 1
             do {
-                let publicKey = try PublicKey(derRepresentation: Data(hex: testVector.publicKey))
+                let publicKey = try K1.KeyAgreement.PublicKey(derRepresentation: Data(hex: testVector.publicKey))
                 var privateBytes = [UInt8]()
                 privateBytes = try padKeyIfNecessary(vector: testVector.privateKey)
-                let privateKey = try PrivateKey(rawRepresentation: privateBytes)
+                let privateKey = try K1.KeyAgreement.PrivateKey(rawRepresentation: privateBytes)
                 
                 /// ANS1 X9.63 serialization of shared secret, returning a `CryptoKit.SharedSecret`
                 let sharedPublicKeyPoint = try privateKey.sharedSecretFromKeyAgreement(with: publicKey)

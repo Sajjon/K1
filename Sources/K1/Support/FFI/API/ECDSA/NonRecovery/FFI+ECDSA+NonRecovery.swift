@@ -112,7 +112,7 @@ extension FFI.ECDSA.NonRecovery {
         ecdsaSignature: FFI.ECDSA.NonRecovery.Wrapped,
         publicKey: FFI.PublicKey.Wrapped,
         message: [UInt8],
-        input: K1.ECDSA.ValidationInput = .default
+        options: K1.ECDSA.ValidationOptions = .default
     ) throws -> Bool {
         try FFI.toC { ffi -> Bool in
             var publicKeyRaw = publicKey.raw
@@ -132,7 +132,7 @@ extension FFI.ECDSA.NonRecovery {
                     &publicKeyRaw
                 )
             }
-            let acceptMalleableSignatures = input.malleabilityStrictness == .accepted
+            let acceptMalleableSignatures = options.malleabilityStrictness == .accepted
             switch (isSignatureValid, signatureWasMalleable, acceptMalleableSignatures) {
             case (true, false, _):
                 // Signature is valid
@@ -162,13 +162,13 @@ extension FFI.ECDSA.NonRecovery {
     static func sign(
         hashedMessage: [UInt8],
         privateKey: FFI.PrivateKey.Wrapped,
-        input: K1.ECDSA.SigningInput = .default
+        options: K1.ECDSA.SigningOptions = .default
     ) throws -> FFI.ECDSA.NonRecovery.Wrapped {
         
         try FFI.ECDSA._sign(
             message: hashedMessage,
             privateKey: privateKey,
-            input: input
+            options: options
         )
     }
 }

@@ -38,26 +38,26 @@ private extension XCTestCase {
     ) throws -> ResultOfTestGroup {
         var numberOfTestsRun = 0
         for vector in group.tests {
-            let privateKey = try K1.PrivateKey(rawRepresentation: Data(hex: vector.privateKey))
-            let publicKey = privateKey.publicKey
+            let privateKey = try K1.ECDSA.NonRecoverable.PrivateKey(rawRepresentation: Data(hex: vector.privateKey))
+            let publicKey: K1.ECDSA.NonRecoverable.PublicKey = privateKey.publicKey
             
             let expectedSignature = try vector.expectedSignature()
             let messageDigest = try vector.messageDigest()
-            XCTAssertTrue(publicKey.isValidECDSASignature(expectedSignature, digest: messageDigest))
+            XCTAssertTrue(publicKey.isValidSignature(expectedSignature, digest: messageDigest))
             
-            let signatureFromMessage = try privateKey.ecdsaSignNonRecoverable(digest: messageDigest)
+            let signatureFromMessage = try privateKey.signature(for: messageDigest)
             XCTAssertEqual(signatureFromMessage, expectedSignature)
-            
-            let signatureRandom = try privateKey.ecdsaSignNonRecoverable(
-                digest: messageDigest,
-                input: .init(nonceFunction: .random)
+
+            let signatureRandom = try privateKey.signature(
+                for: messageDigest,
+                options: .init(nonceFunction: .random)
             )
-  
+
             XCTAssertNotEqual(signatureRandom, expectedSignature)
-            XCTAssertTrue(publicKey.isValidECDSASignature(signatureRandom, digest: messageDigest))
-            
-            
-            let signatureRecoverableFromMessage = try privateKey.ecdsaSignRecoverable(digest: messageDigest)
+            XCTAssertTrue(publicKey.isValidSignature(signatureRandom, digest: messageDigest))
+
+            let privateKeyRecoverable = try K1.ECDSA.Recoverable.PrivateKey(rawRepresentation: privateKey.rawRepresentation)
+            let signatureRecoverableFromMessage = try privateKeyRecoverable.signature(for: messageDigest)
             try XCTAssertEqual(signatureRecoverableFromMessage.nonRecoverable(), expectedSignature)
             let recid = try signatureRecoverableFromMessage.compact().recoveryID
             XCTAssertEqual(signatureRecoverableFromMessage.rawRepresentation.hex, expectedSignature.rawRepresentation.hex + "\(Data([UInt8(recid.rawValue)]).hex)")
@@ -71,7 +71,7 @@ private extension XCTestCase {
 private struct SignatureTrezorTestVector: SignatureTestVector {
     
     typealias MessageDigest = SHA256.Digest
-    typealias Signature = ECDSASignatureNonRecoverable
+    typealias Signature = K1.ECDSA.NonRecoverable.Signature
     
     let msg: String
     let privateKey: String
@@ -90,7 +90,7 @@ private struct SignatureTrezorTestVector: SignatureTestVector {
     }
     func expectedSignature() throws -> Signature {
         let derData = try Data(hex: expected.der)
-        let signature = try ECDSASignatureNonRecoverable(derRepresentation: derData)
+        let signature = try K1.ECDSA.NonRecoverable.Signature(derRepresentation: derData)
         try XCTAssertEqual(signature.derRepresentation().hex, expected.der)
         try XCTAssertEqual(
             signature.compactRepresentation().hex,
@@ -101,7 +101,7 @@ private struct SignatureTrezorTestVector: SignatureTestVector {
         )
         
         try XCTAssertEqual(
-            ECDSASignatureNonRecoverable(compactRepresentation: Data(hex: expected.r + expected.s)),
+            K1.ECDSA.NonRecoverable.Signature(compactRepresentation: Data(hex: expected.r + expected.s)),
             signature
         )
         

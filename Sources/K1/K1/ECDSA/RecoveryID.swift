@@ -8,7 +8,7 @@
 import Foundation
 
 // MARK: Recovery
-extension ECDSASignatureRecoverable {
+extension K1.ECDSA.Recoverable.Signature {
     
     public enum RecoveryID: UInt8, Sendable, Hashable, Codable {
         case _0 = 0
@@ -22,7 +22,7 @@ extension ECDSASignatureRecoverable {
     }
 }
 
-extension ECDSASignatureRecoverable.RecoveryID {
+extension K1.ECDSA.Recoverable.Signature.RecoveryID {
     public init(byte: UInt8) throws {
         guard let self_ = Self(rawValue: byte) else {
             throw K1.Error.invalidRecoveryID(got: Int(byte))

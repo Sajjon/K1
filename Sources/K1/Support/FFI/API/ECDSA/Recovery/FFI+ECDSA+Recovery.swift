@@ -109,14 +109,14 @@ extension FFI.ECDSA.Recovery {
     /// Produces a **recoverable** ECDSA signature from a hashed `message`
     static func sign(
         hashedMessage: [UInt8],
-        privateKey: K1.PrivateKey.Wrapped,
-        input: K1.ECDSA.SigningInput = .default
+        privateKey: K1.PrivateKeyImpl.Wrapped,
+        options: K1.ECDSA.SigningOptions = .default
     ) throws -> FFI.ECDSA.Recovery.Wrapped {
        
         try FFI.ECDSA._sign(
             message: hashedMessage,
             privateKey: privateKey,
-            input: input
+            options: options
         )
     }
 }

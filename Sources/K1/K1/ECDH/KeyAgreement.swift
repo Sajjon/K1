@@ -2,14 +2,30 @@
 //  File.swift
 //  
 //
-//  Created by Alexander Cyon on 2023-03-20.
+//  Created by Alexander Cyon on 2023-03-24.
 //
 
 import Foundation
 import struct CryptoKit.SharedSecret
 
-// MARK: ECDH
-extension K1.PrivateKey {
+public protocol K1Feature {
+    associatedtype PublicKey: K1PublicKeyProtocol
+}
+
+extension K1 {
+    
+    /// A mechanism used to create a shared secret between two users by performing `secp256k1` elliptic curve Diffie Hellman (ECDH) key exchange.
+    public enum KeyAgreement: K1Feature {
+        
+        /// A `secp256k1` private key used for key agreement.
+        public typealias PrivateKey = PrivateKeyOf<Self>
+        
+        /// A `secp256k1` public key used for key agreement.
+        public typealias PublicKey = PublicKeyOf<Self>
+    }
+}
+
+extension K1.KeyAgreement.PrivateKey {
     /// Computes a shared secret with the provided public key from another party,
     /// returning only the `X` coordinate of the point, following [ANSI X9.63][ansix963] standards.
     ///
@@ -36,16 +52,16 @@ extension K1.PrivateKey {
     /// [ansix963]: https://webstore.ansi.org/standards/ascx9/ansix9632011r2017
     /// [cryptostackexchange]: https://crypto.stackexchange.com/a/57727
     public func sharedSecretFromKeyAgreement(
-        with publicKey: K1.PublicKey
+        with publicKey: PublicKey
     ) throws -> SharedSecret {
         let data = try FFI.ECDH.keyExchange(
-            publicKey: publicKey.wrapped,
-            privateKey: self.wrapped,
+            publicKey: publicKey.impl.wrapped,
+            privateKey: self.impl.wrapped,
             serializeOutputFunction: .ansiX963
         )
-        return try SharedSecret.init(data: data)
-        
+        return try SharedSecret(data: data)
     }
+    
     
     /// Computes a shared secret with the provided public key from another party,
     /// using `libsecp256k1` default behaviour, returning a hashed of the compressed point.
@@ -69,12 +85,12 @@ extension K1.PrivateKey {
     /// [cryptostackexchange]: https://crypto.stackexchange.com/a/57727
     ///
     public func ecdh(
-        with publicKey: K1.PublicKey,
+        with publicKey: PublicKey,
         arbitraryData: Data? = nil
     ) throws -> SharedSecret {
         let data = try FFI.ECDH.keyExchange(
-            publicKey: publicKey.wrapped,
-            privateKey: self.wrapped,
+            publicKey: publicKey.impl.wrapped,
+            privateKey: self.impl.wrapped,
             serializeOutputFunction: .libsecp256kDefault(arbitraryData: arbitraryData)
         )
         return try SharedSecret(data: data)
@@ -93,10 +109,10 @@ extension K1.PrivateKey {
     /// **This is not following any standard at all**, but might be useful if you want to write your
     /// cryptographic functions, e.g. some ECIES scheme.
     ///
-    public func ecdhPoint(with publicKey: K1.PublicKey) throws -> Data {
+    public func ecdhPoint(with publicKey: PublicKey) throws -> Data {
         try FFI.ECDH.keyExchange(
-            publicKey: publicKey.wrapped,
-            privateKey: self.wrapped,
+            publicKey: publicKey.impl.wrapped,
+            privateKey: self.impl.wrapped,
             serializeOutputFunction: .noHashWholePoint
         )
     }
