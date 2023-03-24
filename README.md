@@ -8,7 +8,7 @@ _K1_ is Swift wrapper around [libsecp256k1 (bitcoin-core/secp256k1)][lib], offer
 
 ## Sign
 
-There exists two ECDSA signature versions, one which produces `K1.ECDSA.NonRecoverable.Signature` and the other `ECDSASignatureRecoverable`.
+There exists two ECDSA signature versions, one which produces `K1.ECDSA.NonRecoverable.Signature` and the other `K1.ECDSA.Recoverable.Signature`.
 
 Given a private key and message:
 
@@ -38,7 +38,7 @@ Both recovery and non-recovery signature methods takes a `SigningOptions` struct
 
 ## Validate
 
-Both `K1.ECDSA.NonRecoverable.Signature` and `ECDSASignatureRecoverable` share the same validation interface `isValidECDSASignature`.
+Both `K1.ECDSA.NonRecoverable.Signature` and `K1.ECDSA.Recoverable.Signature` share the same validation interface `isValidECDSASignature`.
 
 ```swift
 assert(alice.publicKey.isValidECDSASignature(signature, unhashed: message)) // PASS

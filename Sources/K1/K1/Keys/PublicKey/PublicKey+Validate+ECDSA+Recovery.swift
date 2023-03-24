@@ -15,7 +15,7 @@ extension K1.PublicKey {
     /// non-recoverable and validates it against
     /// a `SHA256` hashed messages for this public key.
     public func isValidECDSASignature(
-        _ signature: ECDSASignatureRecoverable,
+        _ signature: K1.ECDSA.Recoverable.Signature,
         hashed: some DataProtocol,
         options: K1.ECDSA.ValidationOptions = .default
     ) -> Bool {
@@ -34,7 +34,7 @@ extension K1.PublicKey {
     /// non-recoverable and validates it against
     /// a `SHA256` hashed messages for this public key.
     public func isValidECDSASignature(
-        _ signature: ECDSASignatureRecoverable,
+        _ signature: K1.ECDSA.Recoverable.Signature,
         digest: some Digest,
         options: K1.ECDSA.ValidationOptions = .default
     ) -> Bool {
@@ -53,7 +53,7 @@ extension K1.PublicKey {
     /// recoverable ECDSA signature to non-recoverable and
     /// validates it against the hashed message for this public key.
     public func isValidECDSASignature(
-        _ signature: ECDSASignatureRecoverable,
+        _ signature: K1.ECDSA.Recoverable.Signature,
         unhashed: some DataProtocol,
         options: K1.ECDSA.ValidationOptions = .default
     ) -> Bool {

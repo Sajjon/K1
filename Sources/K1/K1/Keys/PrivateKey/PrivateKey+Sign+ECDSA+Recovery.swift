@@ -14,8 +14,8 @@ extension K1.PrivateKey {
     public func ecdsaSignRecoverable(
         hashed hashedMessage: some DataProtocol,
         input: K1.ECDSA.SigningOptions = .default
-    ) throws -> ECDSASignatureRecoverable {
-        try ECDSASignatureRecoverable(
+    ) throws -> K1.ECDSA.Recoverable.Signature {
+        try K1.ECDSA.Recoverable.Signature(
             wrapped: FFI.ECDSA.Recovery.sign(
                 hashedMessage: [UInt8](hashedMessage),
                 privateKey: wrapped,
@@ -27,7 +27,7 @@ extension K1.PrivateKey {
     public func ecdsaSignRecoverable(
         digest: some Digest,
         input: K1.ECDSA.SigningOptions = .default
-    ) throws -> ECDSASignatureRecoverable {
+    ) throws -> K1.ECDSA.Recoverable.Signature {
         try ecdsaSignRecoverable(
             hashed: Data(digest),
             input: input
@@ -38,7 +38,7 @@ extension K1.PrivateKey {
     public func ecdsaSignRecoverable(
         unhashed: some DataProtocol,
         input: K1.ECDSA.SigningOptions = .default
-    ) throws -> ECDSASignatureRecoverable {
+    ) throws -> K1.ECDSA.Recoverable.Signature {
         try ecdsaSignRecoverable(
             digest: SHA256.hash(data: unhashed),
             input: input

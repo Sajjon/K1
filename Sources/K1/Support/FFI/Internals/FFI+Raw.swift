@@ -15,7 +15,7 @@ extension Raw {
     static func recoverableSignature(
         _ rawRepresentation: some DataProtocol
     ) throws -> secp256k1_ecdsa_recoverable_signature {
-        let expected = ECDSASignatureRecoverable.Compact.byteCount
+        let expected = K1.ECDSA.Recoverable.Signature.Compact.byteCount
         guard
             rawRepresentation.count == expected
         else {

@@ -72,7 +72,7 @@ extension K1.ECDSA.NonRecoverable.Signature {
 // MARK: Recover
 extension K1.ECDSA.NonRecoverable.Signature {
     public func recoverPublicKey(
-        recoveryID: ECDSASignatureRecoverable.RecoveryID,
+        recoveryID: K1.ECDSA.Recoverable.Signature.RecoveryID,
         message: some DataProtocol
     ) throws -> K1.PublicKey {
         try K1.PublicKey(

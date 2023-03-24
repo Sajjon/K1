@@ -8,17 +8,28 @@
 import Foundation
 import CryptoKit
 
-public struct ECDSASignatureRecoverable: Sendable, Hashable, ContiguousBytes {
-    typealias Wrapped = FFI.ECDSA.Recovery.Wrapped
-    private let wrapped: Wrapped
-    
-    internal init(wrapped: Wrapped) {
-        self.wrapped = wrapped
+extension K1.ECDSA {
+    public enum Recoverable {
+        public typealias PrivateKey = PrivateKeyOf<Self>
+        public typealias PublicKey = PrivateKey.PublicKey
     }
 }
 
+extension K1.ECDSA.Recoverable {
+    public struct Signature: Sendable, Hashable, ContiguousBytes {
+        
+        typealias Wrapped = FFI.ECDSA.Recovery.Wrapped
+        private let wrapped: Wrapped
+        
+        internal init(wrapped: Wrapped) {
+            self.wrapped = wrapped
+        }
+    }
+}
+
+
 // MARK: Init
-extension ECDSASignatureRecoverable {
+extension K1.ECDSA.Recoverable.Signature {
 
     /// Compact aka `IEEE P1363` aka `R||S`.
     public init(compact: Compact) throws {
@@ -46,14 +57,14 @@ extension ECDSASignatureRecoverable {
 }
 
 // MARK: ContiguousBytes
-extension ECDSASignatureRecoverable {
+extension K1.ECDSA.Recoverable.Signature {
     public func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
         try wrapped.withUnsafeBytes(body)
     }
 }
 
 // MARK: Serialize
-extension ECDSASignatureRecoverable {
+extension K1.ECDSA.Recoverable.Signature {
     
     internal var rawRepresentation: Data {
         Data(wrapped.bytes)
@@ -95,7 +106,7 @@ extension ECDSASignatureRecoverable {
     }
 }
 
-extension ECDSASignatureRecoverable.Compact {
+extension K1.ECDSA.Recoverable.Signature.Compact {
     
     public static let byteCountRS = 2 * Curve.Field.byteCount
     public static let byteCount = Self.byteCountRS + 1
@@ -152,7 +163,7 @@ extension ECDSASignatureRecoverable.Compact {
         }
     }
 }
-extension ECDSASignatureRecoverable.RecoveryID {
+extension K1.ECDSA.Recoverable.Signature.RecoveryID {
     var vData: Data {
         Data(
             [UInt8(rawValue)]
@@ -161,7 +172,7 @@ extension ECDSASignatureRecoverable.RecoveryID {
 }
 
 // MARK: Recovery
-extension ECDSASignatureRecoverable {
+extension K1.ECDSA.Recoverable.Signature {
     public func recoverPublicKey(
         message: some DataProtocol
     ) throws -> K1.PublicKey {
@@ -173,7 +184,7 @@ extension ECDSASignatureRecoverable {
 
 
 // MARK: Conversion
-extension ECDSASignatureRecoverable {
+extension K1.ECDSA.Recoverable.Signature {
     public func nonRecoverable() throws -> K1.ECDSA.NonRecoverable.Signature {
         try K1.ECDSA.NonRecoverable.Signature(
             wrapped: FFI.ECDSA.Recovery.nonRecoverable(self.wrapped)
@@ -182,7 +193,7 @@ extension ECDSASignatureRecoverable {
 }
 
 // MARK: Equatable
-extension ECDSASignatureRecoverable {
+extension K1.ECDSA.Recoverable.Signature {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.wrapped.withUnsafeBytes { lhsBytes in
             rhs.wrapped.withUnsafeBytes { rhsBytes in
@@ -193,7 +204,7 @@ extension ECDSASignatureRecoverable {
 }
 
 // MARK: Hashable
-extension ECDSASignatureRecoverable {
+extension K1.ECDSA.Recoverable.Signature {
 
     public func hash(into hasher: inout Hasher) {
         wrapped.withUnsafeBytes {

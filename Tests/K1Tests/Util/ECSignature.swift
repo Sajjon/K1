@@ -10,4 +10,4 @@ import K1
 
 public protocol ECSignature {}
 extension K1.ECDSA.NonRecoverable.Signature: ECSignature {}
-extension ECDSASignatureRecoverable: ECSignature {}
+extension K1.ECDSA.Recoverable.Signature: ECSignature {}

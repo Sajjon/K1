@@ -41,7 +41,7 @@ final class PerformanceTests: XCTestCase {
                         )
                     )
                     try XCTAssertEqual(
-                        ECDSASignatureRecoverable(compact: ecdsa.compact()),
+                        K1.ECDSA.Recoverable.Signature(compact: ecdsa.compact()),
                         ecdsa
                     )
                     try XCTAssertEqual(
