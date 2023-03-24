@@ -3,48 +3,154 @@
 
 _K1_ is Swift wrapper around [libsecp256k1 (bitcoin-core/secp256k1)][lib], offering ECDSA, Schnorr ([BIP340][bip340]) and ECDH features.
 
+# API
+The API of K1 maps almost 1:1 with Apple's [CryptoKit][ck], vendoring a set of keypairs, one per feature. E.g. in CryptoKit you have `Curve25519.KeyAgreement.PrivateKey` and `Curve25519.KeyAgreement.PublicKey` which are seperate for `Curve25519.Signing.PrivateKey` and `Curve25519.Signing.PublicKey`. 
+
+Just like that K1 vendors these key pairs:
+- `K1.KeyAgreement.PrivateKey` / `K1.KeyAgreement.PublicKey` for key agreement (ECDH)
+- `K1.Schnorr.PrivateKey` / `K1.Schnorr.PublicKey` for sign / verify methods using Schnorr signature scheme
+- `K1.ECDSA.Recoverable.PrivateKey` / `K1.ECDSA.Recoverable.PublicKey` for sign / verify methods using ECDSA (producing/validating signature where public key is recoverable)
+- `K1.ECDSA.NonRecoverable.PrivateKey` / `K1.ECDSA.NonRecoverable.PublicKey` for sign / verify methods using ECDSA (producing/validating signature where public key is **not** recoverable)
+
+Just like you can convert between e.g. `Curve25519.KeyAgreement.PrivateKey` and  `Curve25519.Signing.PrivateKey` back and forth using any of the initializers and serializer, you can convert between all PrivateKeys and all PublicKeys of all features in K1.
+
+All keys conform to `K1KeyExportable` protocol below to serialize the Private/PubliKey:
+
+```swift
+public protocol K1KeyExportable {
+    var rawRepresentation: Data { get }
+    var x963Representation: Data { get }
+    var derRepresentation: Data { get }
+    var pemRepresentation: String { get }
+}
+```
+
+All keys conform to `K1KeyImportable` protocol below to deserialize to Private/PubliKey:
+
+```swift
+public protocol K1KeyImportable {
+    init(rawRepresentation: some ContiguousBytes) throws
+    init(x963Representation: some ContiguousBytes) throws
+    init(derRepresentation: some RandomAccessCollection<UInt8>) throws
+    init(pemRepresentation: String) throws
+}
+```
+
+Furthermore, all PrivateKey's conform to this protocol
+
+```swift
+protocol K1PrivateKeyProtocol: K1KeyPortable {
+    associatedtype PublicKey: K1PublicKeyProtocol
+    var publicKey: PublicKey { get }
+    init()
+}
+```
+
+Furthermore, all PublicKey's conform to this protocol
+
+```swift
+public protocol K1PublicKeyProtocol: K1KeyPortable {
+    init(compressedRepresentation: some ContiguousBytes) throws
+    var compressedRepresentation: Data { get }
+}
+
+```
+
 
 # ECDSA (Elliptic Curve Digital Signature Algorithm)
 
-## Sign
+There exists two set of ECDSA key pairs:
+- A key pair for signatures from which you can recover the public key, specifically: `K1.ECDSA.Recoverable.PrivateKey` and `K1.ECDSA.Recoverable.PublicKey`
+- A key pair for signatures from which you can **not** recover the public key, specifically: `K1.ECDSA.NonRecoverable.PrivateKey` and `K1.ECDSA.NonRecoverable.PublicKey`
 
-There exists two ECDSA signature versions, one which produces `K1.ECDSA.NonRecoverable.Signature` and the other `K1.ECDSA.Recoverable.Signature`.
+For each private key there exists two different `signature:for:options` (one taking hashed data and taking `Digest` as argument) methods and one `signature:forUnhashed:options`.
 
-Given a private key and message:
+The `option` is a `K1.ECDSA.SigningOptions` struct, which by default specifies [`RFC6979`][rfc6979] deterministic signing, as per Bitcoin standard, however, you can change to use secure random nonce instead.
 
-```swift
-let alice = K1.PrivateKey()
-let message = "Send Bob 3 BTC".data(using: .utf8)!
-```
+## NonRecoverable 
 
-### Non Recovery 
-
-```swift
-let signature = try alice.ecdsaSign(unhashed: message)
-```
-
-Which SHA256 hashes the message before signing it. Alternatively you can also use `ecdsaSign:hashed` or `ecdsaSign:digest` if you already have hashed the message yourself.
-
-### Recovery 
+### Sign
 
 ```swift
-let signature = try alice.ecdsaSignRecoverable(unhashed: message)
+let alice = K1.ECDA.NonRecovarable.PrivateKey()
 ```
 
-Which SHA256 hashes the message before signing it. Alternatively you can also use `ecdsaSignRecoverable:hashed` or `ecdsaSignRecoverable:digest` if you already have hashed the message yourself.
-
-### Options
-Both recovery and non-recovery signature methods takes a `SigningOptions` struct, which by default specifies [`RFC6979`][rfc6979] deterministic signing, as per Bitcoin standard, however, you can change to use secure random nonce instead.
-
-## Validate
-
-Both `K1.ECDSA.NonRecoverable.Signature` and `K1.ECDSA.Recoverable.Signature` share the same validation interface `isValidECDSASignature`.
+#### Hashed (Data)
 
 ```swift
-assert(alice.publicKey.isValidECDSASignature(signature, unhashed: message)) // PASS
+let hashedMessage: Data = // from somewhere
+let signature = try alice.signature(for: hashedMessage)
 ```
 
-Or alternatively `isValidECDSASignature:digest` or `isValidECDSASignature:hashed`. All variants takes a `ValidationOptions` struct, which specifies if [malleaable signatures][mall] should be accepted or rejected.
+#### Digest 
+
+```swift
+let message: Data = // from somewhere
+let digest = SHA256.hash(data: message)
+let signature = try alice.signature(for: digest)
+```
+
+#### Hash and Sign
+
+The `forUnhashed` will `SHA256` hash the message and then sign it. 
+
+```swift
+let message: Data = // from somewhere
+let signature = try alice.signature(forUnhashed: message)
+```
+
+### Validate
+
+#### Hashed (Data)
+
+```swift
+let hashedMessage: Data = // from somewhere
+let publicKey: K1.ECDSA.NonRecoverable.PublicKey = alice.publcKey
+let signature: K1.ECDSA.NonRecoverable.Signature // from above
+
+assert(
+    publicKey.isValidSignature(signature, hashed: hashedMessage)
+) // PASS
+```
+
+#### Digest
+
+```swift
+let message: Data = // from somewhere
+let digest = SHA256.hash(data: message)
+let signature: K1.ECDSA.NonRecoverable.Signature // from above
+
+assert(
+    publicKey.isValidSignature(signature, digest: digest)
+) // PASS
+```
+
+#### Hash and Validate
+
+```swift
+let message: Data = // from somewhere
+let signature: K1.ECDSA.NonRecoverable.Signature // from above
+
+assert(
+    publicKey.isValidSignature(signature, unhashed: message)
+) // PASS
+```
+
+
+## Recoverable
+
+All signing and validation APIs are identical to the `NonRecoverable` namespace.
+
+```swift
+let alice = K1.ECDA.Recovarable.PrivateKey()
+let message: Data = // from somewhere
+let digest = SHA256.hash(data: message)
+let signature: K1.ECDSA.Recoverable.Signature = try alice.signature(for: digest)
+let publicKey: K1.ECDSA.Recoverable.PublicKey = alice.publicKey
+assert(
+    publicKey.isValidSignature(signature, digest: digest)
+) // PASS
+```
 
 
 # Schnorr Signature Scheme
@@ -52,18 +158,20 @@ Or alternatively `isValidECDSASignature:digest` or `isValidECDSASignature:hashed
 ## Sign
 
 ```swift
-let signature = try alice.schnorrSign(unhashed: message)
+let alice = K1.Schnorr.PrivateKey()
+let signature = try alice.signature(forUnhashed: message)
 ```
 
-There exists other sign variants, `schnorrSign:digest` and `schnorrSign:hashed` if you already have a signed message. All three variants accepts a `Schnorr.Input` struct where you can pass `auxiliaryRandomData` to be signed.
+There exists other sign variants, `signature:for:options` (hashed data) and `signature:for:options` (`Digest`) if you already have a hashed message. All three variants takes a `K1.Schnorr.SigningOptions` struct where you can pass `auxiliaryRandomData` to be signed.
 
 ## Validate
 
 ```swift
-assert(alice.publicKey.isValidSchnorrSignature(signature, unhashed: message)) // PASS
+let publicKey: K1.Schnorr.PublicKey = alice.publicKey
+assert(publicKey.isValidSignature(signature, unhashed: message)) // PASS
 ```
 
-Or alternatively `isValidSchnorrSignature:digest` or `isValidSchnorrSignature:hashed`.
+Or alternatively `isValidSignature:digest` or `isValidSignature:hashed`.
 
 #### Schnorr Scheme
 
@@ -80,8 +188,8 @@ This library vendors three different EC Diffie-Hellman (ECDH) key exchange funct
 3. Custom - No hash, return point uncompressed - `ecdhPoint -> Data`
 
 ```swift
-let alice = try K1.PrivateKey()
-let bob = try K1.PrivateKey()
+let alice = try K1.KeyAgreement.PrivateKey()
+let bob = try K1.KeyAgreement.PrivateKey()
 ```
 
 ## `ASN1 x9.63` ECDH
@@ -126,6 +234,7 @@ assert(ab == ba) // pass
 assert(ab.count == 65) // pass
 ```
 
+
 # Acknowledgements
 `K1` is a Swift wrapper around [libsecp256k1][lib], so this library would not exist without the Bitcoin Core developers. Massive thank you for a wonder ful library! I've included it as a submodule, without any changes to the code, i.e. with copyright headers in files intact.
 
@@ -151,6 +260,7 @@ To clone the dependency [libsecp256k1][lib], using commit [427bc3cdcfbc747780704
 - [Sajjon/EllipticCurveKit](https://github.com/Sajjon/EllipticCurveKit) (Custom ECC impl (mine), ☣️ unsafe, ✅ Schnorr support)
 
 
+[ck]: https://developer.apple.com/documentation/cryptokit
 [BIP340]: https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
 [lib]: https://github.com/bitcoin-core/secp256k1
 [x963]: https://webstore.ansi.org/standards/ascx9/ansix9632011r2017

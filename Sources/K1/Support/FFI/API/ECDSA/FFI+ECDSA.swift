@@ -36,10 +36,13 @@ extension FFI.ECDSA {
     internal static func _sign<WrappedSignature>(
         message: [UInt8],
         privateKey: FFI.PrivateKey.Wrapped,
-        input: K1.ECDSA.SigningOptions = .default
+        options: K1.ECDSA.SigningOptions = .default
     ) throws -> WrappedSignature where WrappedSignature: WrappedECDSASignature {
         guard message.count == Curve.Field.byteCount else {
-            throw K1.Error.unableToSignMessageHasInvalidLength(got: message.count, expected: Curve.Field.byteCount)
+            throw K1.Error.unableToSignMessageHasInvalidLength(
+                got: message.count,
+                expected: Curve.Field.byteCount
+            )
         }
     
         var raw = WrappedSignature.Raw()
@@ -52,8 +55,8 @@ extension FFI.ECDSA {
                 &raw,
                 message,
                 privateKey.secureBytes.backing.bytes,
-                input.nonceFunction.function(),
-                input.arbitraryData
+                options.nonceFunction.function(),
+                options.arbitraryData
             )
         }
         

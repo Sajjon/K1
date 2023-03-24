@@ -8,21 +8,21 @@
 import CryptoKit
 import Foundation
 
-protocol K1KeyExportable {
+public protocol K1KeyExportable {
     var rawRepresentation: Data { get }
     var x963Representation: Data { get }
     var derRepresentation: Data { get }
     var pemRepresentation: String { get }
 }
 
-protocol K1KeyImportable {
+public protocol K1KeyImportable {
     init(rawRepresentation: some ContiguousBytes) throws
     init(x963Representation: some ContiguousBytes) throws
     init(derRepresentation: some RandomAccessCollection<UInt8>) throws
     init(pemRepresentation: String) throws
 }
 
-typealias K1KeyPortable = K1KeyImportable & K1KeyExportable
+public typealias K1KeyPortable = K1KeyImportable & K1KeyExportable
 
 protocol K1PrivateKeyProtocol: K1KeyPortable {
     associatedtype PublicKey: K1PublicKeyProtocol

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct PrivateKeyOf<Feature>: Sendable, Hashable, K1PrivateKeyProtocol {
+public struct PrivateKeyOf<Feature: K1Feature>: Sendable, Hashable, K1PrivateKeyProtocol {
     public init() {
         self.init(impl: .init())
     }
@@ -47,9 +47,10 @@ public struct PrivateKeyOf<Feature>: Sendable, Hashable, K1PrivateKeyProtocol {
     internal let impl: K1.PrivateKey
     internal let publicKeyImpl: K1.PublicKey
     
-    public typealias PublicKey = PublicKeyOf<K1.KeyAgreement>
+    public typealias PublicKey = Feature.PublicKey
+    
     public var publicKey: PublicKey {
-        .init(impl: publicKeyImpl)
+        try! .init(rawRepresentation: publicKeyImpl.rawRepresentation)
     }
     
     public init(impl: K1.PrivateKey) {

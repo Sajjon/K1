@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol K1PublicKeyProtocol: K1KeyPortable {
+public protocol K1PublicKeyProtocol: K1KeyPortable {
     init(compressedRepresentation: some ContiguousBytes) throws
     var compressedRepresentation: Data { get }
 }

@@ -6,13 +6,108 @@
 //
 
 import Foundation
-import CryptoKit
+import protocol CryptoKit.Digest
+import struct CryptoKit.SHA256
 
 extension K1.ECDSA {
-    public enum Recoverable {
+    public enum Recoverable: K1Feature {
         public typealias PrivateKey = PrivateKeyOf<Self>
-        public typealias PublicKey = PrivateKey.PublicKey
+        public typealias PublicKey = PublicKeyOf<Self>
     }
+}
+
+// MARK: Sign
+extension K1.ECDSA.Recoverable.PrivateKey {
+    public func signature(
+        for hashedMessage: some DataProtocol,
+        options: K1.ECDSA.SigningOptions = .default
+    ) throws -> K1.ECDSA.Recoverable.Signature {
+        try K1.ECDSA.Recoverable.Signature(
+            wrapped: FFI.ECDSA.Recovery.sign(
+                hashedMessage: [UInt8](hashedMessage),
+                privateKey: impl.wrapped,
+                options: options
+            )
+        )
+    }
+    
+    public func signature(
+        for digest: some Digest,
+        options: K1.ECDSA.SigningOptions = .default
+    ) throws -> K1.ECDSA.Recoverable.Signature {
+        try signature(
+            for: Data(digest),
+            options: options
+        )
+    }
+    
+    /// SHA256 hashes `unhashed` before signing it.
+    public func signature(
+        forUnhashed unhashed: some DataProtocol,
+        options: K1.ECDSA.SigningOptions = .default
+    ) throws -> K1.ECDSA.Recoverable.Signature {
+        try signature(
+            for: SHA256.hash(data: unhashed),
+            options: options
+        )
+    }
+
+}
+
+// MARK: Validate
+extension K1.ECDSA.Recoverable.PublicKey {
+    /// Converts a recoverable ECDSA signature to
+    /// non-recoverable and validates it against
+    /// a `SHA256` hashed messages for this public key.
+    public func isValidSignature(
+        _ signature: K1.ECDSA.Recoverable.Signature,
+        hashed: some DataProtocol,
+        options: K1.ECDSA.ValidationOptions = .default
+    ) -> Bool {
+        do {
+            let publicKeyNonRecoverable = try K1.ECDSA.NonRecoverable.PublicKey(rawRepresentation: self.rawRepresentation)
+            let signatureNonRecoverable = try signature.nonRecoverable()
+            
+            return publicKeyNonRecoverable.isValidSignature(
+                signatureNonRecoverable,
+                hashed: hashed,
+                options: options
+            )
+        } catch {
+            return false
+        }
+    }
+    
+    /// Converts a recoverable ECDSA signature to
+    /// non-recoverable and validates it against
+    /// a `SHA256` hashed messages for this public key.
+    public func isValidSignature(
+        _ signature: K1.ECDSA.Recoverable.Signature,
+        digest: some Digest,
+        options: K1.ECDSA.ValidationOptions = .default
+    ) -> Bool {
+        isValidSignature(
+            signature,
+            hashed: Data(digest),
+            options: options
+        )
+    }
+
+    /// `SHA256` hashed messages and converts a
+    /// recoverable ECDSA signature to non-recoverable and
+    /// validates it against the hashed message for this public key.
+    public func isValidSignature(
+        _ signature: K1.ECDSA.Recoverable.Signature,
+        unhashed: some DataProtocol,
+        options: K1.ECDSA.ValidationOptions = .default
+    ) -> Bool {
+        isValidSignature(
+            signature,
+            digest: SHA256.hash(data: unhashed),
+            options: options
+        )
+    }
+    
 }
 
 extension K1.ECDSA.Recoverable {

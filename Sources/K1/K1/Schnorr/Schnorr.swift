@@ -11,45 +11,45 @@ import struct CryptoKit.SHA256
 
 
 extension K1 {
-    public enum Schnorr {
+    public enum Schnorr: K1Feature {
         public typealias PrivateKey = PrivateKeyOf<Self>
-        public typealias PublicKey = PrivateKey.PublicKey
+        public typealias PublicKey = PublicKeyOf<Self>
     }
 }
 
 // MARK: Sign
 extension K1.Schnorr.PrivateKey {
-    public func sign(
-        hashed: some DataProtocol,
-        input: K1.Schnorr.SigningOptions = .default
+    public func signature(
+        for hashed: some DataProtocol,
+        options: K1.Schnorr.SigningOptions = .default
     ) throws -> K1.Schnorr.Signature {
         try K1.Schnorr.Signature(
             wrapped: FFI.Schnorr.sign(
                 hashedMessage: [UInt8](hashed),
                 privateKey: impl.wrapped,
-                input: input
+                options: options
             )
         )
     }
     
-    public func sign(
-        digest: some Digest,
-        input: K1.Schnorr.SigningOptions = .default
+    public func signature(
+        for digest: some Digest,
+        options: K1.Schnorr.SigningOptions = .default
     ) throws -> K1.Schnorr.Signature {
-        try sign(
-            hashed: [UInt8](digest),
-            input: input
+        try signature(
+            for: [UInt8](digest),
+            options: options
         )
     }
     
     /// SHA256 hashes `unhashed` before signing it.
-    public func sign(
-        unhashed: some DataProtocol,
-        input: K1.Schnorr.SigningOptions = .default
+    public func signature(
+        forUnhashed unhashed: some DataProtocol,
+        options: K1.Schnorr.SigningOptions = .default
     ) throws -> K1.Schnorr.Signature {
-        try sign(
-            digest: SHA256.hash(data: unhashed),
-            input: input
+        try signature(
+            for: SHA256.hash(data: unhashed),
+            options: options
         )
     }
 }

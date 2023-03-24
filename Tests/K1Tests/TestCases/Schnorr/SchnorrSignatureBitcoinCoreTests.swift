@@ -104,9 +104,9 @@ private extension SchnorrSignatureBitcoinCoreTests {
         )
 
         let message = try Data(hex: vector.messageHex)
-        let signature = try privateKey.sign(
-            hashed: message,
-            input: .init(auxilaryRandomData: .init(aux: Data(hex: vector.auxDataHex)))
+        let signature = try privateKey.signature(
+            for: message,
+            options: .init(auxilaryRandomData: .init(aux: Data(hex: vector.auxDataHex)))
         )
 
         let expectedSig = try K1.Schnorr.Signature(rawRepresentation: Data(hex: vector.signatureCompact))

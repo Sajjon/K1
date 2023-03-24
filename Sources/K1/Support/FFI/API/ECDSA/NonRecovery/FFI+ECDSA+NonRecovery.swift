@@ -162,13 +162,13 @@ extension FFI.ECDSA.NonRecovery {
     static func sign(
         hashedMessage: [UInt8],
         privateKey: FFI.PrivateKey.Wrapped,
-        input: K1.ECDSA.SigningOptions = .default
+        options: K1.ECDSA.SigningOptions = .default
     ) throws -> FFI.ECDSA.NonRecovery.Wrapped {
         
         try FFI.ECDSA._sign(
             message: hashedMessage,
             privateKey: privateKey,
-            input: input
+            options: options
         )
     }
 }

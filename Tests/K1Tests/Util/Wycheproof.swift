@@ -82,13 +82,13 @@ extension XCTestCase {
             throw ECDSASignatureTestError(description: errorMessage)
         }
         let keyBytes = try Array(hex: group.key.uncompressed)
-        let key = try PublicKey(x963Representation: keyBytes)
+        let key = try K1.ECDSA.NonRecoverable.PublicKey(x963Representation: keyBytes)
         
-        let keyFromDER = try PublicKey(derRepresentation: Data(hex: group.keyDer))
+        let keyFromDER = try K1.ECDSA.NonRecoverable.PublicKey(derRepresentation: Data(hex: group.keyDer))
         XCTAssertEqual(key.derRepresentation.hex, group.keyDer)
         XCTAssertEqual(keyFromDER, key)
         
-        let keyFromPEM = try PublicKey(pemRepresentation: group.keyPem)
+        let keyFromPEM = try K1.ECDSA.NonRecoverable.PublicKey(pemRepresentation: group.keyPem)
         XCTAssertEqual(key.pemRepresentation, group.keyPem)
         XCTAssertEqual(keyFromPEM, key)
 
@@ -115,7 +115,7 @@ extension XCTestCase {
         let xOnly = try ensure32Bytes(compactXRaw)
         let yOnly = try ensure32Bytes(compactYRaw)
             
-        let fromRaw = try PublicKey(rawRepresentation: xOnly + yOnly)
+        let fromRaw = try K1.ECDSA.NonRecoverable.PublicKey(rawRepresentation: xOnly + yOnly)
         XCTAssertEqual(fromRaw, key)
         
         var numberOfTestsRun = 0
@@ -140,7 +140,7 @@ extension XCTestCase {
             let signature = try testVector.expectedSignature()
             let messageDigest = try testVector.messageDigest()
             
-            isValid = key.isValidECDSASignature(
+            isValid = key.isValidSignature(
                 signature,
                 digest: messageDigest,
                 options: signatureValidationMode
@@ -213,9 +213,6 @@ protocol WycheproofTestVector: SignatureTestVector where Signature == K1.ECDSA.N
     var comment: String { get }
 }
 
-
-typealias PublicKey = K1.PublicKey
-typealias PrivateKey = K1.PrivateKey
 
 
 struct ECDSASignatureTestError: Swift.Error, CustomStringConvertible {

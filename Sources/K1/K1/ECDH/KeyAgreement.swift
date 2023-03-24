@@ -8,10 +8,14 @@
 import Foundation
 import struct CryptoKit.SharedSecret
 
+public protocol K1Feature {
+    associatedtype PublicKey: K1PublicKeyProtocol
+}
+
 extension K1 {
-    public enum KeyAgreement {
+    public enum KeyAgreement: K1Feature {
         public typealias PrivateKey = PrivateKeyOf<Self>
-        public typealias PublicKey = PrivateKey.PublicKey
+        public typealias PublicKey = PublicKeyOf<Self>
     }
 }
 

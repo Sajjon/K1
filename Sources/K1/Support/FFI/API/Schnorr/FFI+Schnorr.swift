@@ -14,6 +14,7 @@ extension FFI {
 
 // MARK: Schnorr Validate
 extension FFI.Schnorr {
+    
     static func isValid(
         signature: FFI.Schnorr.Wrapped,
         publicKey: FFI.PublicKey.Wrapped,
@@ -47,14 +48,22 @@ extension FFI.Schnorr {
 
 // MARK: Schnorr Sign
 extension FFI.Schnorr {
+    
     static func sign(
         hashedMessage message: [UInt8],
         privateKey: FFI.PrivateKey.Wrapped,
-        input: K1.Schnorr.SigningOptions = .default
+        options: K1.Schnorr.SigningOptions = .default
     ) throws -> FFI.Schnorr.Wrapped {
-        guard message.count == Curve.Field.byteCount else {
-            throw K1.Error.unableToSignMessageHasInvalidLength(got: message.count, expected: Curve.Field.byteCount)
+        
+        guard
+            message.count == Curve.Field.byteCount
+        else {
+            throw K1.Error.unableToSignMessageHasInvalidLength(
+                got: message.count,
+                expected: Curve.Field.byteCount
+            )
         }
+        
         var signatureOut = [UInt8](repeating: 0, count: FFI.Schnorr.Wrapped.byteCount)
         
         var keyPair = secp256k1_keypair()
@@ -62,7 +71,11 @@ extension FFI.Schnorr {
         try FFI.call(
             ifFailThrow: .failedToInitializeKeyPairForSchnorrSigning
         ) { context in
-            secp256k1_keypair_create(context, &keyPair, privateKey.secureBytes.backing.bytes)
+            secp256k1_keypair_create(
+                context,
+                &keyPair,
+                privateKey.secureBytes.backing.bytes
+            )
         }
         
         
@@ -74,7 +87,7 @@ extension FFI.Schnorr {
                 &signatureOut,
                 message,
                 &keyPair,
-                input.auxilaryRandomData?.aux
+                options.auxilaryRandomData?.aux
             )
         }
         
