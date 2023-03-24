@@ -15,7 +15,7 @@ extension K1.PrivateKey {
     /// Generates an Elliptic Curve Digital Signature Algorithm (ECDSA) signature of _hashed_ data you provide over the `secp256k1` elliptic curve.
     public func ecdsaSignNonRecoverable(
         hashed: some DataProtocol,
-        input: K1.ECDSA.SigningInput = .default
+        input: K1.ECDSA.SigningOptions = .default
     ) throws -> ECDSASignatureNonRecoverable {
         try ECDSASignatureNonRecoverable(
             wrapped: FFI.ECDSA.NonRecovery.sign(
@@ -29,7 +29,7 @@ extension K1.PrivateKey {
     /// Generates an Elliptic Curve Digital Signature Algorithm (ECDSA) signature of the digest you provide over the `secp256k1` elliptic curve.
     public func ecdsaSignNonRecoverable(
         digest: some Digest,
-        input: K1.ECDSA.SigningInput = .default
+        input: K1.ECDSA.SigningOptions = .default
     ) throws -> ECDSASignatureNonRecoverable {
         try ecdsaSignNonRecoverable(
             hashed: Data(digest),
@@ -40,7 +40,7 @@ extension K1.PrivateKey {
     /// Generates an elliptic curve digital signature algorithm (ECDSA) signature of the given data over the `secp256k1` elliptic curve, using SHA-256 as a hash function.
     public func ecdsaSignNonRecoverable(
         unhashed: some DataProtocol,
-        input: K1.ECDSA.SigningInput = .default
+        input: K1.ECDSA.SigningOptions = .default
     ) throws -> ECDSASignatureNonRecoverable {
         try ecdsaSignNonRecoverable(
             digest: SHA256.hash(data: unhashed),

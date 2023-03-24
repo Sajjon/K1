@@ -16,19 +16,19 @@ extension K1.PublicKey {
     /// - Parameters:
     ///   - signature: The (non-recoverable) signature to check against the _hashed_ data.
     ///   - hashed: The _hashed_ data covered by the signature.
-    ///   - mode: Whether or not to consider malleable signatures valid.
+    ///   - options: Whether or not to consider malleable signatures valid.
     /// - Returns: A Boolean value that’s true if the signature is valid for the given _hashed_ data.
     public func isValidECDSASignature(
         _ signature: ECDSASignatureNonRecoverable,
         hashed: some DataProtocol,
-        input: K1.ECDSA.ValidationInput = .default
+        options: K1.ECDSA.ValidationOptions = .default
     ) -> Bool {
         do {
             return try FFI.ECDSA.NonRecovery.isValid(
                 ecdsaSignature: signature.wrapped,
                 publicKey: self.wrapped,
                 message: [UInt8](hashed),
-                input: input
+                options: options
             )
         } catch {
             return false
@@ -39,17 +39,17 @@ extension K1.PublicKey {
     /// - Parameters:
     ///   - signature: The (non-recoverable) signature to check against the given digest.
     ///   - digest: The digest covered by the signature.
-    ///   - mode: Whether or not to consider malleable signatures valid.
+    ///   - options: Whether or not to consider malleable signatures valid.
     /// - Returns: A Boolean value that’s true if the signature is valid for the given digest.
     public func isValidECDSASignature(
         _ signature: ECDSASignatureNonRecoverable,
         digest: some Digest,
-        input: K1.ECDSA.ValidationInput = .default
+        options: K1.ECDSA.ValidationOptions = .default
     ) -> Bool {
         isValidECDSASignature(
             signature,
             hashed: Data(digest),
-            input: input
+            options: options
         )
     }
 
@@ -60,12 +60,12 @@ extension K1.PublicKey {
     public func isValidECDSASignature(
         _ signature: ECDSASignatureNonRecoverable,
         unhashed: some DataProtocol,
-        input: K1.ECDSA.ValidationInput = .default
+        options: K1.ECDSA.ValidationOptions = .default
     ) -> Bool {
         isValidECDSASignature(
             signature,
             digest: SHA256.hash(data: unhashed),
-            input: input
+            options: options
         )
     }
 }

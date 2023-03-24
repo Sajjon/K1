@@ -34,7 +34,7 @@ let signature = try alice.ecdsaSignRecoverable(unhashed: message)
 Which SHA256 hashes the message before signing it. Alternatively you can also use `ecdsaSignRecoverable:hashed` or `ecdsaSignRecoverable:digest` if you already have hashed the message yourself.
 
 ### Options
-Both recovery and non-recovery signature methods takes a `SigningInput` struct, which by default specifies [`RFC6979`][rfc6979] deterministic signing, as per Bitcoin standard, however, you can change to use secure random nonce instead.
+Both recovery and non-recovery signature methods takes a `SigningOptions` struct, which by default specifies [`RFC6979`][rfc6979] deterministic signing, as per Bitcoin standard, however, you can change to use secure random nonce instead.
 
 ## Validate
 
@@ -44,7 +44,7 @@ Both `ECDSASignatureNonRecoverable` and `ECDSASignatureRecoverable` share the sa
 assert(alice.publicKey.isValidECDSASignature(signature, unhashed: message)) // PASS
 ```
 
-Or alternatively `isValidECDSASignature:digest` or `isValidECDSASignature:hashed`. All variants takes a `ValidationInput` struct, which specifies if [malleaable signatures][mall] should be accepted or rejected.
+Or alternatively `isValidECDSASignature:digest` or `isValidECDSASignature:hashed`. All variants takes a `ValidationOptions` struct, which specifies if [malleaable signatures][mall] should be accepted or rejected.
 
 
 # Schnorr Signature Scheme

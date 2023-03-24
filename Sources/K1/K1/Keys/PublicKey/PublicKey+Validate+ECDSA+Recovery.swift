@@ -17,13 +17,13 @@ extension K1.PublicKey {
     public func isValidECDSASignature(
         _ signature: ECDSASignatureRecoverable,
         hashed: some DataProtocol,
-        input: K1.ECDSA.ValidationInput = .default
+        options: K1.ECDSA.ValidationOptions = .default
     ) -> Bool {
         do {
             return try isValidECDSASignature(
                 signature.nonRecoverable(),
                 hashed: hashed,
-                input: input
+                options: options
             )
         } catch {
             return false
@@ -36,13 +36,13 @@ extension K1.PublicKey {
     public func isValidECDSASignature(
         _ signature: ECDSASignatureRecoverable,
         digest: some Digest,
-        input: K1.ECDSA.ValidationInput = .default
+        options: K1.ECDSA.ValidationOptions = .default
     ) -> Bool {
         do {
             return try isValidECDSASignature(
                 signature.nonRecoverable(),
                 digest: digest,
-                input: input
+                options: options
             )
         } catch {
             return false
@@ -55,13 +55,13 @@ extension K1.PublicKey {
     public func isValidECDSASignature(
         _ signature: ECDSASignatureRecoverable,
         unhashed: some DataProtocol,
-        input: K1.ECDSA.ValidationInput = .default
+        options: K1.ECDSA.ValidationOptions = .default
     ) -> Bool {
         do {
             return try isValidECDSASignature(
                 signature.nonRecoverable(),
                 unhashed: unhashed,
-                input: input
+                options: options
             )
         } catch {
             return false

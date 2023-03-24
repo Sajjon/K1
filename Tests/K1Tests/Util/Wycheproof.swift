@@ -70,7 +70,7 @@ extension XCTestCase {
     
     func doTestGroup<HF: HashFunction, TV: WycheproofTestVector>(
         group: ECDSAWycheTestGroup<TV>,
-        signatureValidationMode: K1.ECDSA.ValidationInput = .default,
+        signatureValidationMode: K1.ECDSA.ValidationOptions = .default,
         hashFunction: HF.Type,
         skipIfContainsFlags: [String] = [],
         skipIfContainsComment: [String] = [],
@@ -143,7 +143,7 @@ extension XCTestCase {
             isValid = key.isValidECDSASignature(
                 signature,
                 digest: messageDigest,
-                input: signatureValidationMode
+                options: signatureValidationMode
             )
         } catch {
             let expectedFailure = testVector.result == "invalid" || testVector.result == "acceptable"

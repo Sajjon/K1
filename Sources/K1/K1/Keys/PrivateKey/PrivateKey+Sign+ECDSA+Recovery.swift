@@ -13,7 +13,7 @@ import struct CryptoKit.SHA256
 extension K1.PrivateKey {
     public func ecdsaSignRecoverable(
         hashed hashedMessage: some DataProtocol,
-        input: K1.ECDSA.SigningInput = .default
+        input: K1.ECDSA.SigningOptions = .default
     ) throws -> ECDSASignatureRecoverable {
         try ECDSASignatureRecoverable(
             wrapped: FFI.ECDSA.Recovery.sign(
@@ -26,7 +26,7 @@ extension K1.PrivateKey {
     
     public func ecdsaSignRecoverable(
         digest: some Digest,
-        input: K1.ECDSA.SigningInput = .default
+        input: K1.ECDSA.SigningOptions = .default
     ) throws -> ECDSASignatureRecoverable {
         try ecdsaSignRecoverable(
             hashed: Data(digest),
@@ -37,7 +37,7 @@ extension K1.PrivateKey {
     /// SHA256 hashes `unhashed` before signing it.
     public func ecdsaSignRecoverable(
         unhashed: some DataProtocol,
-        input: K1.ECDSA.SigningInput = .default
+        input: K1.ECDSA.SigningOptions = .default
     ) throws -> ECDSASignatureRecoverable {
         try ecdsaSignRecoverable(
             digest: SHA256.hash(data: unhashed),
