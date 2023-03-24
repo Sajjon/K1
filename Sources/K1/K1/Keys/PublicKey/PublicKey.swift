@@ -75,6 +75,12 @@ extension K1.PublicKey {
 // MARK: Serialize
 extension K1.PublicKey {
     
+    /// `X || Y` (64 bytes)
+    public var rawRepresentation: Data {
+        Data(x963Representation.dropFirst())
+    }
+    
+    
     /// `04 || X || Y` (65 bytes)
     public var x963Representation: Data {
         try! FFI.PublicKey.serialize(wrapped, format: .uncompressed)
@@ -85,6 +91,7 @@ extension K1.PublicKey {
         try! FFI.PublicKey.serialize(wrapped, format: .compressed)
     }
     
+    /// `DER`
     public var derRepresentation: Data {
         let spki = ASN1.SubjectPublicKeyInfo(
             algorithmIdentifier: .secp256k1,
