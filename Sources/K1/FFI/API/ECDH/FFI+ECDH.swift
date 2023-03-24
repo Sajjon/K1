@@ -42,8 +42,8 @@ extension FFI.ECDH {
         func hashfp() -> (Optional<@convention(c) (Optional<UnsafeMutablePointer<UInt8>>, Optional<UnsafePointer<UInt8>>, Optional<UnsafePointer<UInt8>>, Optional<UnsafeMutableRawPointer>) -> Int32>) {
             switch self {
             case .libsecp256kDefault: return secp256k1_ecdh_hash_function_default
-            case .ansiX963: return ecdh_skip_hash_extract_only_x
-            case .noHashWholePoint: return ecdh_skip_hash_extract_x_and_y
+            case .ansiX963: return ecdh_asn1_x963
+            case .noHashWholePoint: return ecdh_unsafe_whole_point
             }
         }
         
