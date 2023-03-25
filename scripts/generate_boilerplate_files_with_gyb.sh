@@ -16,7 +16,11 @@
 set -eu
 find . -name '*.gyb' |                                               \
     while read file; do                                              \
-		chflags nouchg "${file%.gyb}"; 								\
-        ./scripts/gyb --line-directive '' -o "${file%.gyb}" "$file"; \
-		chflags uchg "${file%.gyb}"; 								\
+		swiftfilename="${file%.gyb}";									\
+        ./scripts/gyb --line-directive '' -o "$swiftfilename" "$file"; \
+        swiftformat "$swiftfilename";									\
+		swiftfile="${swiftfilename%.swift}.generated.swift";					\
+		chflags nouchg "$swiftfile"; 								\
+		mv "$swiftfilename" "$swiftfile";									\
+		chflags uchg "$swiftfile"; 								\
     done

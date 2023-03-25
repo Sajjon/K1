@@ -43,7 +43,6 @@ extension K1 {
 
 // MARK: Inits
 extension K1._PrivateKeyImplementation {
-	/// Creates a `secp256k1` private key from a Privacy-Enhanced Mail (PEM) representation.
 	init(
 		pemRepresentation: String
 	) throws {
@@ -87,7 +86,6 @@ extension K1._PrivateKeyImplementation {
 		// All good
 	}
 
-	/// `DER`
 	init(derRepresentation: some RandomAccessCollection<UInt8>) throws {
 		let bytes = Array(derRepresentation)
 

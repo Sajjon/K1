@@ -6,38 +6,90 @@ import Foundation
 
 %{
 	LIST_KEY_FOR_FEATURE_WITH_DOCS = [
-		{ "feature": "Schnorr", "docSK": "/// A `secp256k1` private key used to create cryptographic signatures,\n\t/// more specifically Schnorr signatures.", "docPK": "/// A `secp256k1` public key used to verify cryptographic signatures,\n\t/// more specifically Schnorr signatures" },
-		{ "feature": "KeyAgreement", "docSK": "/// A `secp256k1` private key used for key agreement.", "docPK": "/// A `secp256k1` public key used for key agreement." },
-		{ "feature": "ECDSA.NonRecoverable", "docSK": "/// A `secp256k1` private key used to create cryptographic signatures,\n\t/// more specifically ECDSA signatures, that do not offer recovery of the public key.", "docPK": "/// A `secp256k1` public key used to verify cryptographic signatures,\n\t/// more specifically ECDSA signatures, that do not offer recovery of the public key." },
-		{ "feature": "ECDSA.Recoverable", "docSK": "/// A `secp256k1` private key used to create cryptographic signatures,\n\t/// more specifically ECDSA signatures that offers recovery of the public key.", "docPK": "/// A `secp256k1` public key used to verify cryptographic signatures.\n\t/// more specifically ECDSA signatures that offers recovery of the public key." },
+		{
+			"feature": "KeyAgreement",
+			"purposeSK": "key agreement",
+			"purposePK": "key agreement",
+			"docSK": "/// A `secp256k1` private key used for key agreement.",
+			"docPK": "/// A `secp256k1` public key used for key agreement."
+		},
+		{
+			"feature": "Schnorr",
+			"purposeSK": "signing",
+			"purposePK": "verifying signatures",
+			"docSK": "/// A `secp256k1` private key used to create cryptographic signatures,\n\t/// more specifically Schnorr signatures.",
+			"docPK": "/// A `secp256k1` public key used to verify cryptographic signatures,\n\t/// more specifically Schnorr signatures"
+		},
+		{
+			"feature": "ECDSA.NonRecoverable",
+			"purposeSK": "signing",
+			"purposePK": "verifying signatures",
+			"docSK": "/// A `secp256k1` private key used to create cryptographic signatures,\n\t/// more specifically ECDSA signatures, that do not offer recovery of the public key.",
+			"docPK": "/// A `secp256k1` public key used to verify cryptographic signatures,\n\t/// more specifically ECDSA signatures, that do not offer recovery of the public key."
+		},
+		{
+			"feature": "ECDSA.Recoverable",
+			"purposeSK": "signing",
+			"purposePK": "verifying signatures",
+			"docSK": "/// A `secp256k1` private key used to create cryptographic signatures,\n\t/// more specifically ECDSA signatures that offers recovery of the public key.",
+			"docPK": "/// A `secp256k1` public key used to verify cryptographic signatures.\n\t/// more specifically ECDSA signatures that offers recovery of the public key."
+		},
 	]
 }%
 % for KEY_FOR_FEATURE_WITH_DOCS in LIST_KEY_FOR_FEATURE_WITH_DOCS:
 %{
 	FEATURE = KEY_FOR_FEATURE_WITH_DOCS["feature"]
-	DocPrivateKey = KEY_FOR_FEATURE_WITH_DOCS["docSK"]
-	DocPublicKey = KEY_FOR_FEATURE_WITH_DOCS["docPK"]
+	PURPOSE_PRIVATEKEY = KEY_FOR_FEATURE_WITH_DOCS["purposeSK"]
+	PURPOSE_PUBLICKEY = KEY_FOR_FEATURE_WITH_DOCS["purposePK"]
+	PRIVATEKEY_TYPE_DOC = KEY_FOR_FEATURE_WITH_DOCS["docSK"]
+	PUBLICKEY_TYPE_DOC = KEY_FOR_FEATURE_WITH_DOCS["docPK"]
 }%
 extension K1.${FEATURE} {
 	// MARK: ${FEATURE} + PrivateKey
-	${DocPrivateKey}
+	${PRIVATEKEY_TYPE_DOC}
 	public struct PrivateKey: Sendable, Hashable, K1PrivateKeyProtocol {
+		
+		typealias Impl = K1._PrivateKeyImplementation
+		public typealias PublicKey = K1.${FEATURE}.PublicKey
+
+		internal let impl: Impl
+		internal let publicKeyImpl: K1._PublicKeyImplementation
+
+		/// The corresponding public key.
+		public var publicKey: PublicKey {
+			try! .init(rawRepresentation: publicKeyImpl.rawRepresentation)
+		}
+
+		init(impl: Impl) {
+			self.impl = impl
+			self.publicKeyImpl = impl.publicKey
+		}
+		
+		/// Creates a random `secp256k1` private key for ${PURPOSE_PRIVATEKEY}.
 		public init() {
 			self.init(impl: .init())
 		}
 
+		/// Creates a `secp256k1` private key for ${PURPOSE_PRIVATEKEY} from a data representation of the key.
+		/// - Parameter rawRepresentation: A raw representation of the key as a collection of contiguous bytes.
 		public init(rawRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
 		}
 
+		/// Creates a `secp256k1` private key for  ${PURPOSE_PRIVATEKEY}  from an ANSI x9.63 representation of the key.
+		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
 		public init(x963Representation: some ContiguousBytes) throws {
 			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
+		/// Creates a `secp256k1` private key for  ${PURPOSE_PRIVATEKEY} from a Distinguished Encoding Rules (DER) encoded representation of the key.
+		/// - Parameter derRepresentation: A DER-encoded representation of the key.
 		public init(derRepresentation: some RandomAccessCollection<UInt8>) throws {
 			try self.init(impl: .init(derRepresentation: derRepresentation))
 		}
 
+		/// Creates a `secp256k1` private key for ${PURPOSE_PRIVATEKEY} from a Privacy-Enhanced Mail (PEM) representation of the key.
+		/// - Parameter pemRepresentation: A PEM representation of the key.
 		public init(pemRepresentation: String) throws {
 			try self.init(impl: .init(pemRepresentation: pemRepresentation))
 		}
@@ -57,25 +109,18 @@ extension K1.${FEATURE} {
 		public var pemRepresentation: String {
 			impl.pemRepresentation
 		}
-
-		typealias Impl = K1._PrivateKeyImplementation
-		internal let impl: Impl
-		internal let publicKeyImpl: K1._PublicKeyImplementation
-
-		public typealias PublicKey = K1.${FEATURE}.PublicKey
-		public var publicKey: PublicKey {
-			try! .init(rawRepresentation: publicKeyImpl.rawRepresentation)
-		}
-
-		init(impl: Impl) {
-			self.impl = impl
-			self.publicKeyImpl = impl.publicKey
-		}
 	}
 
 	// MARK: ${FEATURE} + PublicKey
-	${DocPublicKey}
+	${PUBLICKEY_TYPE_DOC}
 	public struct PublicKey: Sendable, Hashable, K1PublicKeyProtocol {
+		
+		typealias Impl = K1._PublicKeyImplementation
+		internal let impl: Impl
+		internal init(impl: Impl) {
+			self.impl = impl
+		}
+		
 		public init(rawRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
 		}
@@ -115,14 +160,8 @@ extension K1.${FEATURE} {
 		public var pemRepresentation: String {
 			impl.pemRepresentation
 		}
-
-		typealias Impl = K1._PublicKeyImplementation
-		internal let impl: Impl
-		internal init(impl: Impl) {
-			self.impl = impl
-		}
 	}
 }
 
-	% end
-	% end
+% end
+% end
