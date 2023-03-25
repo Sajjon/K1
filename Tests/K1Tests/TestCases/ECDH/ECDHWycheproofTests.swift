@@ -26,14 +26,12 @@ import XCTest
 // MARK: - ECDHWycheproofTests
 final class ECDHWycheproofTests: XCTestCase {
 	func testECDHWycheproof() throws {
-		let result = try testSuite(
+		let _ = try testSuite(
 			jsonName: "wycheproof_ecdh_ASN1x963",
 			testFunction: { (group: ECDHTestGroup) in
 				testGroup(group: group)
 			}
 		)
-
-		print("☑️ \(String(describing: result))")
 	}
 }
 
