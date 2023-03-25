@@ -1,0 +1,16 @@
+--swiftversion 5.6
+
+# format options
+--allman false # Prefer `K&R` https://en.wikipedia.org/wiki/Indentation_style#K&R_style
+--indent tab
+--tabwidth 4
+
+--stripunusedargs closure-only
+--enable marktypes
+--disable redundantNilInit,redundantSelf,extensionAccessControl
+--lineaftermarks false
+--ifdef no-indent
+--header strip
+
+# file options
+--exclude .build,Sources/secp256k1,Sources/K1/Support/ThirdyParty
