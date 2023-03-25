@@ -6,13 +6,7 @@ import Foundation
 extension K1 {
 	/// A mechanism used to create or verify a cryptographic signature using the `secp256k1` and Schnorr signature scheme.
 	public enum Schnorr {
-		/// A `secp256k1` private key used to create cryptographic signatures,
-		/// more specifically Schnorr signatures.
-		case privKeyDoc
-
-		/// A `secp256k1` public key used to verify cryptographic signatures,
-		/// more specifically Schnorr signatures.
-		case pubKeyDoc
+		// Just a namespace
 	}
 }
 

@@ -6,18 +6,14 @@ import Foundation
 extension K1.ECDSA {
 	/// A mechanism used to create or verify a cryptographic signature using the `secp256k1` elliptic curve digital signature algorithm (ECDSA), signatures that do not offer recovery of the public key.
 	public enum NonRecoverable {
-		/// A `secp256k1` private key used to create cryptographic signatures,
-		/// more specifically ECDSA signatures, that do not offer recovery of the public key.
-		case privKeyDoc
-
-		/// A `secp256k1` public key used to verify cryptographic signatures,
-		/// more specifically ECDSA signatures, that do not offer recovery of the public key.
-		case pubKeyDoc
+		// Just a namespace
 	}
 }
 
 // MARK: - K1.ECDSA.NonRecoverable.Signature
 extension K1.ECDSA.NonRecoverable {
+	/// A `secp256k1` elliptic curve digital signature algorithm (ECDSA) signature,
+	/// from which users can recover a public key with the message that was signed.
 	public struct Signature: Sendable, Hashable, ContiguousBytes {
 		typealias Wrapped = FFI.ECDSA.NonRecovery.Wrapped
 		internal let wrapped: Wrapped

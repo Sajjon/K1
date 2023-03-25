@@ -6,10 +6,10 @@ import Foundation
 
 %{
 	LIST_KEY_FOR_FEATURE_WITH_DOCS = [
-		{ "feature": "Schnorr", "docSK": "private key for schnoriri", "docPK": "pub key for schnooorrriiii" },
-		{ "feature": "KeyAgreement", "docSK": "private key for keyagremt", "docPK": "pub key for ec dh adhd" },
-		{ "feature": "ECDSA.NonRecoverable", "docSK": "sign key nonrec", "docPK": "pub key verif key nonrec" },
-		{ "feature": "ECDSA.Recoverable", "docSK": "sign key reccco", "docPK": "pub key verif key recoo" },
+		{ "feature": "Schnorr", "docSK": "/// A `secp256k1` private key used to create cryptographic signatures,\n\t/// more specifically Schnorr signatures.", "docPK": "/// A `secp256k1` public key used to verify cryptographic signatures,\n\t/// more specifically Schnorr signatures" },
+		{ "feature": "KeyAgreement", "docSK": "/// A `secp256k1` private key used for key agreement.", "docPK": "/// A `secp256k1` public key used for key agreement." },
+		{ "feature": "ECDSA.NonRecoverable", "docSK": "/// A `secp256k1` private key used to create cryptographic signatures,\n\t/// more specifically ECDSA signatures, that do not offer recovery of the public key.", "docPK": "/// A `secp256k1` public key used to verify cryptographic signatures,\n\t/// more specifically ECDSA signatures, that do not offer recovery of the public key." },
+		{ "feature": "ECDSA.Recoverable", "docSK": "/// A `secp256k1` private key used to create cryptographic signatures,\n\t/// more specifically ECDSA signatures that offers recovery of the public key.", "docPK": "/// A `secp256k1` public key used to verify cryptographic signatures.\n\t/// more specifically ECDSA signatures that offers recovery of the public key." },
 	]
 }%
 % for KEY_FOR_FEATURE_WITH_DOCS in LIST_KEY_FOR_FEATURE_WITH_DOCS:
@@ -18,10 +18,9 @@ import Foundation
 	DocPrivateKey = KEY_FOR_FEATURE_WITH_DOCS["docSK"]
 	DocPublicKey = KEY_FOR_FEATURE_WITH_DOCS["docPK"]
 }%
-// MARK: - ${FEATURE}
 extension K1.${FEATURE} {
-	// MARK: PrivateKey
-	/// ${DocPrivateKey}
+	// MARK: ${FEATURE} + PrivateKey
+	${DocPrivateKey}
 	public struct PrivateKey: Sendable, Hashable, K1PrivateKeyProtocol {
 		public init() {
 			self.init(impl: .init())
@@ -74,8 +73,8 @@ extension K1.${FEATURE} {
 		}
 	}
 
-	// MARK: PublicKey
-	/// ${DocPublicKey}
+	// MARK: ${FEATURE} + PublicKey
+	${DocPublicKey}
 	public struct PublicKey: Sendable, Hashable, K1PublicKeyProtocol {
 		public init(rawRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))

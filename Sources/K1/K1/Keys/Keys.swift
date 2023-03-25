@@ -4,10 +4,10 @@
 
 import Foundation
 
-// MARK: - Schnorr
 extension K1.Schnorr {
-	// MARK: PrivateKey
-	/// private key for schnoriri
+	// MARK: Schnorr + PrivateKey
+	/// A `secp256k1` private key used to create cryptographic signatures,
+	/// more specifically Schnorr signatures.
 	public struct PrivateKey: Sendable, Hashable, K1PrivateKeyProtocol {
 		public init() {
 			self.init(impl: .init())
@@ -60,8 +60,9 @@ extension K1.Schnorr {
 		}
 	}
 
-	// MARK: PublicKey
-	/// pub key for schnooorrriiii
+	// MARK: Schnorr + PublicKey
+	/// A `secp256k1` public key used to verify cryptographic signatures,
+	/// more specifically Schnorr signatures
 	public struct PublicKey: Sendable, Hashable, K1PublicKeyProtocol {
 		public init(rawRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
@@ -111,10 +112,9 @@ extension K1.Schnorr {
 	}
 }
 
-// MARK: - KeyAgreement
 extension K1.KeyAgreement {
-	// MARK: PrivateKey
-	/// private key for keyagremt
+	// MARK: KeyAgreement + PrivateKey
+	/// A `secp256k1` private key used for key agreement.
 	public struct PrivateKey: Sendable, Hashable, K1PrivateKeyProtocol {
 		public init() {
 			self.init(impl: .init())
@@ -167,8 +167,8 @@ extension K1.KeyAgreement {
 		}
 	}
 
-	// MARK: PublicKey
-	/// pub key for ec dh adhd
+	// MARK: KeyAgreement + PublicKey
+	/// A `secp256k1` public key used for key agreement.
 	public struct PublicKey: Sendable, Hashable, K1PublicKeyProtocol {
 		public init(rawRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
@@ -218,10 +218,10 @@ extension K1.KeyAgreement {
 	}
 }
 
-// MARK: - ECDSA.NonRecoverable
 extension K1.ECDSA.NonRecoverable {
-	// MARK: PrivateKey
-	/// sign key nonrec
+	// MARK: ECDSA.NonRecoverable + PrivateKey
+	/// A `secp256k1` private key used to create cryptographic signatures,
+	/// more specifically ECDSA signatures, that do not offer recovery of the public key.
 	public struct PrivateKey: Sendable, Hashable, K1PrivateKeyProtocol {
 		public init() {
 			self.init(impl: .init())
@@ -274,8 +274,9 @@ extension K1.ECDSA.NonRecoverable {
 		}
 	}
 
-	// MARK: PublicKey
-	/// pub key verif key nonrec
+	// MARK: ECDSA.NonRecoverable + PublicKey
+	/// A `secp256k1` public key used to verify cryptographic signatures,
+	/// more specifically ECDSA signatures, that do not offer recovery of the public key.
 	public struct PublicKey: Sendable, Hashable, K1PublicKeyProtocol {
 		public init(rawRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
@@ -325,10 +326,10 @@ extension K1.ECDSA.NonRecoverable {
 	}
 }
 
-// MARK: - ECDSA.Recoverable
 extension K1.ECDSA.Recoverable {
-	// MARK: PrivateKey
-	/// sign key reccco
+	// MARK: ECDSA.Recoverable + PrivateKey
+	/// A `secp256k1` private key used to create cryptographic signatures,
+	/// more specifically ECDSA signatures that offers recovery of the public key.
 	public struct PrivateKey: Sendable, Hashable, K1PrivateKeyProtocol {
 		public init() {
 			self.init(impl: .init())
@@ -381,8 +382,9 @@ extension K1.ECDSA.Recoverable {
 		}
 	}
 
-	// MARK: PublicKey
-	/// pub key verif key recoo
+	// MARK: ECDSA.Recoverable + PublicKey
+	/// A `secp256k1` public key used to verify cryptographic signatures.
+	/// more specifically ECDSA signatures that offers recovery of the public key.
 	public struct PublicKey: Sendable, Hashable, K1PublicKeyProtocol {
 		public init(rawRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
@@ -431,4 +433,3 @@ extension K1.ECDSA.Recoverable {
 		}
 	}
 }
-
