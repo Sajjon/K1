@@ -70,20 +70,40 @@ extension K1.KeyAgreement {
 			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
+		/// A representation of the private key as a collection of bytes.
+		///
+		/// Returns 32 bytes representation of a UInt256 scalar.
 		public var rawRepresentation: Data {
 			impl.rawRepresentation
 		}
 
-		public var x963Representation: Data {
-			impl.x963Representation
-		}
-
+		/// A Distinguished Encoding Rules (DER) encoded representation of the private key.
 		public var derRepresentation: Data {
 			impl.derRepresentation
 		}
 
+		/// A Privacy-Enhanced Mail (PEM) representation of the private key.
+		///
+		/// Returns a string on format:
+		///
+		/// 	-----BEGIN PRIVATE KEY-----
+		///		MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgvddDDSbMRcLWZETSUOyD
+		///		NIr6bL2F1/hw/rkkjELYhVihRANCAAQGOLtZWXDFwKhJhA6mEoorRokGwohvxe1D
+		///		MXhk8/iiD9ZtUygoHEl7AT88R8IYcrqp403A1b+w4LvM0Ih64rQc
+		///		-----END PRIVATE KEY-----
+		///
 		public var pemRepresentation: String {
 			impl.pemRepresentation
+		}
+
+		/// An ANSI x9.63 representation of the private key.
+		///
+		/// Returns 97 bytes on format `04 || X || Y || D`, i.e. the byte prefix `04`,
+		/// followed by 32 bytes X- and Y-coordinates of its public key and then the private
+		/// key itself (UInt256 integers).
+		///
+		public var x963Representation: Data {
+			impl.x963Representation
 		}
 	}
 
@@ -146,24 +166,38 @@ extension K1.KeyAgreement {
 			try self.init(impl: .init(compressedRepresentation: compressedRepresentation))
 		}
 
+		/// A full representation of the public key.
+		///
+		/// Returns 64 bytes on format: `X || Y`
 		public var rawRepresentation: Data {
 			impl.rawRepresentation
 		}
 
-		public var x963Representation: Data {
-			impl.x963Representation
-		}
-
+		/// A Distinguished Encoding Rules (DER) encoded representation of the public key.
 		public var derRepresentation: Data {
 			impl.derRepresentation
 		}
 
-		public var compressedRepresentation: Data {
-			impl.compressedRepresentation
-		}
-
+		/// A Privacy-Enhanced Mail (PEM) representation of the public key.
 		public var pemRepresentation: String {
 			impl.pemRepresentation
+		}
+
+		/// An ANSI x9.63 representation of the public key.
+		///
+		/// Returns 65 bytes on format: `04 || X || Y`, i.e. the byte prefix `04`,
+		/// followed by 32 bytes X- and Y-coordinates (UInt256 integers).
+		public var x963Representation: Data {
+			impl.x963Representation
+		}
+
+		/// A compressed representation of the public key.
+		///
+		/// Returns 33 bytes on format: `02|03 || X`, i.e. either `02` or `03,
+		/// followed by 32 bytes X-coordinate (UInt256 integer).
+		///
+		public var compressedRepresentation: Data {
+			impl.compressedRepresentation
 		}
 	}
 }
@@ -235,20 +269,40 @@ extension K1.Schnorr {
 			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
+		/// A representation of the private key as a collection of bytes.
+		///
+		/// Returns 32 bytes representation of a UInt256 scalar.
 		public var rawRepresentation: Data {
 			impl.rawRepresentation
 		}
 
-		public var x963Representation: Data {
-			impl.x963Representation
-		}
-
+		/// A Distinguished Encoding Rules (DER) encoded representation of the private key.
 		public var derRepresentation: Data {
 			impl.derRepresentation
 		}
 
+		/// A Privacy-Enhanced Mail (PEM) representation of the private key.
+		///
+		/// Returns a string on format:
+		///
+		/// 	-----BEGIN PRIVATE KEY-----
+		///		MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgvddDDSbMRcLWZETSUOyD
+		///		NIr6bL2F1/hw/rkkjELYhVihRANCAAQGOLtZWXDFwKhJhA6mEoorRokGwohvxe1D
+		///		MXhk8/iiD9ZtUygoHEl7AT88R8IYcrqp403A1b+w4LvM0Ih64rQc
+		///		-----END PRIVATE KEY-----
+		///
 		public var pemRepresentation: String {
 			impl.pemRepresentation
+		}
+
+		/// An ANSI x9.63 representation of the private key.
+		///
+		/// Returns 97 bytes on format `04 || X || Y || D`, i.e. the byte prefix `04`,
+		/// followed by 32 bytes X- and Y-coordinates of its public key and then the private
+		/// key itself (UInt256 integers).
+		///
+		public var x963Representation: Data {
+			impl.x963Representation
 		}
 	}
 
@@ -312,24 +366,38 @@ extension K1.Schnorr {
 			try self.init(impl: .init(compressedRepresentation: compressedRepresentation))
 		}
 
+		/// A full representation of the public key.
+		///
+		/// Returns 64 bytes on format: `X || Y`
 		public var rawRepresentation: Data {
 			impl.rawRepresentation
 		}
 
-		public var x963Representation: Data {
-			impl.x963Representation
-		}
-
+		/// A Distinguished Encoding Rules (DER) encoded representation of the public key.
 		public var derRepresentation: Data {
 			impl.derRepresentation
 		}
 
-		public var compressedRepresentation: Data {
-			impl.compressedRepresentation
-		}
-
+		/// A Privacy-Enhanced Mail (PEM) representation of the public key.
 		public var pemRepresentation: String {
 			impl.pemRepresentation
+		}
+
+		/// An ANSI x9.63 representation of the public key.
+		///
+		/// Returns 65 bytes on format: `04 || X || Y`, i.e. the byte prefix `04`,
+		/// followed by 32 bytes X- and Y-coordinates (UInt256 integers).
+		public var x963Representation: Data {
+			impl.x963Representation
+		}
+
+		/// A compressed representation of the public key.
+		///
+		/// Returns 33 bytes on format: `02|03 || X`, i.e. either `02` or `03,
+		/// followed by 32 bytes X-coordinate (UInt256 integer).
+		///
+		public var compressedRepresentation: Data {
+			impl.compressedRepresentation
 		}
 	}
 }
@@ -401,20 +469,40 @@ extension K1.ECDSA.NonRecoverable {
 			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
+		/// A representation of the private key as a collection of bytes.
+		///
+		/// Returns 32 bytes representation of a UInt256 scalar.
 		public var rawRepresentation: Data {
 			impl.rawRepresentation
 		}
 
-		public var x963Representation: Data {
-			impl.x963Representation
-		}
-
+		/// A Distinguished Encoding Rules (DER) encoded representation of the private key.
 		public var derRepresentation: Data {
 			impl.derRepresentation
 		}
 
+		/// A Privacy-Enhanced Mail (PEM) representation of the private key.
+		///
+		/// Returns a string on format:
+		///
+		/// 	-----BEGIN PRIVATE KEY-----
+		///		MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgvddDDSbMRcLWZETSUOyD
+		///		NIr6bL2F1/hw/rkkjELYhVihRANCAAQGOLtZWXDFwKhJhA6mEoorRokGwohvxe1D
+		///		MXhk8/iiD9ZtUygoHEl7AT88R8IYcrqp403A1b+w4LvM0Ih64rQc
+		///		-----END PRIVATE KEY-----
+		///
 		public var pemRepresentation: String {
 			impl.pemRepresentation
+		}
+
+		/// An ANSI x9.63 representation of the private key.
+		///
+		/// Returns 97 bytes on format `04 || X || Y || D`, i.e. the byte prefix `04`,
+		/// followed by 32 bytes X- and Y-coordinates of its public key and then the private
+		/// key itself (UInt256 integers).
+		///
+		public var x963Representation: Data {
+			impl.x963Representation
 		}
 	}
 
@@ -478,24 +566,38 @@ extension K1.ECDSA.NonRecoverable {
 			try self.init(impl: .init(compressedRepresentation: compressedRepresentation))
 		}
 
+		/// A full representation of the public key.
+		///
+		/// Returns 64 bytes on format: `X || Y`
 		public var rawRepresentation: Data {
 			impl.rawRepresentation
 		}
 
-		public var x963Representation: Data {
-			impl.x963Representation
-		}
-
+		/// A Distinguished Encoding Rules (DER) encoded representation of the public key.
 		public var derRepresentation: Data {
 			impl.derRepresentation
 		}
 
-		public var compressedRepresentation: Data {
-			impl.compressedRepresentation
-		}
-
+		/// A Privacy-Enhanced Mail (PEM) representation of the public key.
 		public var pemRepresentation: String {
 			impl.pemRepresentation
+		}
+
+		/// An ANSI x9.63 representation of the public key.
+		///
+		/// Returns 65 bytes on format: `04 || X || Y`, i.e. the byte prefix `04`,
+		/// followed by 32 bytes X- and Y-coordinates (UInt256 integers).
+		public var x963Representation: Data {
+			impl.x963Representation
+		}
+
+		/// A compressed representation of the public key.
+		///
+		/// Returns 33 bytes on format: `02|03 || X`, i.e. either `02` or `03,
+		/// followed by 32 bytes X-coordinate (UInt256 integer).
+		///
+		public var compressedRepresentation: Data {
+			impl.compressedRepresentation
 		}
 	}
 }
@@ -567,20 +669,40 @@ extension K1.ECDSA.Recoverable {
 			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
+		/// A representation of the private key as a collection of bytes.
+		///
+		/// Returns 32 bytes representation of a UInt256 scalar.
 		public var rawRepresentation: Data {
 			impl.rawRepresentation
 		}
 
-		public var x963Representation: Data {
-			impl.x963Representation
-		}
-
+		/// A Distinguished Encoding Rules (DER) encoded representation of the private key.
 		public var derRepresentation: Data {
 			impl.derRepresentation
 		}
 
+		/// A Privacy-Enhanced Mail (PEM) representation of the private key.
+		///
+		/// Returns a string on format:
+		///
+		/// 	-----BEGIN PRIVATE KEY-----
+		///		MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgvddDDSbMRcLWZETSUOyD
+		///		NIr6bL2F1/hw/rkkjELYhVihRANCAAQGOLtZWXDFwKhJhA6mEoorRokGwohvxe1D
+		///		MXhk8/iiD9ZtUygoHEl7AT88R8IYcrqp403A1b+w4LvM0Ih64rQc
+		///		-----END PRIVATE KEY-----
+		///
 		public var pemRepresentation: String {
 			impl.pemRepresentation
+		}
+
+		/// An ANSI x9.63 representation of the private key.
+		///
+		/// Returns 97 bytes on format `04 || X || Y || D`, i.e. the byte prefix `04`,
+		/// followed by 32 bytes X- and Y-coordinates of its public key and then the private
+		/// key itself (UInt256 integers).
+		///
+		public var x963Representation: Data {
+			impl.x963Representation
 		}
 	}
 
@@ -644,24 +766,38 @@ extension K1.ECDSA.Recoverable {
 			try self.init(impl: .init(compressedRepresentation: compressedRepresentation))
 		}
 
+		/// A full representation of the public key.
+		///
+		/// Returns 64 bytes on format: `X || Y`
 		public var rawRepresentation: Data {
 			impl.rawRepresentation
 		}
 
-		public var x963Representation: Data {
-			impl.x963Representation
-		}
-
+		/// A Distinguished Encoding Rules (DER) encoded representation of the public key.
 		public var derRepresentation: Data {
 			impl.derRepresentation
 		}
 
-		public var compressedRepresentation: Data {
-			impl.compressedRepresentation
-		}
-
+		/// A Privacy-Enhanced Mail (PEM) representation of the public key.
 		public var pemRepresentation: String {
 			impl.pemRepresentation
+		}
+
+		/// An ANSI x9.63 representation of the public key.
+		///
+		/// Returns 65 bytes on format: `04 || X || Y`, i.e. the byte prefix `04`,
+		/// followed by 32 bytes X- and Y-coordinates (UInt256 integers).
+		public var x963Representation: Data {
+			impl.x963Representation
+		}
+
+		/// A compressed representation of the public key.
+		///
+		/// Returns 33 bytes on format: `02|03 || X`, i.e. either `02` or `03,
+		/// followed by 32 bytes X-coordinate (UInt256 integer).
+		///
+		public var compressedRepresentation: Data {
+			impl.compressedRepresentation
 		}
 	}
 }
