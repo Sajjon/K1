@@ -6,7 +6,7 @@ import XCTest
 // MARK: - ECDSA_Wycheproof_IEEE_P1364_RS_EncodedSignaturesTests
 final class ECDSA_Wycheproof_IEEE_P1364_RS_EncodedSignaturesTests: XCTestCase {
 	func testWycheProofSecp256k1_P1364_RS() throws {
-		let result: TestResult =
+		let _: TestResult =
 			try testSuite(
 				/* https://github.com/google/wycheproof/blob/master/testvectors/ecdsa_secp256k1_sha256_test.json */
 				jsonName: "wycheproof_ecdsa_verify_p1363",
@@ -20,13 +20,10 @@ final class ECDSA_Wycheproof_IEEE_P1364_RS_EncodedSignaturesTests: XCTestCase {
 					)
 				}
 			)
-
-		print("☑️ Test result: \(String(describing: result))")
 	}
 }
 
 // MARK: - SignatureWycheproofP1364TestVector
-
 private struct SignatureWycheproofP1364TestVector: WycheproofTestVector {
 	typealias MessageDigest = SHA256.Digest
 	typealias Signature = K1.ECDSA.NonRecoverable.Signature

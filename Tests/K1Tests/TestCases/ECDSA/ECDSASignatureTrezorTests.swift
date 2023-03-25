@@ -13,7 +13,7 @@ import XCTest
 /// [bitcointalk2]: https://bitcointalk.org/index.php?topic=285142.msg3299061#msg3299061
 final class ECDSASignatureTrezorsTests: XCTestCase {
 	func testTrezorSecp256k1() throws {
-		let result: TestResult = try testSuite(
+		let _: TestResult = try testSuite(
 			jsonName: "trezor_ecdsa_sign_rfc6979",
 			testFunction: { group in
 				try doTestGroup(
@@ -21,8 +21,6 @@ final class ECDSASignatureTrezorsTests: XCTestCase {
 				)
 			}
 		)
-
-		print("☑️ Test result: \(String(describing: result))")
 	}
 }
 

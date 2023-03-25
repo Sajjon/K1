@@ -12,14 +12,12 @@ final class ECDASignaturePublicKeyRecoveryTests: XCTestCase {
 	}
 
 	func test_recovery_test_vectors() throws {
-		let result: TestResult = try testSuite(
+		let _: TestResult = try testSuite(
 			jsonName: "warta_cyon_publickey_recovery",
 			testFunction: { (group: RecoveryTestGroup) in
 				try doTestGroup(group: group)
 			}
 		)
-
-		print("☑️ Test result: \(String(describing: result))")
 	}
 
 	func test_conversionRoundtrips() throws {
