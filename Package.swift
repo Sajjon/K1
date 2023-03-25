@@ -3,15 +3,16 @@
 
 import PackageDescription
 
+let development = false
+
 let cSettings: [CSetting] = [
     // Basic config values that are universal and require no dependencies.
     // https://github.com/bitcoin-core/secp256k1/blob/master/src/basic-config.h#L12-L13
     .define("ECMULT_WINDOW_SIZE", to: "15"),
     .define("ECMULT_GEN_PREC_BITS", to: "4"),
 
-    // Enable modules in secp256k1.
-    // See bottom of: Sources/secp256k1/libsecp256k1/src/secp256k1.c
-    // For list
+    // Enable modules in secp256k1, for list scroll down to bottom of:
+    // Sources/secp256k1/libsecp256k1/src/secp256k1.c
     .define("ENABLE_MODULE_ECDH"),
     .define("ENABLE_MODULE_RECOVERY"),
     .define("ENABLE_MODULE_SCHNORRSIG"),
@@ -21,8 +22,10 @@ let cSettings: [CSetting] = [
 let package = Package(
     name: "K1",
     platforms: [
-      .macOS(.v11),
       .iOS(.v13),
+      .macOS(.v11),
+      .tvOS(.v13),
+      .watchOS(.v6),
     ],
     products: [
         .library(
@@ -85,3 +88,15 @@ let package = Package(
     ]
 )
 
+if development {
+    for target in package.targets {
+      target.swiftSettings = target.swiftSettings ?? []
+      target.swiftSettings?.append(
+        .unsafeFlags([
+          "-Xfrontend", "-warn-concurrency",
+          "-Xfrontend", "-enable-actor-data-race-checks",
+          "-enable-library-evolution",
+        ])
+      )
+    }
+}
