@@ -80,21 +80,13 @@ extension K1.KeyAgreement {
 		}
 
 		/// Creates a `secp256k1` public key for key agreement from a collection of bytes.
+		///
+		///	Expects 64 bytes on format `X || Y`, i.e. X- and Y-coordinates, as two
+		///	32 byte sequences (UInt256 integers).
+		///
 		/// - Parameter rawRepresentation: A raw representation of the key as a collection of contiguous bytes.
 		public init(rawRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
-		}
-
-		/// Creates a `secp256k1` public key for key agreement from a compressed representation of the key.
-		/// - Parameter compressedRepresentation: A compressed representation of the key as a collection of contiguous bytes.
-		public init(compressedRepresentation: some ContiguousBytes) throws {
-			try self.init(impl: .init(compressedRepresentation: compressedRepresentation))
-		}
-
-		/// Creates a `secp256k1` public key for key agreement from an ANSI x9.63 representation.
-		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
-		public init(x963Representation: some ContiguousBytes) throws {
-			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
 		/// Creates a `secp256k1` public key for key agreement from a Distinguished Encoding Rules (DER) encoded representation.
@@ -104,9 +96,37 @@ extension K1.KeyAgreement {
 		}
 
 		/// Creates a `secp256k1` public key for key agreement from a Privacy-Enhanced Mail (PEM) representation.
+		///
+		/// Expectes a string on format:
+		///
+		/// 	-----BEGIN PUBLIC KEY-----
+		///		MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEEmDCEiyeJE4a9RUb7eDDriO1TXxZaIHT
+		///		7rrSHzfdh4xcmgwamt52c3qIEb1qf5KHyXjuOWqonBHkcinSzLVS8A==
+		///	 	-----END PUBLIC KEY-----
+		///
 		/// - Parameter pemRepresentation: A PEM representation of the key.
 		public init(pemRepresentation: String) throws {
 			try self.init(impl: .init(pemRepresentation: pemRepresentation))
+		}
+
+		/// Creates a `secp256k1` public key for key agreement from an ANSI x9.63 representation.
+		///
+		/// Expects 65 bytes on format `04 || X || Y`, i.e. the byte prefix `04`,
+		/// followed by 32 bytes X- and Y-coordinates (UInt256 integers).
+		///
+		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
+		public init(x963Representation: some ContiguousBytes) throws {
+			try self.init(impl: .init(x963Representation: x963Representation))
+		}
+
+		/// Creates a `secp256k1` public key for key agreement from a compressed representation of the key.
+		///
+		/// Expects 33 bytes on format: `02|03 || X`, i.e. either `02` or `03,
+		/// followed by 32 bytes X-coordinate (UInt256 integer).
+		///
+		/// - Parameter compressedRepresentation: A compressed representation of the key as a collection of contiguous bytes.
+		public init(compressedRepresentation: some ContiguousBytes) throws {
+			try self.init(impl: .init(compressedRepresentation: compressedRepresentation))
 		}
 
 		public var rawRepresentation: Data {
@@ -209,21 +229,13 @@ extension K1.Schnorr {
 		}
 
 		/// Creates a `secp256k1` public key for verifying signatures from a collection of bytes.
+		///
+		///	Expects 64 bytes on format `X || Y`, i.e. X- and Y-coordinates, as two
+		///	32 byte sequences (UInt256 integers).
+		///
 		/// - Parameter rawRepresentation: A raw representation of the key as a collection of contiguous bytes.
 		public init(rawRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
-		}
-
-		/// Creates a `secp256k1` public key for verifying signatures from a compressed representation of the key.
-		/// - Parameter compressedRepresentation: A compressed representation of the key as a collection of contiguous bytes.
-		public init(compressedRepresentation: some ContiguousBytes) throws {
-			try self.init(impl: .init(compressedRepresentation: compressedRepresentation))
-		}
-
-		/// Creates a `secp256k1` public key for verifying signatures from an ANSI x9.63 representation.
-		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
-		public init(x963Representation: some ContiguousBytes) throws {
-			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
 		/// Creates a `secp256k1` public key for verifying signatures from a Distinguished Encoding Rules (DER) encoded representation.
@@ -233,9 +245,37 @@ extension K1.Schnorr {
 		}
 
 		/// Creates a `secp256k1` public key for verifying signatures from a Privacy-Enhanced Mail (PEM) representation.
+		///
+		/// Expectes a string on format:
+		///
+		/// 	-----BEGIN PUBLIC KEY-----
+		///		MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEEmDCEiyeJE4a9RUb7eDDriO1TXxZaIHT
+		///		7rrSHzfdh4xcmgwamt52c3qIEb1qf5KHyXjuOWqonBHkcinSzLVS8A==
+		///	 	-----END PUBLIC KEY-----
+		///
 		/// - Parameter pemRepresentation: A PEM representation of the key.
 		public init(pemRepresentation: String) throws {
 			try self.init(impl: .init(pemRepresentation: pemRepresentation))
+		}
+
+		/// Creates a `secp256k1` public key for verifying signatures from an ANSI x9.63 representation.
+		///
+		/// Expects 65 bytes on format `04 || X || Y`, i.e. the byte prefix `04`,
+		/// followed by 32 bytes X- and Y-coordinates (UInt256 integers).
+		///
+		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
+		public init(x963Representation: some ContiguousBytes) throws {
+			try self.init(impl: .init(x963Representation: x963Representation))
+		}
+
+		/// Creates a `secp256k1` public key for verifying signatures from a compressed representation of the key.
+		///
+		/// Expects 33 bytes on format: `02|03 || X`, i.e. either `02` or `03,
+		/// followed by 32 bytes X-coordinate (UInt256 integer).
+		///
+		/// - Parameter compressedRepresentation: A compressed representation of the key as a collection of contiguous bytes.
+		public init(compressedRepresentation: some ContiguousBytes) throws {
+			try self.init(impl: .init(compressedRepresentation: compressedRepresentation))
 		}
 
 		public var rawRepresentation: Data {
@@ -338,21 +378,13 @@ extension K1.ECDSA.NonRecoverable {
 		}
 
 		/// Creates a `secp256k1` public key for verifying signatures from a collection of bytes.
+		///
+		///	Expects 64 bytes on format `X || Y`, i.e. X- and Y-coordinates, as two
+		///	32 byte sequences (UInt256 integers).
+		///
 		/// - Parameter rawRepresentation: A raw representation of the key as a collection of contiguous bytes.
 		public init(rawRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
-		}
-
-		/// Creates a `secp256k1` public key for verifying signatures from a compressed representation of the key.
-		/// - Parameter compressedRepresentation: A compressed representation of the key as a collection of contiguous bytes.
-		public init(compressedRepresentation: some ContiguousBytes) throws {
-			try self.init(impl: .init(compressedRepresentation: compressedRepresentation))
-		}
-
-		/// Creates a `secp256k1` public key for verifying signatures from an ANSI x9.63 representation.
-		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
-		public init(x963Representation: some ContiguousBytes) throws {
-			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
 		/// Creates a `secp256k1` public key for verifying signatures from a Distinguished Encoding Rules (DER) encoded representation.
@@ -362,9 +394,37 @@ extension K1.ECDSA.NonRecoverable {
 		}
 
 		/// Creates a `secp256k1` public key for verifying signatures from a Privacy-Enhanced Mail (PEM) representation.
+		///
+		/// Expectes a string on format:
+		///
+		/// 	-----BEGIN PUBLIC KEY-----
+		///		MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEEmDCEiyeJE4a9RUb7eDDriO1TXxZaIHT
+		///		7rrSHzfdh4xcmgwamt52c3qIEb1qf5KHyXjuOWqonBHkcinSzLVS8A==
+		///	 	-----END PUBLIC KEY-----
+		///
 		/// - Parameter pemRepresentation: A PEM representation of the key.
 		public init(pemRepresentation: String) throws {
 			try self.init(impl: .init(pemRepresentation: pemRepresentation))
+		}
+
+		/// Creates a `secp256k1` public key for verifying signatures from an ANSI x9.63 representation.
+		///
+		/// Expects 65 bytes on format `04 || X || Y`, i.e. the byte prefix `04`,
+		/// followed by 32 bytes X- and Y-coordinates (UInt256 integers).
+		///
+		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
+		public init(x963Representation: some ContiguousBytes) throws {
+			try self.init(impl: .init(x963Representation: x963Representation))
+		}
+
+		/// Creates a `secp256k1` public key for verifying signatures from a compressed representation of the key.
+		///
+		/// Expects 33 bytes on format: `02|03 || X`, i.e. either `02` or `03,
+		/// followed by 32 bytes X-coordinate (UInt256 integer).
+		///
+		/// - Parameter compressedRepresentation: A compressed representation of the key as a collection of contiguous bytes.
+		public init(compressedRepresentation: some ContiguousBytes) throws {
+			try self.init(impl: .init(compressedRepresentation: compressedRepresentation))
 		}
 
 		public var rawRepresentation: Data {
@@ -467,21 +527,13 @@ extension K1.ECDSA.Recoverable {
 		}
 
 		/// Creates a `secp256k1` public key for verifying signatures from a collection of bytes.
+		///
+		///	Expects 64 bytes on format `X || Y`, i.e. X- and Y-coordinates, as two
+		///	32 byte sequences (UInt256 integers).
+		///
 		/// - Parameter rawRepresentation: A raw representation of the key as a collection of contiguous bytes.
 		public init(rawRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
-		}
-
-		/// Creates a `secp256k1` public key for verifying signatures from a compressed representation of the key.
-		/// - Parameter compressedRepresentation: A compressed representation of the key as a collection of contiguous bytes.
-		public init(compressedRepresentation: some ContiguousBytes) throws {
-			try self.init(impl: .init(compressedRepresentation: compressedRepresentation))
-		}
-
-		/// Creates a `secp256k1` public key for verifying signatures from an ANSI x9.63 representation.
-		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
-		public init(x963Representation: some ContiguousBytes) throws {
-			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
 		/// Creates a `secp256k1` public key for verifying signatures from a Distinguished Encoding Rules (DER) encoded representation.
@@ -491,9 +543,37 @@ extension K1.ECDSA.Recoverable {
 		}
 
 		/// Creates a `secp256k1` public key for verifying signatures from a Privacy-Enhanced Mail (PEM) representation.
+		///
+		/// Expectes a string on format:
+		///
+		/// 	-----BEGIN PUBLIC KEY-----
+		///		MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEEmDCEiyeJE4a9RUb7eDDriO1TXxZaIHT
+		///		7rrSHzfdh4xcmgwamt52c3qIEb1qf5KHyXjuOWqonBHkcinSzLVS8A==
+		///	 	-----END PUBLIC KEY-----
+		///
 		/// - Parameter pemRepresentation: A PEM representation of the key.
 		public init(pemRepresentation: String) throws {
 			try self.init(impl: .init(pemRepresentation: pemRepresentation))
+		}
+
+		/// Creates a `secp256k1` public key for verifying signatures from an ANSI x9.63 representation.
+		///
+		/// Expects 65 bytes on format `04 || X || Y`, i.e. the byte prefix `04`,
+		/// followed by 32 bytes X- and Y-coordinates (UInt256 integers).
+		///
+		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
+		public init(x963Representation: some ContiguousBytes) throws {
+			try self.init(impl: .init(x963Representation: x963Representation))
+		}
+
+		/// Creates a `secp256k1` public key for verifying signatures from a compressed representation of the key.
+		///
+		/// Expects 33 bytes on format: `02|03 || X`, i.e. either `02` or `03,
+		/// followed by 32 bytes X-coordinate (UInt256 integer).
+		///
+		/// - Parameter compressedRepresentation: A compressed representation of the key as a collection of contiguous bytes.
+		public init(compressedRepresentation: some ContiguousBytes) throws {
+			try self.init(impl: .init(compressedRepresentation: compressedRepresentation))
 		}
 
 		public var rawRepresentation: Data {
