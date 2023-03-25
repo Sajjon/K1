@@ -5,14 +5,13 @@ import Foundation
 // MARK: - K1.ECDSA.Recoverable
 extension K1.ECDSA {
 	/// A mechanism used to create or verify a cryptographic signature using the `secp256k1` elliptic curve digital signature algorithm (ECDSA), signatures that do offers recovery of the public key.
-	public enum Recoverable: K1Feature {
+	public enum Recoverable {
 		/// A `secp256k1` private key used to create cryptographic signatures,
 		/// more specifically ECDSA signatures that offers recovery of the public key.
-		public typealias PrivateKey = PrivateKeyOf<Self>
-
+		case privKeyDoc
 		/// A `secp256k1` public key used to verify cryptographic signatures.
 		/// more specifically ECDSA signatures that offers recovery of the public key.
-		public typealias PublicKey = PublicKeyOf<Self>
+		case pubKeyDoc
 	}
 }
 
