@@ -6,19 +6,43 @@ PLATFORM_WATCHOS = watchOS Simulator,name=Apple Watch Series 7 (45mm)
 
 ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
-.PHONY: submodules test dev clean
+.PHONY: submodules test dev clean testprod testdebug purge reint format formatstaged
 
-dev:
-	./scripts/bootstrap
-	make clean
-	make submodules
+rmsubmod:
+	rm -rf "$(ROOT_DIR)Sources/secp256k1/libsecp256k1"
 
 clean:
-	rm -rf "$(ROOT_DIR)Sources/secp256k1/libsecp256k1"
 	rm -rf .build
+
+purge:
+	make rmsubmod
+	make clean
 
 submodules:  ## Update all sumodules .
 	git submodule update --init
+	
+reint:
+	make purge
+	make submodules
+
+dev:
+	./scripts/bootstrap
+	make reint
 
 test:
+	make clean
+	make testdebug
+	make clean
+	make testprod
+
+testdebug:
 	swift test
+	
+testprod:
+	swift test -c release -Xswiftc -enable-testing
+
+formatstaged:
+	./scripts/swiftformat-staged
+
+format:
+	swiftformat --config .swiftformat "$(ROOT_DIR)"
