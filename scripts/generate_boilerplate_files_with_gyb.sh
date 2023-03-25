@@ -16,5 +16,7 @@
 set -eu
 find . -name '*.gyb' |                                               \
     while read file; do                                              \
+		chflags nouchg "${file%.gyb}"; 								\
         ./scripts/gyb --line-directive '' -o "${file%.gyb}" "$file"; \
+		chflags uchg "${file%.gyb}"; 								\
     done
