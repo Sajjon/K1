@@ -30,15 +30,12 @@ extension K1.KeyAgreement {
 		}
 
 		/// Creates a `secp256k1` private key for key agreement from a data representation of the key.
+		///
+		/// Expects 32 bytes representation of a UInt256 scalar.
+		///
 		/// - Parameter rawRepresentation: A raw representation of the key as a collection of contiguous bytes.
 		public init(rawRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
-		}
-
-		/// Creates a `secp256k1` private key for key agreement from an ANSI x9.63 representation of the key.
-		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
-		public init(x963Representation: some ContiguousBytes) throws {
-			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
 		/// Creates a `secp256k1` private key for key agreement from a Distinguished Encoding Rules (DER) encoded representation of the key.
@@ -48,9 +45,29 @@ extension K1.KeyAgreement {
 		}
 
 		/// Creates a `secp256k1` private key for key agreement from a Privacy-Enhanced Mail (PEM) representation of the key.
+		///
+		/// Expectes a string on format:
+		///
+		/// 	-----BEGIN PRIVATE KEY-----
+		///		MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgvddDDSbMRcLWZETSUOyD
+		///		NIr6bL2F1/hw/rkkjELYhVihRANCAAQGOLtZWXDFwKhJhA6mEoorRokGwohvxe1D
+		///		MXhk8/iiD9ZtUygoHEl7AT88R8IYcrqp403A1b+w4LvM0Ih64rQc
+		///		-----END PRIVATE KEY-----
+		///
 		/// - Parameter pemRepresentation: A PEM representation of the key.
 		public init(pemRepresentation: String) throws {
 			try self.init(impl: .init(pemRepresentation: pemRepresentation))
+		}
+
+		/// Creates a `secp256k1` private key for key agreement from an ANSI x9.63 representation of the key.
+		///
+		/// Expects 97 bytes on format `04 || X || Y || D`, i.e. the byte prefix `04`,
+		/// followed by 32 bytes X- and Y-coordinates of its public key and then the private
+		/// key itself (UInt256 integers).
+		///
+		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
+		public init(x963Representation: some ContiguousBytes) throws {
+			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
 		public var rawRepresentation: Data {
@@ -178,15 +195,12 @@ extension K1.Schnorr {
 		}
 
 		/// Creates a `secp256k1` private key for signing from a data representation of the key.
+		///
+		/// Expects 32 bytes representation of a UInt256 scalar.
+		///
 		/// - Parameter rawRepresentation: A raw representation of the key as a collection of contiguous bytes.
 		public init(rawRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
-		}
-
-		/// Creates a `secp256k1` private key for signing from an ANSI x9.63 representation of the key.
-		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
-		public init(x963Representation: some ContiguousBytes) throws {
-			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
 		/// Creates a `secp256k1` private key for signing from a Distinguished Encoding Rules (DER) encoded representation of the key.
@@ -196,9 +210,29 @@ extension K1.Schnorr {
 		}
 
 		/// Creates a `secp256k1` private key for signing from a Privacy-Enhanced Mail (PEM) representation of the key.
+		///
+		/// Expectes a string on format:
+		///
+		/// 	-----BEGIN PRIVATE KEY-----
+		///		MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgvddDDSbMRcLWZETSUOyD
+		///		NIr6bL2F1/hw/rkkjELYhVihRANCAAQGOLtZWXDFwKhJhA6mEoorRokGwohvxe1D
+		///		MXhk8/iiD9ZtUygoHEl7AT88R8IYcrqp403A1b+w4LvM0Ih64rQc
+		///		-----END PRIVATE KEY-----
+		///
 		/// - Parameter pemRepresentation: A PEM representation of the key.
 		public init(pemRepresentation: String) throws {
 			try self.init(impl: .init(pemRepresentation: pemRepresentation))
+		}
+
+		/// Creates a `secp256k1` private key for signing from an ANSI x9.63 representation of the key.
+		///
+		/// Expects 97 bytes on format `04 || X || Y || D`, i.e. the byte prefix `04`,
+		/// followed by 32 bytes X- and Y-coordinates of its public key and then the private
+		/// key itself (UInt256 integers).
+		///
+		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
+		public init(x963Representation: some ContiguousBytes) throws {
+			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
 		public var rawRepresentation: Data {
@@ -327,15 +361,12 @@ extension K1.ECDSA.NonRecoverable {
 		}
 
 		/// Creates a `secp256k1` private key for signing from a data representation of the key.
+		///
+		/// Expects 32 bytes representation of a UInt256 scalar.
+		///
 		/// - Parameter rawRepresentation: A raw representation of the key as a collection of contiguous bytes.
 		public init(rawRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
-		}
-
-		/// Creates a `secp256k1` private key for signing from an ANSI x9.63 representation of the key.
-		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
-		public init(x963Representation: some ContiguousBytes) throws {
-			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
 		/// Creates a `secp256k1` private key for signing from a Distinguished Encoding Rules (DER) encoded representation of the key.
@@ -345,9 +376,29 @@ extension K1.ECDSA.NonRecoverable {
 		}
 
 		/// Creates a `secp256k1` private key for signing from a Privacy-Enhanced Mail (PEM) representation of the key.
+		///
+		/// Expectes a string on format:
+		///
+		/// 	-----BEGIN PRIVATE KEY-----
+		///		MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgvddDDSbMRcLWZETSUOyD
+		///		NIr6bL2F1/hw/rkkjELYhVihRANCAAQGOLtZWXDFwKhJhA6mEoorRokGwohvxe1D
+		///		MXhk8/iiD9ZtUygoHEl7AT88R8IYcrqp403A1b+w4LvM0Ih64rQc
+		///		-----END PRIVATE KEY-----
+		///
 		/// - Parameter pemRepresentation: A PEM representation of the key.
 		public init(pemRepresentation: String) throws {
 			try self.init(impl: .init(pemRepresentation: pemRepresentation))
+		}
+
+		/// Creates a `secp256k1` private key for signing from an ANSI x9.63 representation of the key.
+		///
+		/// Expects 97 bytes on format `04 || X || Y || D`, i.e. the byte prefix `04`,
+		/// followed by 32 bytes X- and Y-coordinates of its public key and then the private
+		/// key itself (UInt256 integers).
+		///
+		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
+		public init(x963Representation: some ContiguousBytes) throws {
+			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
 		public var rawRepresentation: Data {
@@ -476,15 +527,12 @@ extension K1.ECDSA.Recoverable {
 		}
 
 		/// Creates a `secp256k1` private key for signing from a data representation of the key.
+		///
+		/// Expects 32 bytes representation of a UInt256 scalar.
+		///
 		/// - Parameter rawRepresentation: A raw representation of the key as a collection of contiguous bytes.
 		public init(rawRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
-		}
-
-		/// Creates a `secp256k1` private key for signing from an ANSI x9.63 representation of the key.
-		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
-		public init(x963Representation: some ContiguousBytes) throws {
-			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
 		/// Creates a `secp256k1` private key for signing from a Distinguished Encoding Rules (DER) encoded representation of the key.
@@ -494,9 +542,29 @@ extension K1.ECDSA.Recoverable {
 		}
 
 		/// Creates a `secp256k1` private key for signing from a Privacy-Enhanced Mail (PEM) representation of the key.
+		///
+		/// Expectes a string on format:
+		///
+		/// 	-----BEGIN PRIVATE KEY-----
+		///		MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgvddDDSbMRcLWZETSUOyD
+		///		NIr6bL2F1/hw/rkkjELYhVihRANCAAQGOLtZWXDFwKhJhA6mEoorRokGwohvxe1D
+		///		MXhk8/iiD9ZtUygoHEl7AT88R8IYcrqp403A1b+w4LvM0Ih64rQc
+		///		-----END PRIVATE KEY-----
+		///
 		/// - Parameter pemRepresentation: A PEM representation of the key.
 		public init(pemRepresentation: String) throws {
 			try self.init(impl: .init(pemRepresentation: pemRepresentation))
+		}
+
+		/// Creates a `secp256k1` private key for signing from an ANSI x9.63 representation of the key.
+		///
+		/// Expects 97 bytes on format `04 || X || Y || D`, i.e. the byte prefix `04`,
+		/// followed by 32 bytes X- and Y-coordinates of its public key and then the private
+		/// key itself (UInt256 integers).
+		///
+		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
+		public init(x963Representation: some ContiguousBytes) throws {
+			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
 		public var rawRepresentation: Data {
