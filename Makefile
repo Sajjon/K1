@@ -8,11 +8,12 @@ ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 .PHONY: submodules test
 
-submodules:  ## Update all sumodules .
+clean:
 	rm -rf "$(ROOT_DIR)Sources/secp256k1/libsecp256k1"
+	rm -rf .build
+
+submodules:  ## Update all sumodules .
 	git submodule update --init
 
-
 test:
-	make submodules
 	swift test
