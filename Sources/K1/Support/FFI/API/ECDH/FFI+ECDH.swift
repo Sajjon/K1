@@ -1,12 +1,13 @@
 import Foundation
 import secp256k1
 
+// MARK: - FFI.ECDH
 extension FFI {
 	/// Just a namespace for `FFI ECDH`
 	enum ECDH {}
 }
 
-// MARK: SerializeFunction
+// MARK: - FFI.ECDH.SerializeFunction
 extension FFI.ECDH {
 	enum SerializeFunction {
 		/// Using the `libsecp256k1` default behaviour.

@@ -1,6 +1,7 @@
 // FFI to C
 import secp256k1
 
+// MARK: - FFI.Context
 extension FFI {
 	///  Bridging type used for underlying libsecp256k1 methods:
 	///  - `secp256k1_context_create`

@@ -16,6 +16,7 @@ extension K1.Format {
 	}
 }
 
+// MARK: - K1.Format
 extension K1 {
 	// Bridging type for: `secp256k1_ec_pubkey_serialize`
 	public enum Format: UInt32, CaseIterable {

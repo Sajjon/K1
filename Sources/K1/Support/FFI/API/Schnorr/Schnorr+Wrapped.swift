@@ -1,5 +1,6 @@
 import Foundation
 
+// MARK: - FFI.Schnorr.Wrapped
 extension FFI.Schnorr {
 	struct Wrapped: @unchecked Sendable, Hashable {
 		static let byteCount = 2 * Curve.Field.byteCount

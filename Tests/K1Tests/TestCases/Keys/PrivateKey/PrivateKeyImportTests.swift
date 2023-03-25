@@ -5,40 +5,40 @@ import XCTest
 final class PrivateKeyImportTests: XCTestCase {
 	func testAssertImportingPrivateKeyWithTooFewBytesThrowsError() throws {
 		let raw = try Data(hex: "deadbeef")
-		assert(
-			try K1.ECDSA.NonRecoverable.PrivateKey(rawRepresentation: raw),
+		try assert(
+			K1.ECDSA.NonRecoverable.PrivateKey(rawRepresentation: raw),
 			throws: K1.Error.failedToInitializePrivateKeyIncorrectByteCount(got: 4, expected: 32)
 		)
 	}
 
 	func testAssertImportingPrivateKeyWithTooManyBytesThrowsError() throws {
 		let raw = Data(repeating: 0xBA, count: 33)
-		assert(
-			try K1.ECDSA.NonRecoverable.PrivateKey(rawRepresentation: raw),
+		try assert(
+			K1.ECDSA.NonRecoverable.PrivateKey(rawRepresentation: raw),
 			throws: K1.Error.failedToInitializePrivateKeyIncorrectByteCount(got: 33, expected: 32)
 		)
 	}
 
 	func testAssertImportingPrivateKeyZeroThrowsError() throws {
 		let raw = Data(repeating: 0x00, count: 32)
-		assert(
-			try K1.ECDSA.NonRecoverable.PrivateKey(rawRepresentation: raw),
+		try assert(
+			K1.ECDSA.NonRecoverable.PrivateKey(rawRepresentation: raw),
 			throws: K1.Error.invalidPrivateKeyMustNotBeZero
 		)
 	}
 
 	func testAssertImportingPrivateKeyCurveOrderThrowsError() throws {
 		let raw = try Data(hex: "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141")
-		assert(
-			try K1.ECDSA.NonRecoverable.PrivateKey(rawRepresentation: raw),
+		try assert(
+			K1.ECDSA.NonRecoverable.PrivateKey(rawRepresentation: raw),
 			throws: K1.Error.invalidPrivateKeyMustBeSmallerThanOrder
 		)
 	}
 
 	func testAssertImportingPrivateKeyLargerThanCurveOrderThrowsError() throws {
 		let raw = Data(repeating: 0xFF, count: 32)
-		assert(
-			try K1.ECDSA.NonRecoverable.PrivateKey(rawRepresentation: raw),
+		try assert(
+			K1.ECDSA.NonRecoverable.PrivateKey(rawRepresentation: raw),
 			throws: K1.Error.invalidPrivateKeyMustBeSmallerThanOrder
 		)
 	}

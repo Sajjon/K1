@@ -26,7 +26,7 @@ public protocol K1PrivateKeyProtocol: K1KeyPortable {
 	init()
 }
 
-// MARK: - PrivateKey
+// MARK: - K1._PrivateKeyImplementation
 extension K1 {
 	struct _PrivateKeyImplementation: Sendable, Hashable, K1PrivateKeyProtocol {
 		typealias Wrapped = FFI.PrivateKey.Wrapped

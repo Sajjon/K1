@@ -1,6 +1,6 @@
 import Foundation
 
-// MARK: Recovery
+// MARK: - K1.ECDSA.Recoverable.Signature.RecoveryID
 extension K1.ECDSA.Recoverable.Signature {
 	public enum RecoveryID: UInt8, Sendable, Hashable, Codable {
 		case _0 = 0

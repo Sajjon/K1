@@ -2,6 +2,7 @@ import protocol CryptoKit.Digest
 import struct CryptoKit.SHA256
 import Foundation
 
+// MARK: - K1.ECDSA.NonRecoverable
 extension K1.ECDSA {
 	/// A mechanism used to create or verify a cryptographic signature using the `secp256k1` elliptic curve digital signature algorithm (ECDSA), signatures that do not offer recovery of the public key.
 	public enum NonRecoverable: K1Feature {
@@ -15,6 +16,7 @@ extension K1.ECDSA {
 	}
 }
 
+// MARK: - K1.ECDSA.NonRecoverable.Signature
 extension K1.ECDSA.NonRecoverable {
 	public struct Signature: Sendable, Hashable, ContiguousBytes {
 		typealias Wrapped = FFI.ECDSA.NonRecovery.Wrapped

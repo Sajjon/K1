@@ -2,6 +2,7 @@ import protocol CryptoKit.Digest
 import struct CryptoKit.SHA256
 import Foundation
 
+// MARK: - K1.ECDSA.Recoverable
 extension K1.ECDSA {
 	/// A mechanism used to create or verify a cryptographic signature using the `secp256k1` elliptic curve digital signature algorithm (ECDSA), signatures that do offers recovery of the public key.
 	public enum Recoverable: K1Feature {
@@ -134,6 +135,7 @@ extension K1.ECDSA.Recoverable.PublicKey {
 	}
 }
 
+// MARK: - K1.ECDSA.Recoverable.Signature
 extension K1.ECDSA.Recoverable {
 	public struct Signature: Sendable, Hashable, ContiguousBytes {
 		typealias Wrapped = FFI.ECDSA.Recovery.Wrapped

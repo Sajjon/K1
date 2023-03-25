@@ -5,32 +5,32 @@ import XCTest
 final class PublicKeyImportTests: XCTestCase {
 	func testAssertImportingPublicKeyWithTooFewBytesThrowsError() throws {
 		let raw = try Data(hex: "deadbeef")
-		assert(
-			try K1.ECDSA.NonRecoverable.PublicKey(x963Representation: raw),
+		try assert(
+			K1.ECDSA.NonRecoverable.PublicKey(x963Representation: raw),
 			throws: K1.Error.incorrectByteCountOfX963PublicKey(got: 4, expected: 65)
 		)
 	}
 
 	func testAssertImportingPublicKeyWithTooManyBytesThrowsError() throws {
 		let raw = Data(repeating: 0xDE, count: 66)
-		assert(
-			try K1.ECDSA.NonRecoverable.PublicKey(x963Representation: raw),
+		try assert(
+			K1.ECDSA.NonRecoverable.PublicKey(x963Representation: raw),
 			throws: K1.Error.incorrectByteCountOfX963PublicKey(got: 66, expected: 65)
 		)
 	}
 
 	func testAssertImportingInvalidUncompressedPublicKeyThrowsError() throws {
 		let raw = Data(repeating: 0x04, count: 65)
-		assert(
-			try K1.ECDSA.NonRecoverable.PublicKey(x963Representation: raw),
+		try assert(
+			K1.ECDSA.NonRecoverable.PublicKey(x963Representation: raw),
 			throws: K1.Error.failedToDeserializePublicKey
 		)
 	}
 
 	func testAssertImportingInvalidCompressedPublicKeyThrowsError() throws {
 		let raw = Data(repeating: 0x03, count: 33)
-		assert(
-			try K1.ECDSA.NonRecoverable.PublicKey(compressedRepresentation: raw),
+		try assert(
+			K1.ECDSA.NonRecoverable.PublicKey(compressedRepresentation: raw),
 			throws: K1.Error.failedToDeserializePublicKey
 		)
 	}
@@ -56,8 +56,8 @@ final class PublicKeyImportTests: XCTestCase {
 		/// DER => raw
 		let raw = try Data(hex: "040000000000000000000000000000000000000000000000000000000000000000fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2e")
 
-		assert(
-			try K1.ECDSA.NonRecoverable.PublicKey(x963Representation: raw),
+		try assert(
+			K1.ECDSA.NonRecoverable.PublicKey(x963Representation: raw),
 			throws: K1.Error.failedToDeserializePublicKey
 		)
 	}

@@ -6,6 +6,7 @@ public protocol K1PublicKeyProtocol: K1KeyPortable {
 	var compressedRepresentation: Data { get }
 }
 
+// MARK: - K1._PublicKeyImplementation
 extension K1 {
 	struct _PublicKeyImplementation: Sendable, Hashable, K1PublicKeyProtocol {
 		typealias Wrapped = FFI.PublicKey.Wrapped

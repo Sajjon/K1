@@ -4,7 +4,7 @@ import Foundation
 /// Details about the elliptic curve `secp256k1`.
 enum Curve {}
 
-// MARK: - FiniteField
+// MARK: Curve.Field
 extension Curve {
 	/// The finite field of the secp256k1 curve.
 	enum Field {}

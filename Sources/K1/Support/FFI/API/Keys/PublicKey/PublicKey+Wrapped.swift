@@ -1,11 +1,12 @@
 import Foundation
 import secp256k1
 
+// MARK: - FFI.PublicKey
 extension FFI {
 	enum PublicKey {}
 }
 
-// MARK: PublicKey Wrapped
+// MARK: - FFI.PublicKey.Wrapped
 extension FFI.PublicKey {
 	struct Wrapped: @unchecked Sendable, ContiguousBytes {
 		typealias Raw = secp256k1_pubkey

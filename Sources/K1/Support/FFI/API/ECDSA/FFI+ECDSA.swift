@@ -1,6 +1,7 @@
 import Foundation
 import secp256k1
 
+// MARK: - FFI.ECDSA
 extension FFI {
 	public enum ECDSA {}
 }

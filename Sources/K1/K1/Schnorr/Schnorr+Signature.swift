@@ -1,5 +1,6 @@
 import Foundation
 
+// MARK: - K1.Schnorr.Signature
 extension K1.Schnorr {
 	public struct Signature: Sendable, Hashable {
 		typealias Wrapped = FFI.Schnorr.Wrapped

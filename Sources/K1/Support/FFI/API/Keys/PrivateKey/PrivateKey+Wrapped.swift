@@ -1,6 +1,7 @@
 import Foundation
 import secp256k1
 
+// MARK: - FFI.PrivateKey
 extension FFI {
 	enum PrivateKey {
 		struct Wrapped: @unchecked Sendable {

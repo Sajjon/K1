@@ -1,10 +1,12 @@
 import Foundation
 
+// MARK: - K1.ECDSA
 extension K1 {
 	/// A mechanism used to create or verify a cryptographic signature using the `secp256k1` elliptic curve digital signature algorithm (ECDSA).
 	public enum ECDSA {}
 }
 
+// MARK: - K1.ECDSA.ValidationOptions
 extension K1.ECDSA {
 	public struct ValidationOptions {
 		public let malleabilityStrictness: MalleabilityStrictness
@@ -32,7 +34,7 @@ extension K1.ECDSA.ValidationOptions {
 	}
 }
 
-// MARK: SigningOptions
+// MARK: - K1.ECDSA.SigningOptions
 extension K1.ECDSA {
 	public struct SigningOptions: Sendable, Hashable {
 		public let nonceFunction: NonceFunction
@@ -54,6 +56,7 @@ extension K1.ECDSA.SigningOptions {
 	}
 }
 
+// MARK: - K1.ECDSA.SigningOptions.NonceFunction.RFC6979ArbitraryData
 extension K1.ECDSA.SigningOptions.NonceFunction {
 	public struct RFC6979ArbitraryData: Sendable, Hashable {
 		public let arbitraryData: [UInt8]

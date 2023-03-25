@@ -1,7 +1,7 @@
 import Foundation
 import secp256k1
 
-// MARK: ECDSA Recovery Wrapped
+// MARK: - FFI.ECDSA.Recovery.Wrapped
 extension FFI.ECDSA.Recovery {
 	struct Wrapped: @unchecked Sendable, ContiguousBytes, WrappedECDSASignature {
 		typealias Raw = secp256k1_ecdsa_recoverable_signature

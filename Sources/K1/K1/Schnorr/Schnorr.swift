@@ -2,6 +2,7 @@ import protocol CryptoKit.Digest
 import struct CryptoKit.SHA256
 import Foundation
 
+// MARK: - K1.Schnorr
 extension K1 {
 	/// A mechanism used to create or verify a cryptographic signature using the `secp256k1` and Schnorr signature scheme.
 	public enum Schnorr: K1Feature {
@@ -109,6 +110,7 @@ extension K1.Schnorr.PublicKey {
 	}
 }
 
+// MARK: - K1.Schnorr.SigningOptions
 extension K1.Schnorr {
 	public struct SigningOptions: Sendable, Hashable {
 		public let auxilaryRandomData: AuxilaryRandomData?
