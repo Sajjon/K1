@@ -13,4 +13,4 @@
 --header strip
 
 # file options
---exclude .build,Sources/secp256k1,Sources/K1/Support/ThirdyParty
+--exclude .build,Sources/secp256k1,Sources/K1/Support/ThirdyParty,**/*.swift.gyb

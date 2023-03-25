@@ -1,20 +1,11 @@
 import struct CryptoKit.SharedSecret
 import Foundation
 
-// MARK: - K1Feature
-public protocol K1Feature {
-	associatedtype PublicKey: K1PublicKeyProtocol
-}
-
 // MARK: - K1.KeyAgreement
 extension K1 {
 	/// A mechanism used to create a shared secret between two users by performing `secp256k1` elliptic curve Diffie Hellman (ECDH) key exchange.
-	public enum KeyAgreement: K1Feature {
-		/// A `secp256k1` private key used for key agreement.
-		public typealias PrivateKey = PrivateKeyOf<Self>
-
-		/// A `secp256k1` public key used for key agreement.
-		public typealias PublicKey = PublicKeyOf<Self>
+	public enum KeyAgreement {
+		// Just a namespace
 	}
 }
 

@@ -71,6 +71,9 @@ let package = Package(
 			dependencies: [
 				"secp256k1",
 			],
+			exclude: [
+				"K1/Keys/Keys.swift.gyb",
+			],
 			swiftSettings: [
 				.define("CRYPTO_IN_SWIFTPM_FORCE_BUILD_API"),
 			]
