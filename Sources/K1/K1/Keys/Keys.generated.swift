@@ -35,13 +35,13 @@ extension K1.KeyAgreement {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
 		}
 
-		/// Creates a `secp256k1` private key for  key agreement  from an ANSI x9.63 representation of the key.
+		/// Creates a `secp256k1` private key for key agreement from an ANSI x9.63 representation of the key.
 		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
 		public init(x963Representation: some ContiguousBytes) throws {
 			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
-		/// Creates a `secp256k1` private key for  key agreement from a Distinguished Encoding Rules (DER) encoded representation of the key.
+		/// Creates a `secp256k1` private key for key agreement from a Distinguished Encoding Rules (DER) encoded representation of the key.
 		/// - Parameter derRepresentation: A DER-encoded representation of the key.
 		public init(derRepresentation: some RandomAccessCollection<UInt8>) throws {
 			try self.init(impl: .init(derRepresentation: derRepresentation))
@@ -79,22 +79,32 @@ extension K1.KeyAgreement {
 			self.impl = impl
 		}
 
+		/// Creates a `secp256k1` public key for key agreement from a collection of bytes.
+		/// - Parameter rawRepresentation: A raw representation of the key as a collection of contiguous bytes.
 		public init(rawRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
 		}
 
+		/// Creates a `secp256k1` public key for key agreement from a compressed representation of the key.
+		/// - Parameter compressedRepresentation: A compressed representation of the key as a collection of contiguous bytes.
 		public init(compressedRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(compressedRepresentation: compressedRepresentation))
 		}
 
+		/// Creates a `secp256k1` public key for key agreement from an ANSI x9.63 representation.
+		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
 		public init(x963Representation: some ContiguousBytes) throws {
 			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
+		/// Creates a `secp256k1` public key for key agreement from a Distinguished Encoding Rules (DER) encoded representation.
+		/// - Parameter derRepresentation: A DER-encoded representation of the key.
 		public init(derRepresentation: some RandomAccessCollection<UInt8>) throws {
 			try self.init(impl: .init(derRepresentation: derRepresentation))
 		}
 
+		/// Creates a `secp256k1` public key for key agreement from a Privacy-Enhanced Mail (PEM) representation.
+		/// - Parameter pemRepresentation: A PEM representation of the key.
 		public init(pemRepresentation: String) throws {
 			try self.init(impl: .init(pemRepresentation: pemRepresentation))
 		}
@@ -153,13 +163,13 @@ extension K1.Schnorr {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
 		}
 
-		/// Creates a `secp256k1` private key for  signing  from an ANSI x9.63 representation of the key.
+		/// Creates a `secp256k1` private key for signing from an ANSI x9.63 representation of the key.
 		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
 		public init(x963Representation: some ContiguousBytes) throws {
 			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
-		/// Creates a `secp256k1` private key for  signing from a Distinguished Encoding Rules (DER) encoded representation of the key.
+		/// Creates a `secp256k1` private key for signing from a Distinguished Encoding Rules (DER) encoded representation of the key.
 		/// - Parameter derRepresentation: A DER-encoded representation of the key.
 		public init(derRepresentation: some RandomAccessCollection<UInt8>) throws {
 			try self.init(impl: .init(derRepresentation: derRepresentation))
@@ -198,22 +208,32 @@ extension K1.Schnorr {
 			self.impl = impl
 		}
 
+		/// Creates a `secp256k1` public key for verifying signatures from a collection of bytes.
+		/// - Parameter rawRepresentation: A raw representation of the key as a collection of contiguous bytes.
 		public init(rawRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
 		}
 
+		/// Creates a `secp256k1` public key for verifying signatures from a compressed representation of the key.
+		/// - Parameter compressedRepresentation: A compressed representation of the key as a collection of contiguous bytes.
 		public init(compressedRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(compressedRepresentation: compressedRepresentation))
 		}
 
+		/// Creates a `secp256k1` public key for verifying signatures from an ANSI x9.63 representation.
+		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
 		public init(x963Representation: some ContiguousBytes) throws {
 			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
+		/// Creates a `secp256k1` public key for verifying signatures from a Distinguished Encoding Rules (DER) encoded representation.
+		/// - Parameter derRepresentation: A DER-encoded representation of the key.
 		public init(derRepresentation: some RandomAccessCollection<UInt8>) throws {
 			try self.init(impl: .init(derRepresentation: derRepresentation))
 		}
 
+		/// Creates a `secp256k1` public key for verifying signatures from a Privacy-Enhanced Mail (PEM) representation.
+		/// - Parameter pemRepresentation: A PEM representation of the key.
 		public init(pemRepresentation: String) throws {
 			try self.init(impl: .init(pemRepresentation: pemRepresentation))
 		}
@@ -272,13 +292,13 @@ extension K1.ECDSA.NonRecoverable {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
 		}
 
-		/// Creates a `secp256k1` private key for  signing  from an ANSI x9.63 representation of the key.
+		/// Creates a `secp256k1` private key for signing from an ANSI x9.63 representation of the key.
 		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
 		public init(x963Representation: some ContiguousBytes) throws {
 			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
-		/// Creates a `secp256k1` private key for  signing from a Distinguished Encoding Rules (DER) encoded representation of the key.
+		/// Creates a `secp256k1` private key for signing from a Distinguished Encoding Rules (DER) encoded representation of the key.
 		/// - Parameter derRepresentation: A DER-encoded representation of the key.
 		public init(derRepresentation: some RandomAccessCollection<UInt8>) throws {
 			try self.init(impl: .init(derRepresentation: derRepresentation))
@@ -317,22 +337,32 @@ extension K1.ECDSA.NonRecoverable {
 			self.impl = impl
 		}
 
+		/// Creates a `secp256k1` public key for verifying signatures from a collection of bytes.
+		/// - Parameter rawRepresentation: A raw representation of the key as a collection of contiguous bytes.
 		public init(rawRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
 		}
 
+		/// Creates a `secp256k1` public key for verifying signatures from a compressed representation of the key.
+		/// - Parameter compressedRepresentation: A compressed representation of the key as a collection of contiguous bytes.
 		public init(compressedRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(compressedRepresentation: compressedRepresentation))
 		}
 
+		/// Creates a `secp256k1` public key for verifying signatures from an ANSI x9.63 representation.
+		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
 		public init(x963Representation: some ContiguousBytes) throws {
 			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
+		/// Creates a `secp256k1` public key for verifying signatures from a Distinguished Encoding Rules (DER) encoded representation.
+		/// - Parameter derRepresentation: A DER-encoded representation of the key.
 		public init(derRepresentation: some RandomAccessCollection<UInt8>) throws {
 			try self.init(impl: .init(derRepresentation: derRepresentation))
 		}
 
+		/// Creates a `secp256k1` public key for verifying signatures from a Privacy-Enhanced Mail (PEM) representation.
+		/// - Parameter pemRepresentation: A PEM representation of the key.
 		public init(pemRepresentation: String) throws {
 			try self.init(impl: .init(pemRepresentation: pemRepresentation))
 		}
@@ -391,13 +421,13 @@ extension K1.ECDSA.Recoverable {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
 		}
 
-		/// Creates a `secp256k1` private key for  signing  from an ANSI x9.63 representation of the key.
+		/// Creates a `secp256k1` private key for signing from an ANSI x9.63 representation of the key.
 		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
 		public init(x963Representation: some ContiguousBytes) throws {
 			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
-		/// Creates a `secp256k1` private key for  signing from a Distinguished Encoding Rules (DER) encoded representation of the key.
+		/// Creates a `secp256k1` private key for signing from a Distinguished Encoding Rules (DER) encoded representation of the key.
 		/// - Parameter derRepresentation: A DER-encoded representation of the key.
 		public init(derRepresentation: some RandomAccessCollection<UInt8>) throws {
 			try self.init(impl: .init(derRepresentation: derRepresentation))
@@ -436,22 +466,32 @@ extension K1.ECDSA.Recoverable {
 			self.impl = impl
 		}
 
+		/// Creates a `secp256k1` public key for verifying signatures from a collection of bytes.
+		/// - Parameter rawRepresentation: A raw representation of the key as a collection of contiguous bytes.
 		public init(rawRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(rawRepresentation: rawRepresentation))
 		}
 
+		/// Creates a `secp256k1` public key for verifying signatures from a compressed representation of the key.
+		/// - Parameter compressedRepresentation: A compressed representation of the key as a collection of contiguous bytes.
 		public init(compressedRepresentation: some ContiguousBytes) throws {
 			try self.init(impl: .init(compressedRepresentation: compressedRepresentation))
 		}
 
+		/// Creates a `secp256k1` public key for verifying signatures from an ANSI x9.63 representation.
+		/// - Parameter x963Representation: An ANSI x9.63 representation of the key.
 		public init(x963Representation: some ContiguousBytes) throws {
 			try self.init(impl: .init(x963Representation: x963Representation))
 		}
 
+		/// Creates a `secp256k1` public key for verifying signatures from a Distinguished Encoding Rules (DER) encoded representation.
+		/// - Parameter derRepresentation: A DER-encoded representation of the key.
 		public init(derRepresentation: some RandomAccessCollection<UInt8>) throws {
 			try self.init(impl: .init(derRepresentation: derRepresentation))
 		}
 
+		/// Creates a `secp256k1` public key for verifying signatures from a Privacy-Enhanced Mail (PEM) representation.
+		/// - Parameter pemRepresentation: A PEM representation of the key.
 		public init(pemRepresentation: String) throws {
 			try self.init(impl: .init(pemRepresentation: pemRepresentation))
 		}
