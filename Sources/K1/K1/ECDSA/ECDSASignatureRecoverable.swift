@@ -309,7 +309,7 @@ extension K1.ECDSA.Recoverable.Signature {
         message: some DataProtocol
     ) throws -> K1.ECDSA.Recoverable.PublicKey {
         let wrapped = try FFI.ECDSA.Recovery.recover(wrapped, message: [UInt8](message))
-        let impl = K1.PublicKeyImpl(wrapped: wrapped)
+        let impl = K1._PublicKeyImplementation(wrapped: wrapped)
         return K1.ECDSA.Recoverable.PublicKey(
             impl: impl
         )

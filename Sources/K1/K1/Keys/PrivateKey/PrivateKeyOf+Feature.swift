@@ -45,9 +45,9 @@ public struct PrivateKeyOf<Feature: K1Feature>: Sendable, Hashable, K1PrivateKey
         impl.pemRepresentation
     }
     
-    typealias Impl = K1.PrivateKeyImpl
+    typealias Impl = K1._PrivateKeyImplementation
     internal let impl: Impl
-    internal let publicKeyImpl: K1.PublicKeyImpl
+    internal let publicKeyImpl: K1._PublicKeyImplementation
     
     public typealias PublicKey = Feature.PublicKey
     

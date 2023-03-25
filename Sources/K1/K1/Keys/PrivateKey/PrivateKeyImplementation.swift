@@ -33,12 +33,12 @@ public protocol K1PrivateKeyProtocol: K1KeyPortable {
 // MARK: - PrivateKey
 extension K1 {
     
-    struct PrivateKeyImpl: Sendable, Hashable, K1PrivateKeyProtocol {
+    struct _PrivateKeyImplementation: Sendable, Hashable, K1PrivateKeyProtocol {
         
         typealias Wrapped = FFI.PrivateKey.Wrapped
         internal let wrapped: Wrapped
         
-        let publicKey: PublicKeyImpl
+        let publicKey: _PublicKeyImplementation
         
         internal init(wrapped: Wrapped) {
             self.wrapped = wrapped
@@ -48,7 +48,7 @@ extension K1 {
 }
 
 // MARK: Inits
-extension K1.PrivateKeyImpl {
+extension K1._PrivateKeyImplementation {
     
     /// Creates a `secp256k1` private key from a Privacy-Enhanced Mail (PEM) representation.
     init(
@@ -84,8 +84,8 @@ extension K1.PrivateKeyImpl {
             throw K1.Error.incorrectByteCountOfX963PrivateKey(got: length, expected: Self.x963ByteCount)
         }
         
-        let publicKeyX963 = x963Representation.bytes.prefix(K1.PublicKeyImpl.x963ByteCount)
-        let publicKeyFromX963 = try K1.PublicKeyImpl.init(x963Representation: publicKeyX963)
+        let publicKeyX963 = x963Representation.bytes.prefix(K1._PublicKeyImplementation.x963ByteCount)
+        let publicKeyFromX963 = try K1._PublicKeyImplementation.init(x963Representation: publicKeyX963)
         let privateKeyRaw = x963Representation.bytes.suffix(Self.rawByteCount)
         try self.init(rawRepresentation: privateKeyRaw)
         guard self.publicKey == publicKeyFromX963 else {
@@ -116,7 +116,7 @@ extension K1.PrivateKeyImpl {
 }
 
 // MARK: Serialize
-extension K1.PrivateKeyImpl {
+extension K1._PrivateKeyImplementation {
 
     /// A raw representation of the private key.
     var rawRepresentation: Data {
@@ -156,16 +156,16 @@ extension K1.PrivateKeyImpl {
     
 
     static let rawByteCount = Curve.Field.byteCount
-    static let x963ByteCount = K1.PublicKeyImpl.x963ByteCount + K1.PrivateKeyImpl.rawByteCount
+    static let x963ByteCount = K1._PublicKeyImplementation.x963ByteCount + K1._PrivateKeyImplementation.rawByteCount
 }
 
-extension K1.PrivateKeyImpl {
+extension K1._PrivateKeyImplementation {
     static let pemType = "PRIVATE KEY"
 }
 
 
 // MARK: - Equatable
-extension K1.PrivateKeyImpl {
+extension K1._PrivateKeyImplementation {
     /// Constant-time comparision.
     static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.wrapped.secureBytes == rhs.wrapped.secureBytes
@@ -173,7 +173,7 @@ extension K1.PrivateKeyImpl {
 }
 
 // MARK: - Hashable
-extension K1.PrivateKeyImpl {
+extension K1._PrivateKeyImplementation {
     /// We use the key of the private key as input to hash
     func hash(into hasher: inout Hasher) {
         hasher.combine(self.publicKey)

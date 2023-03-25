@@ -207,7 +207,7 @@ extension K1.ECDSA.NonRecoverable.Signature {
             recoveryID: recoveryID.recid,
             message: [UInt8](message)
         )
-        let impl = K1.PublicKeyImpl(wrapped: wrapped)
+        let impl = K1._PublicKeyImplementation(wrapped: wrapped)
         return K1.ECDSA.NonRecoverable.PublicKey(impl: impl)
     }
 }

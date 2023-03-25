@@ -50,7 +50,7 @@ public struct PublicKeyOf<Feature>: Sendable, Hashable, K1PublicKeyProtocol {
         impl.pemRepresentation
     }
     
-    typealias Impl = K1.PublicKeyImpl
+    typealias Impl = K1._PublicKeyImplementation
     internal let impl: Impl
     internal init(impl: Impl) {
         self.impl = impl

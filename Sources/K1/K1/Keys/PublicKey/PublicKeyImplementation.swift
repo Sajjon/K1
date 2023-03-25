@@ -14,7 +14,7 @@ public protocol K1PublicKeyProtocol: K1KeyPortable {
 
 extension K1 {
     
-    struct PublicKeyImpl: Sendable, Hashable, K1PublicKeyProtocol {
+    struct _PublicKeyImplementation: Sendable, Hashable, K1PublicKeyProtocol {
         
         typealias Wrapped = FFI.PublicKey.Wrapped
         internal let wrapped: Wrapped
@@ -26,7 +26,7 @@ extension K1 {
 }
 
 // MARK: Init
-extension K1.PublicKeyImpl {
+extension K1._PublicKeyImplementation {
     
 
     /// `04 || X || Y` (65 bytes)
@@ -77,12 +77,12 @@ extension K1.PublicKeyImpl {
 
 }
 
-extension K1.PublicKeyImpl {
+extension K1._PublicKeyImplementation {
     static let pemType = "PUBLIC KEY"
 }
 
 // MARK: Serialize
-extension K1.PublicKeyImpl {
+extension K1._PublicKeyImplementation {
     
     /// `X || Y` (64 bytes)
     var rawRepresentation: Data {
@@ -121,7 +121,7 @@ extension K1.PublicKeyImpl {
 }
 
 // MARK: Equatable
-extension K1.PublicKeyImpl {
+extension K1._PublicKeyImplementation {
     static func == (lhsSelf: Self, rhsSelf: Self) -> Bool {
         let lhs = lhsSelf.wrapped
         let rhs = rhsSelf.wrapped
@@ -138,7 +138,7 @@ extension K1.PublicKeyImpl {
 }
 
 // MARK: Hashable
-extension K1.PublicKeyImpl {
+extension K1._PublicKeyImplementation {
     func hash(into hasher: inout Hasher) {
         wrapped.withUnsafeBytes {
             hasher.combine(bytes: $0)
