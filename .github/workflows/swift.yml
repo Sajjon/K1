@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.ref }} 
   cancel-in-progress: true
 
 jobs:
@@ -25,4 +25,4 @@ jobs:
       - name: Select Xcode ${{ matrix.xcode }}
         run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
       - name: Run ${{ matrix.config }} tests
-        run: CONFIG=${{ matrix.config }} make test-library
+        run: CONFIG=${{ matrix.config }} make test
