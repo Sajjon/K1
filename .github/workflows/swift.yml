@@ -14,18 +14,30 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  linting:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3
+      - name: "Run Lint"
+        run: |
+          brew update
+          brew upgrade swiftformat
+          swiftformat . --lint
+
   unittest:
     runs-on: macos-12
+    needs:
+      - linting
     strategy:
       matrix:
         xcode: ['14.1']
     steps:
       - uses: actions/checkout@v3
-      - name: Select Xcode ${{ matrix.xcode }}
+      - name: "Select Xcode ${{ matrix.xcode }}"
         run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
-      - name: Clean and init submodules
+      - name: "Clean and init submodules"
         run: make init
-      - name: Run test in debug
+      - name: "Run test in debug"
         run: make testdebug
-      - name: Run test in production
+      - name: "Run test in production"
         run: make testprod
