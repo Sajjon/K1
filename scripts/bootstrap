@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -o errexit # exit out if any command fails
+set -o nounset # exit out if any used variable is unset
+
+echo "Installing CLI tools (if missing)"
+if ! command -v grealpath &> /dev/null; then
+    brew install coreutils
+fi
+if ! command -v swiftformat &> /dev/null; then
+    brew install swiftformat
+fi
+
+DIR=$(cd "$(dirname "$BASH_SOURCE")" && pwd)
+
+pushd "$DIR/.." > /dev/null
+
+echo "Symlinking Git hooks"
+GIT_HOOKS_DIR=.git/hooks
+mkdir -p "$GIT_HOOKS_DIR"
+ln -sf "$(grealpath --relative-to=.git/hooks scripts)/pre-commit" "$GIT_HOOKS_DIR"
+
+echo "Done ✅"
+
+popd > /dev/null
