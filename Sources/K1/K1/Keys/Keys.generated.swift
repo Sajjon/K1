@@ -46,7 +46,7 @@ extension K1.KeyAgreement {
 
 		/// Creates a `secp256k1` private key for key agreement from a Privacy-Enhanced Mail (PEM) representation of the key.
 		///
-		/// Expectes a string on format:
+		/// Expects a string on format:
 		///
 		/// 	-----BEGIN PRIVATE KEY-----
 		///		MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgvddDDSbMRcLWZETSUOyD
@@ -134,7 +134,7 @@ extension K1.KeyAgreement {
 
 		/// Creates a `secp256k1` public key for key agreement from a Privacy-Enhanced Mail (PEM) representation.
 		///
-		/// Expectes a string on format:
+		/// Expects a string on format:
 		///
 		/// 	-----BEGIN PUBLIC KEY-----
 		///		MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEEmDCEiyeJE4a9RUb7eDDriO1TXxZaIHT
@@ -245,7 +245,7 @@ extension K1.Schnorr {
 
 		/// Creates a `secp256k1` private key for signing from a Privacy-Enhanced Mail (PEM) representation of the key.
 		///
-		/// Expectes a string on format:
+		/// Expects a string on format:
 		///
 		/// 	-----BEGIN PRIVATE KEY-----
 		///		MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgvddDDSbMRcLWZETSUOyD
@@ -334,7 +334,7 @@ extension K1.Schnorr {
 
 		/// Creates a `secp256k1` public key for verifying signatures from a Privacy-Enhanced Mail (PEM) representation.
 		///
-		/// Expectes a string on format:
+		/// Expects a string on format:
 		///
 		/// 	-----BEGIN PUBLIC KEY-----
 		///		MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEEmDCEiyeJE4a9RUb7eDDriO1TXxZaIHT
@@ -445,7 +445,7 @@ extension K1.ECDSA.NonRecoverable {
 
 		/// Creates a `secp256k1` private key for signing from a Privacy-Enhanced Mail (PEM) representation of the key.
 		///
-		/// Expectes a string on format:
+		/// Expects a string on format:
 		///
 		/// 	-----BEGIN PRIVATE KEY-----
 		///		MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgvddDDSbMRcLWZETSUOyD
@@ -534,7 +534,7 @@ extension K1.ECDSA.NonRecoverable {
 
 		/// Creates a `secp256k1` public key for verifying signatures from a Privacy-Enhanced Mail (PEM) representation.
 		///
-		/// Expectes a string on format:
+		/// Expects a string on format:
 		///
 		/// 	-----BEGIN PUBLIC KEY-----
 		///		MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEEmDCEiyeJE4a9RUb7eDDriO1TXxZaIHT
@@ -645,7 +645,7 @@ extension K1.ECDSA.Recoverable {
 
 		/// Creates a `secp256k1` private key for signing from a Privacy-Enhanced Mail (PEM) representation of the key.
 		///
-		/// Expectes a string on format:
+		/// Expects a string on format:
 		///
 		/// 	-----BEGIN PRIVATE KEY-----
 		///		MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgvddDDSbMRcLWZETSUOyD
@@ -734,7 +734,7 @@ extension K1.ECDSA.Recoverable {
 
 		/// Creates a `secp256k1` public key for verifying signatures from a Privacy-Enhanced Mail (PEM) representation.
 		///
-		/// Expectes a string on format:
+		/// Expects a string on format:
 		///
 		/// 	-----BEGIN PUBLIC KEY-----
 		///		MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEEmDCEiyeJE4a9RUb7eDDriO1TXxZaIHT

@@ -107,9 +107,9 @@ extension K1.Schnorr.PublicKey {
 // MARK: - K1.Schnorr.SigningOptions
 extension K1.Schnorr {
 	public struct SigningOptions: Sendable, Hashable {
-		public let auxilaryRandomData: AuxilaryRandomData?
-		public init(auxilaryRandomData: AuxilaryRandomData? = nil) {
-			self.auxilaryRandomData = auxilaryRandomData
+		public let auxiliaryRandomData: AuxiliaryRandomData?
+		public init(auxiliaryRandomData: AuxiliaryRandomData? = nil) {
+			self.auxiliaryRandomData = auxiliaryRandomData
 		}
 	}
 }
@@ -117,7 +117,7 @@ extension K1.Schnorr {
 extension K1.Schnorr.SigningOptions {
 	public static let `default` = Self()
 
-	public struct AuxilaryRandomData: Sendable, Hashable {
+	public struct AuxiliaryRandomData: Sendable, Hashable {
 		public let aux: [UInt8]
 
 		public init(aux: some DataProtocol) throws {

@@ -76,7 +76,7 @@ extension FFI.Schnorr {
 				&signatureOut,
 				message,
 				&keyPair,
-				options.auxilaryRandomData?.aux
+				options.auxiliaryRandomData?.aux
 			)
 		}
 

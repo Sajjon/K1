@@ -47,7 +47,7 @@ extension K1.KeyAgreement.PrivateKey {
 	}
 
 	/// Computes a shared secret with the provided public key from another party,
-	/// using `libsecp256k1` default behaviour, returning a hashed of the compressed point.
+	/// using `libsecp256k1` default behavior, returning a hashed of the compressed point.
 	///
 	/// This is one of three ECDH functions, this library vendors, all three versions
 	/// uses different serialization of the shared EC Point, specifically:
@@ -56,7 +56,7 @@ extension K1.KeyAgreement.PrivateKey {
 	/// 3. Custom: No hash, return point uncompressed
 	///
 	/// This function uses 1. i.e.SHA-256 hash the compressed point.
-	/// This is using the [default behaviour of `libsecp256k1`][libsecp256k1], which does not adhere to any
+	/// This is using the [default behavior of `libsecp256k1`][libsecp256k1], which does not adhere to any
 	/// other standard.
 	///
 	/// As seen on [StackExchange][cryptostackexchange], this version is compatible with all

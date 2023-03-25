@@ -87,7 +87,7 @@ extension K1.${FEATURE} {
 
 		/// Creates a `secp256k1` private key for ${PURPOSE_PRIVATEKEY} from a Privacy-Enhanced Mail (PEM) representation of the key.
 		///
-		/// Expectes a string on format:
+		/// Expects a string on format:
 		///
 		/// 	-----BEGIN PRIVATE KEY-----
 		///		MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgvddDDSbMRcLWZETSUOyD
@@ -177,7 +177,7 @@ extension K1.${FEATURE} {
 
 		/// Creates a `secp256k1` public key for ${PURPOSE_PUBLICKEY} from a Privacy-Enhanced Mail (PEM) representation.
 		///
-		/// Expectes a string on format:
+		/// Expects a string on format:
 		///
 		/// 	-----BEGIN PUBLIC KEY-----
 		///		MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEEmDCEiyeJE4a9RUb7eDDriO1TXxZaIHT
