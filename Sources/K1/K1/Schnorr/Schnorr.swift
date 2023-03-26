@@ -58,7 +58,7 @@ extension K1.Schnorr.SigningOptions.AuxiliaryRandomData {
 		public static let byteCount = Curve.Field.byteCount
 		public init(aux: some DataProtocol) throws {
 			guard aux.count == Self.byteCount else {
-				throw K1.Error.failedToSchnorrSignDigestProvidedRandomnessInvalidLength
+				throw K1.Error.incorrectParameterSize
 			}
 			self.aux = [UInt8](aux)
 		}

@@ -28,8 +28,12 @@ extension FFI.ECDSA.NonRecoverable {
 	static func compact(_ wrapped: Wrapped) throws -> Data {
 		var out = [UInt8](repeating: 0, count: Self.byteCount)
 		var rawSignature = wrapped.raw
-		try FFI.call(ifFailThrow: .failedToSerializeSignature) { context in
-			secp256k1_ecdsa_signature_serialize_compact(context, &out, &rawSignature)
+		try FFI.call(ifFailThrow: .ecdsaSignatureSerializeCompact) { context in
+			secp256k1_ecdsa_signature_serialize_compact(
+				context,
+				&out,
+				&rawSignature
+			)
 		}
 		return Data(out)
 	}
@@ -40,7 +44,7 @@ extension FFI.ECDSA.NonRecoverable {
 		var derMaxLength = 75 // in fact max is 73, but we can have some margin.
 		var derSignature = [UInt8](repeating: 0, count: derMaxLength)
 		var rawSignature = wrapped.raw
-		try FFI.call(ifFailThrow: .failedToSerializeDERSignature) { context in
+		try FFI.call(ifFailThrow: .ecdsaSignatureSerializeDER) { context in
 			secp256k1_ecdsa_signature_serialize_der(
 				context,
 				&derSignature,
@@ -60,7 +64,7 @@ extension FFI.ECDSA.NonRecoverable {
 		message: [UInt8]
 	) throws -> FFI.PublicKey.Wrapped {
 		guard message.count == Curve.Field.byteCount else {
-			throw K1.Error.unableToRecoverMessageHasInvalidLength(got: message.count, expected: Curve.Field.byteCount)
+			throw K1.Error.incorrectParameterSize
 		}
 		let nonRecoverableCompact = try FFI.ECDSA.NonRecoverable.compact(wrapped)
 		return try Self.recoverPublicKey(
@@ -76,14 +80,11 @@ extension FFI.ECDSA.NonRecoverable {
 		message: [UInt8]
 	) throws -> FFI.PublicKey.Wrapped {
 		guard message.count == Curve.Field.byteCount else {
-			throw K1.Error.unableToRecoverMessageHasInvalidLength(
-				got: message.count,
-				expected: Curve.Field.byteCount
-			)
+			throw K1.Error.incorrectParameterSize
 		}
 		var compact = [UInt8](nonRecoverableCompact)
 		var recoverable = secp256k1_ecdsa_recoverable_signature()
-		try FFI.call(ifFailThrow: .failedToParseRecoverableSignatureFromCompact) { context in
+		try FFI.call(ifFailThrow: .recoverableSignatureParseCompact) { context in
 			secp256k1_ecdsa_recoverable_signature_parse_compact(
 				context,
 				&recoverable,
@@ -92,7 +93,7 @@ extension FFI.ECDSA.NonRecoverable {
 			)
 		}
 		var publicKeyRaw = secp256k1_pubkey()
-		try FFI.call(ifFailThrow: .failedToRecoverPublicKey) { context in
+		try FFI.call(ifFailThrow: .recover) { context in
 			secp256k1_ecdsa_recover(
 				context,
 				&publicKeyRaw,

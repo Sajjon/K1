@@ -68,7 +68,7 @@ extension FFI.ECDH {
 		}()
 		var publicKeyRaw = publicKey.raw
 		try FFI.call(
-			ifFailThrow: .failedToPerformDiffieHellmanKeyExchange
+			ifFailThrow: .ecdh
 		) { context in
 			secp256k1_ecdh(
 				context,

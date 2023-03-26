@@ -72,7 +72,7 @@ extension K1.ECDSA.SigningOptions.NonceFunction {
 		public static let byteCount = Curve.Field.byteCount
 		public init(arbitraryData: [UInt8]) throws {
 			guard arbitraryData.count == Self.byteCount else {
-				throw K1.Error.incorrectByteCountOfArbitraryDataForNonceFunction
+				throw K1.Error.incorrectParameterSize
 			}
 			self.arbitraryData = arbitraryData
 		}

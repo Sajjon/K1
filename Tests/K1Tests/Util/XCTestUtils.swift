@@ -8,10 +8,10 @@ extension XCTestCase {
 	) {
 		XCTAssertThrowsError(try fn()) { anyError in
 			guard let error = anyError as? E else {
-				XCTFail("Incorrect type of error, got '\(type(of: anyError))' but expected: \(E.self)")
+				XCTFail("Incorrect type of error, got errorType: '\(type(of: anyError))' but expected errorType: \(E.self),  got: \(String(describing: anyError))", file: file, line: line)
 				return
 			}
-			XCTAssertEqual(error, expectedError)
+			XCTAssertEqual(error, expectedError, file: file, line: line)
 		}
 	}
 }

@@ -87,10 +87,7 @@ extension K1.ECDSA.Recoverable.Signature {
 			recoveryID: RecoveryID
 		) throws {
 			guard compact.count == Self.byteCountRS else {
-				throw K1.Error.failedToDeserializeCompactRSRecoverableSignatureInvalidByteCount(
-					got: compact.count,
-					expected: Self.byteCountRS
-				)
+				throw K1.Error.incorrectKeySize
 			}
 			self.compact = compact
 			self.recoveryID = recoveryID
@@ -108,7 +105,7 @@ extension K1.ECDSA.Recoverable.Signature.Compact {
 		format: SerializationFormat
 	) throws {
 		guard rawRepresentation.count == Self.byteCount else {
-			throw K1.Error.failedToDeserializeCompactRecoverableSignatureInvalidByteCount(got: rawRepresentation.count, expected: Self.byteCount)
+			throw K1.Error.incorrectKeySize
 		}
 		switch format {
 		case .vrs:

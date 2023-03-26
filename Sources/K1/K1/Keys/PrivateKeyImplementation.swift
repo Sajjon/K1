@@ -56,7 +56,7 @@ extension K1._PrivateKeyImplementation {
 			let parsed = try ASN1.PKCS8PrivateKey(asn1Encoded: Array(pem.derBytes))
 			self = try .init(rawRepresentation: parsed.privateKey.privateKey)
 		default:
-			throw K1.Error.invalidPEMDocument
+			throw K1.ASN1Error.invalidPEMDocument
 		}
 	}
 
@@ -73,7 +73,7 @@ extension K1._PrivateKeyImplementation {
 	) throws {
 		let length = x963Representation.withUnsafeBytes { $0.count }
 		guard length == Self.x963ByteCount else {
-			throw K1.Error.incorrectByteCountOfX963PrivateKey(got: length, expected: Self.x963ByteCount)
+			throw K1.Error.incorrectKeySize
 		}
 
 		let publicKeyX963 = x963Representation.bytes.prefix(K1._PublicKeyImplementation.x963ByteCount)
@@ -81,7 +81,7 @@ extension K1._PrivateKeyImplementation {
 		let privateKeyRaw = x963Representation.bytes.suffix(Self.rawByteCount)
 		try self.init(rawRepresentation: privateKeyRaw)
 		guard self.publicKey == publicKeyFromX963 else {
-			throw K1.Error.invalidPrivateX963RepresentationPublicKeyDiscrepancy
+			throw K1.Error.invalidKey
 		}
 		// All good
 	}

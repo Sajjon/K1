@@ -38,16 +38,13 @@ extension FFI.ECDSA {
 		options: K1.ECDSA.SigningOptions = .default
 	) throws -> WrappedSignature where WrappedSignature: WrappedECDSASignature {
 		guard message.count == Curve.Field.byteCount else {
-			throw K1.Error.unableToSignMessageHasInvalidLength(
-				got: message.count,
-				expected: Curve.Field.byteCount
-			)
+			throw K1.Error.incorrectParameterSize
 		}
 
 		var raw = WrappedSignature.Raw()
 
 		try FFI.call(
-			ifFailThrow: .failedToECDSASignDigest
+			ifFailThrow: .ecdsaSign
 		) { context in
 			WrappedSignature.sign()(
 				context,

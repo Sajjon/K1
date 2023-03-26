@@ -18,7 +18,7 @@ extension FFI.ECDSA.Recoverable {
 	) throws -> Wrapped {
 		var raw = Wrapped.Raw()
 		try FFI.call(
-			ifFailThrow: .failedSignatureToConvertRecoverableSignatureToCompact
+			ifFailThrow: .recoverableSignatureParseCompact
 		) { context in
 			secp256k1_ecdsa_recoverable_signature_parse_compact(
 				context,
@@ -40,7 +40,7 @@ extension FFI.ECDSA.Recoverable {
 		var recoveryID: Int32 = 0
 		var rawSignature = wrapped.raw
 		try FFI.call(
-			ifFailThrow: .failedSignatureToConvertRecoverableSignatureToCompact
+			ifFailThrow: .recoverableSignatureSerializeCompact
 		) { context in
 			secp256k1_ecdsa_recoverable_signature_serialize_compact(
 				context,
@@ -62,7 +62,7 @@ extension FFI.ECDSA.Recoverable {
 		var recoverable = wrapped.raw
 
 		try FFI.call(
-			ifFailThrow: .failedToConvertRecoverableSignatureToNonRecoverable
+			ifFailThrow: .recoverableSignatureConvert
 		) { context in
 			secp256k1_ecdsa_recoverable_signature_convert(
 				context,
@@ -82,12 +82,12 @@ extension FFI.ECDSA.Recoverable {
 		message: [UInt8]
 	) throws -> FFI.PublicKey.Wrapped {
 		guard message.count == Curve.Field.byteCount else {
-			throw K1.Error.unableToRecoverMessageHasInvalidLength(got: message.count, expected: Curve.Field.byteCount)
+			throw K1.Error.incorrectParameterSize
 		}
 		var rawSignature = wrapped.raw
 		var rawPublicKey = secp256k1_pubkey()
 		try FFI.call(
-			ifFailThrow: .failedToRecoverPublicKey
+			ifFailThrow: .recover
 		) { context in
 			secp256k1_ecdsa_recover(
 				context,

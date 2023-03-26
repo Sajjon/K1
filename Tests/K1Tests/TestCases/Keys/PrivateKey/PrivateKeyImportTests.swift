@@ -7,7 +7,7 @@ final class PrivateKeyImportTests: XCTestCase {
 		let raw = try Data(hex: "deadbeef")
 		try assert(
 			K1.ECDSA.NonRecoverable.PrivateKey(rawRepresentation: raw),
-			throws: K1.Error.failedToInitializePrivateKeyIncorrectByteCount(got: 4, expected: 32)
+			throws: K1.Error.incorrectKeySize
 		)
 	}
 
@@ -15,7 +15,7 @@ final class PrivateKeyImportTests: XCTestCase {
 		let raw = Data(repeating: 0xBA, count: 33)
 		try assert(
 			K1.ECDSA.NonRecoverable.PrivateKey(rawRepresentation: raw),
-			throws: K1.Error.failedToInitializePrivateKeyIncorrectByteCount(got: 33, expected: 32)
+			throws: K1.Error.incorrectKeySize
 		)
 	}
 
@@ -23,7 +23,7 @@ final class PrivateKeyImportTests: XCTestCase {
 		let raw = Data(repeating: 0x00, count: 32)
 		try assert(
 			K1.ECDSA.NonRecoverable.PrivateKey(rawRepresentation: raw),
-			throws: K1.Error.invalidPrivateKeyMustNotBeZero
+			throws: K1.Error.invalidKey
 		)
 	}
 
@@ -31,7 +31,7 @@ final class PrivateKeyImportTests: XCTestCase {
 		let raw = try Data(hex: "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141")
 		try assert(
 			K1.ECDSA.NonRecoverable.PrivateKey(rawRepresentation: raw),
-			throws: K1.Error.invalidPrivateKeyMustBeSmallerThanOrder
+			throws: K1.Error.underlyingLibsecp256k1Error(.publicKeyCreate)
 		)
 	}
 
@@ -39,7 +39,7 @@ final class PrivateKeyImportTests: XCTestCase {
 		let raw = Data(repeating: 0xFF, count: 32)
 		try assert(
 			K1.ECDSA.NonRecoverable.PrivateKey(rawRepresentation: raw),
-			throws: K1.Error.invalidPrivateKeyMustBeSmallerThanOrder
+			throws: K1.Error.underlyingLibsecp256k1Error(.publicKeyCreate)
 		)
 	}
 
