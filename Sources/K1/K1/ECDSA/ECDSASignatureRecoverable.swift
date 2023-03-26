@@ -10,132 +10,13 @@ extension K1.ECDSA {
 	}
 }
 
-// MARK: Sign
-extension K1.ECDSA.Recoverable.PrivateKey {
-	/// Generates an Elliptic Curve Digital Signature Algorithm (ECDSA) signature of _hashed_ data you provide over the `secp256k1` elliptic curve.
-	/// - Parameters:
-	///   - hashed: The _hashed_ data to sign.
-	///   - options: Whether or not to consider malleable signatures valid.
-	/// - Returns: The signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
-	public func signature(
-		for hashed: some DataProtocol,
-		options: K1.ECDSA.SigningOptions = .default
-	) throws -> K1.ECDSA.Recoverable.Signature {
-		try K1.ECDSA.Recoverable.Signature(
-			wrapped: FFI.ECDSA.Recovery.sign(
-				hashedMessage: [UInt8](hashed),
-				privateKey: impl.wrapped,
-				options: options
-			)
-		)
-	}
-
-	/// Generates an Elliptic Curve Digital Signature Algorithm (ECDSA) signature of the digest you provide over the `secp256k1` elliptic curve.
-	/// - Parameters:
-	///   - digest: The digest of the data to sign.
-	///   - options: Whether or not to consider malleable signatures valid.
-	/// - Returns: The signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
-	public func signature(
-		for digest: some Digest,
-		options: K1.ECDSA.SigningOptions = .default
-	) throws -> K1.ECDSA.Recoverable.Signature {
-		try signature(
-			for: Data(digest),
-			options: options
-		)
-	}
-
-	/// Generates an elliptic curve digital signature algorithm (ECDSA) signature of the given data over the `secp256k1` elliptic curve, using SHA-256 as a hash function.
-	/// - Parameters:
-	///   - unhashed: The data hash and then to sign.
-	///   - options: Whether or not to consider malleable signatures valid.
-	/// - Returns: The signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
-	public func signature(
-		forUnhashed unhashed: some DataProtocol,
-		options: K1.ECDSA.SigningOptions = .default
-	) throws -> K1.ECDSA.Recoverable.Signature {
-		try signature(
-			for: SHA256.hash(data: unhashed),
-			options: options
-		)
-	}
-}
-
-// MARK: Validate
-extension K1.ECDSA.Recoverable.PublicKey {
-	/// Verifies a recoverable ECDSA signature on some _hash_ over the `secp256k1` elliptic curve.
-	/// - Parameters:
-	///   - signature: The recoverable ECDSA signature to check against the given digest.
-	///   - hashed: The _hashed_ data covered by the signature.
-	///   - options: ECDSA validation options used during validation
-	/// - Returns: A Boolean value that’s true if the signature is valid for the given _hashed_ data.
-	public func isValidSignature(
-		_ signature: K1.ECDSA.Recoverable.Signature,
-		hashed: some DataProtocol,
-		options: K1.ECDSA.ValidationOptions = .default
-	) -> Bool {
-		do {
-			let publicKeyNonRecoverable = try K1.ECDSA.NonRecoverable.PublicKey(rawRepresentation: self.rawRepresentation)
-			let signatureNonRecoverable = try signature.nonRecoverable()
-
-			return publicKeyNonRecoverable.isValidSignature(
-				signatureNonRecoverable,
-				hashed: hashed,
-				options: options
-			)
-		} catch {
-			return false
-		}
-	}
-
-	/// Verifies a recoverable ECDSA signature on a digest over the `secp256k1` elliptic curve.
-	/// - Parameters:
-	///   - signature: The recoverable ECDSA signature to check against the given digest.
-	///   - digest: The digest covered by the signature.
-	///   - options: ECDSA validation options used during validation
-	/// - Returns: A Boolean value that’s true if the signature is valid for the given digest.
-	public func isValidSignature(
-		_ signature: K1.ECDSA.Recoverable.Signature,
-		digest: some Digest,
-		options: K1.ECDSA.ValidationOptions = .default
-	) -> Bool {
-		isValidSignature(
-			signature,
-			hashed: Data(digest),
-			options: options
-		)
-	}
-
-	/// Verifies a recoverable ECDSA signature on a block of data over the `secp256k1` elliptic curve.
-	///
-	/// The function computes an SHA-256 hash from the data before verifying the signature. If you separately hash the data to be signed, use `isValidSignature(_:digest:input)` with the created digest. Or if you have access to a digest just as `some DataProtocol`, use
-	/// `isValidSignature(_:hashed:input)`.
-	///
-	/// - Parameters:
-	///   - signature: The recoverable ECDSA signature to check against the given digest.
-	///   - unhashed: The block of data covered by the signature.
-	///   - options: ECDSA validation options used during validation
-	/// - Returns: A Boolean value that’s true if the signature is valid for the given block of data.
-	public func isValidSignature(
-		_ signature: K1.ECDSA.Recoverable.Signature,
-		unhashed: some DataProtocol,
-		options: K1.ECDSA.ValidationOptions = .default
-	) -> Bool {
-		isValidSignature(
-			signature,
-			digest: SHA256.hash(data: unhashed),
-			options: options
-		)
-	}
-}
-
 // MARK: - K1.ECDSA.Recoverable.Signature
 extension K1.ECDSA.Recoverable {
 	/// A `secp256k1` elliptic curve digital signature algorithm (ECDSA) signature,
 	/// from which users **cannot** recover the public key, not without the `RecoveryID`.
 	public struct Signature: Sendable, Hashable, ContiguousBytes {
-		typealias Wrapped = FFI.ECDSA.Recovery.Wrapped
-		private let wrapped: Wrapped
+		typealias Wrapped = FFI.ECDSA.Recoverable.Wrapped
+		internal let wrapped: Wrapped
 
 		internal init(wrapped: Wrapped) {
 			self.wrapped = wrapped
@@ -148,7 +29,7 @@ extension K1.ECDSA.Recoverable.Signature {
 	/// Compact aka `IEEE P1363` aka `R||S`.
 	public init(compact: Compact) throws {
 		try self.init(
-			wrapped: FFI.ECDSA.Recovery.deserialize(
+			wrapped: FFI.ECDSA.Recoverable.deserialize(
 				compact: [UInt8](compact.compact),
 				recoveryID: compact.recoveryID.recid
 			)
@@ -164,7 +45,7 @@ extension K1.ECDSA.Recoverable.Signature {
 		rawRepresentation: some DataProtocol
 	) throws {
 		try self.init(
-			wrapped: FFI.ECDSA.Recovery.deserialize(rawRepresentation: rawRepresentation)
+			wrapped: FFI.ECDSA.Recoverable.deserialize(rawRepresentation: rawRepresentation)
 		)
 	}
 }
@@ -184,7 +65,7 @@ extension K1.ECDSA.Recoverable.Signature {
 
 	/// Compact aka `IEEE P1363` aka `R||S` with `RecoveryID`
 	public func compact() throws -> Compact {
-		let (rs, recid) = try FFI.ECDSA.Recovery.serializeCompact(
+		let (rs, recid) = try FFI.ECDSA.Recoverable.serializeCompact(
 			wrapped
 		)
 		return try .init(
@@ -285,7 +166,7 @@ extension K1.ECDSA.Recoverable.Signature {
 	public func recoverPublicKey(
 		message: some DataProtocol
 	) throws -> K1.ECDSA.Recoverable.PublicKey {
-		let wrapped = try FFI.ECDSA.Recovery.recover(wrapped, message: [UInt8](message))
+		let wrapped = try FFI.ECDSA.Recoverable.recover(wrapped, message: [UInt8](message))
 		let impl = K1._PublicKeyImplementation(wrapped: wrapped)
 		return K1.ECDSA.Recoverable.PublicKey(
 			impl: impl
@@ -297,7 +178,7 @@ extension K1.ECDSA.Recoverable.Signature {
 extension K1.ECDSA.Recoverable.Signature {
 	public func nonRecoverable() throws -> K1.ECDSA.NonRecoverable.Signature {
 		try K1.ECDSA.NonRecoverable.Signature(
-			wrapped: FFI.ECDSA.Recovery.nonRecoverable(self.wrapped)
+			wrapped: FFI.ECDSA.Recoverable.nonRecoverable(self.wrapped)
 		)
 	}
 }
