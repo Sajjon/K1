@@ -2,7 +2,7 @@ import Foundation
 import secp256k1
 
 // MARK: Deserialize
-extension FFI.ECDSA.NonRecovery {
+extension FFI.ECDSA.NonRecoverable {
 	static let byteCount = 2 * Curve.Field.byteCount
 
 	/// Compact aka `IEEE P1363` aka `R||S`.
@@ -24,7 +24,7 @@ extension FFI.ECDSA.NonRecovery {
 }
 
 // MARK: Serialize
-extension FFI.ECDSA.NonRecovery {
+extension FFI.ECDSA.NonRecoverable {
 	static func compact(_ wrapped: Wrapped) throws -> Data {
 		var out = [UInt8](repeating: 0, count: Self.byteCount)
 		var rawSignature = wrapped.raw
@@ -53,7 +53,7 @@ extension FFI.ECDSA.NonRecovery {
 }
 
 // MARK: Recover
-extension FFI.ECDSA.NonRecovery {
+extension FFI.ECDSA.NonRecoverable {
 	static func recoverPublicKey(
 		_ wrapped: Wrapped,
 		recoveryID: Int32,
@@ -62,7 +62,7 @@ extension FFI.ECDSA.NonRecovery {
 		guard message.count == Curve.Field.byteCount else {
 			throw K1.Error.unableToRecoverMessageHasInvalidLength(got: message.count, expected: Curve.Field.byteCount)
 		}
-		let nonRecoverableCompact = try FFI.ECDSA.NonRecovery.compact(wrapped)
+		let nonRecoverableCompact = try FFI.ECDSA.NonRecoverable.compact(wrapped)
 		return try Self.recoverPublicKey(
 			nonRecoverableCompact: nonRecoverableCompact,
 			recoveryID: recoveryID,
@@ -105,9 +105,9 @@ extension FFI.ECDSA.NonRecovery {
 }
 
 // MARK: Validate
-extension FFI.ECDSA.NonRecovery {
+extension FFI.ECDSA.NonRecoverable {
 	static func isValid(
-		ecdsaSignature: FFI.ECDSA.NonRecovery.Wrapped,
+		ecdsaSignature: FFI.ECDSA.NonRecoverable.Wrapped,
 		publicKey: FFI.PublicKey.Wrapped,
 		message: [UInt8],
 		options: K1.ECDSA.ValidationOptions = .default
@@ -152,13 +152,13 @@ extension FFI.ECDSA.NonRecovery {
 }
 
 // MARK: Sign
-extension FFI.ECDSA.NonRecovery {
+extension FFI.ECDSA.NonRecoverable {
 	/// Produces a **non recoverable** ECDSA signature from a hashed `message`
 	static func sign(
 		hashedMessage: [UInt8],
 		privateKey: FFI.PrivateKey.Wrapped,
 		options: K1.ECDSA.SigningOptions = .default
-	) throws -> FFI.ECDSA.NonRecovery.Wrapped {
+	) throws -> FFI.ECDSA.NonRecoverable.Wrapped {
 		try FFI.ECDSA._sign(
 			message: hashedMessage,
 			privateKey: privateKey,
