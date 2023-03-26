@@ -1,0 +1,94 @@
+// MARK: - Generated file, do NOT edit
+// any edits of this file WILL be overwritten and thus discarded
+// see section `gyb` in `README` for details.
+
+import Foundation
+import struct CryptoKit.SHA256
+import protocol CryptoKit.Digest
+
+%{
+	VARIANTS_OF_FEATURE = [
+		{
+			"scheme": "ECDSA",
+			"feature": "ECDSA.NonRecoverable",
+			"variant": "an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable",
+			"docSignParameterOptions": "Whether or not to consider malleable signatures valid",
+			"docSignReturnExtra": " The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call."
+		},
+		{
+			"scheme": "ECDSA",
+			"feature": "ECDSA.Recoverable",
+			"variant": "an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable",
+			"docSignParameterOptions": "Whether or not to consider malleable signatures valid",
+			"docSignReturnExtra": " The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call."
+		},
+		{
+			"scheme": "Schnorr",
+			"feature": "Schnorr",
+			"variant": "Schnorr",
+			"docSignParameterOptions": "Optional auxiliary random data to use when forming nonce for the signature",
+			"docSignReturnExtra": "",
+		}
+	]
+}%
+% for VARIANT_OF_FEATURE in VARIANTS_OF_FEATURE:
+%{
+	FEATURE = VARIANT_OF_FEATURE["feature"]
+	SCHEME = VARIANT_OF_FEATURE["scheme"]
+	VARIANT = VARIANT_OF_FEATURE["variant"]
+	DOC_SIGN_PARAM_OPTIONS = VARIANT_OF_FEATURE["docSignParameterOptions"]
+	DOC_SIGN_RETURN_EXTRA = VARIANT_OF_FEATURE["docSignReturnExtra"]
+}%
+// MARK: Sign + ${FEATURE}
+extension K1.${FEATURE}.PrivateKey {
+	/// Generates ${VARIANT} signature of _hashed_ data you provide over the `secp256k1` elliptic curve.
+	/// - Parameters:
+	///   - hashed: The _hashed_ data to sign.
+	///   - options: ${DOC_SIGN_PARAM_OPTIONS}.
+	/// - Returns: The ${VARIANT} signature corresponding to the data.${DOC_SIGN_RETURN_EXTRA}
+	public func signature(
+		for hashed: some DataProtocol,
+		options: K1.${SCHEME}.SigningOptions = .default
+	) throws -> K1.${FEATURE}.Signature {
+		try K1.${FEATURE}.Signature(
+			wrapped: FFI.${FEATURE}.sign(
+				hashedMessage: [UInt8](hashed),
+				privateKey: impl.wrapped,
+				options: options
+			)
+		)
+	}
+
+	/// Generates ${VARIANT} signature of the digest you provide over the `secp256k1` elliptic curve.
+	/// - Parameters:
+	///   - digest: The digest of the data to sign.
+	///   - options: ${DOC_SIGN_PARAM_OPTIONS}.
+	/// - Returns: The ${VARIANT} signature corresponding to the data.${DOC_SIGN_RETURN_EXTRA}
+	public func signature(
+		for digest: some Digest,
+		options: K1.${SCHEME}.SigningOptions = .default
+	) throws -> K1.${FEATURE}.Signature {
+		try signature(
+			for: Data(digest),
+			options: options
+		)
+	}
+
+	/// Generates ${VARIANT} signature of the given data over the `secp256k1` elliptic curve, using SHA-256 as a hash function.
+	/// - Parameters:
+	///   - unhashed: The data hash and then to sign.
+	///   - options: ${DOC_SIGN_PARAM_OPTIONS}.
+	/// - Returns: The ${VARIANT} signature corresponding to the data.${DOC_SIGN_RETURN_EXTRA}
+	public func signature(
+		forUnhashed unhashed: some DataProtocol,
+		options: K1.${SCHEME}.SigningOptions = .default
+	) throws -> K1.${FEATURE}.Signature {
+		try signature(
+			for: SHA256.hash(data: unhashed),
+			options: options
+		)
+	}
+}
+
+% end
+% end

@@ -1,0 +1,105 @@
+// MARK: - Generated file, do NOT edit
+// any edits of this file WILL be overwritten and thus discarded
+// see section `gyb` in `README` for details.
+
+import Foundation
+import struct CryptoKit.SHA256
+import protocol CryptoKit.Digest
+
+%{
+	VARIANTS_OF_FEATURE = [
+		{
+			"scheme": "ECDSA",
+			"feature": "ECDSA.NonRecoverable",
+			"variant": "an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable",
+			"docValidationParameterOptions": "\n///   - options: Whether or not to consider malleable signatures valid.",
+			"validationOptionsArg": ",\noptions: K1.ECDSA.ValidationOptions = .default",
+			"validationOptionsFwd": ",\noptions: options",
+		},
+		{
+			"scheme": "ECDSA",
+			"feature": "ECDSA.Recoverable",
+			"variant": "an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable",
+			"docValidationParameterOptions": "\n///   - options: Whether or not to consider malleable signatures valid.",
+			"validationOptionsArg": ",\noptions: K1.ECDSA.ValidationOptions = .default",
+			"validationOptionsFwd": ",\noptions: options",
+		},
+		{
+			"scheme": "Schnorr",
+			"feature": "Schnorr",
+			"variant": "Schnorr",
+			"docValidationParameterOptions": "",
+			"validationOptionsArg": "",
+			"validationOptionsFwd": "",
+		}
+	]
+}%
+% for VARIANT_OF_FEATURE in VARIANTS_OF_FEATURE:
+%{
+	FEATURE = VARIANT_OF_FEATURE["feature"]
+	SCHEME = VARIANT_OF_FEATURE["scheme"]
+	VARIANT = VARIANT_OF_FEATURE["variant"]
+	DOC_VALIDATION_PARAM_OPTIONS = VARIANT_OF_FEATURE["docValidationParameterOptions"]
+	VALIDATION_OPTIONS_ARG = VARIANT_OF_FEATURE["validationOptionsArg"]
+	VALIDATION_OPTIONS_FWD = VARIANT_OF_FEATURE["validationOptionsFwd"]
+}%
+
+// MARK: Verify + ${FEATURE}
+extension K1.${FEATURE}.PublicKey {
+	/// Verifies an elliptic curve digital signature algorithm (ECDSA) ${VARIANT} signature on some _hash_ over the `secp256k1` elliptic curve.
+	/// - Parameters:
+	///   - signature: The ${VARIANT} signature to check against the _hashed_ data.
+	///   - hashed: The _hashed_ data covered by the signature.${DOC_VALIDATION_PARAM_OPTIONS}
+	/// - Returns: A Boolean value that’s true if the ${VARIANT} signature is valid for the given _hashed_ data.
+	public func isValidSignature(
+		_ signature: K1.${FEATURE}.Signature,
+		hashed: some DataProtocol${VALIDATION_OPTIONS_ARG}
+	) -> Bool {
+		do {
+			return try FFI.${FEATURE}.isValid(
+				signature: signature.wrapped,
+				publicKey: self.impl.wrapped,
+				message: [UInt8](hashed)${VALIDATION_OPTIONS_FWD}
+			)
+		} catch {
+			return false
+		}
+	}
+
+	/// Verifies an elliptic curve digital signature algorithm (ECDSA) ${VARIANT} signature on a digest over the `secp256k1` elliptic curve.
+	/// - Parameters:
+	///   - signature: The ${VARIANT} signature to check against the given digest.
+	///   - digest: The digest covered by the signature.${DOC_VALIDATION_PARAM_OPTIONS}
+	/// - Returns: A Boolean value that’s true if the ${VARIANT} signature is valid for the given digest.
+	public func isValidSignature(
+		_ signature: K1.${FEATURE}.Signature,
+		digest: some Digest${VALIDATION_OPTIONS_ARG}
+	) -> Bool {
+		isValidSignature(
+			signature,
+			hashed: Data(digest)${VALIDATION_OPTIONS_FWD}
+		)
+	}
+
+	/// Verifies an elliptic curve digital signature algorithm (ECDSA) ${VARIANT} signature on a block of data over the `secp256k1` elliptic curve.
+	///
+	/// The function computes an SHA-256 hash from the data before verifying the signature. If you separately hash the data to be signed, use `isValidSignature(_:digest:input)` with the created digest. Or if you have access to a digest just as `some DataProtocol`, use
+	/// `isValidSignature(_:hashed:input)`.
+	///
+	/// - Parameters:
+	///   - signature: The ${VARIANT} signature to check against the given digest.
+	///   - unhashed: The block of data covered by the signature.${DOC_VALIDATION_PARAM_OPTIONS}
+	/// - Returns: A Boolean value that’s true if the ${VARIANT} signature is valid for the given block of data.
+	public func isValidSignature(
+		_ signature: K1.${FEATURE}.Signature,
+		unhashed: some DataProtocol${VALIDATION_OPTIONS_ARG}
+	) -> Bool {
+		isValidSignature(
+			signature,
+			digest: SHA256.hash(data: unhashed)${VALIDATION_OPTIONS_FWD}
+		)
+	}
+}
+
+% end
+% end
