@@ -85,9 +85,14 @@ extension K1.ECDSA.SigningOptions.NonceFunction {
 				_: UInt32 // In: how many iterations we have tried to find a nonce. This will almost always be 0, but different attempt values are required to result in a different nonce.
 			) -> Int32 /* Returns: 1 if a nonce was successfully generated. 0 will cause signing to fail. */ in
 
-				SecureBytes(count: Curve.Field.byteCount).withUnsafeBytes {
-					nonce32?.assign(from: $0.baseAddress!.assumingMemoryBound(to: UInt8.self), count: $0.count)
-				}
+				let count = Curve.Field.byteCount
+				let secureBytes = SecureBytes(count: count)
+
+				#if swift(>=5.8)
+				nonce32?.update(from: secureBytes.bytes, count: count)
+				#else
+				nonce32?.assign(from: secureBytes.bytes, count: count)
+				#endif
 
 				// Returns: 1 if a nonce was successfully generated. 0 will cause signing to fail.
 				return 1
