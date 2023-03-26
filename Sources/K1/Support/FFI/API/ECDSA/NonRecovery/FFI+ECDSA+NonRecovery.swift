@@ -107,14 +107,14 @@ extension FFI.ECDSA.NonRecoverable {
 // MARK: Validate
 extension FFI.ECDSA.NonRecoverable {
 	static func isValid(
-		ecdsaSignature: FFI.ECDSA.NonRecoverable.Wrapped,
+		signature: FFI.ECDSA.NonRecoverable.Wrapped,
 		publicKey: FFI.PublicKey.Wrapped,
 		message: [UInt8],
 		options: K1.ECDSA.ValidationOptions = .default
 	) throws -> Bool {
 		try FFI.toC { ffi -> Bool in
 			var publicKeyRaw = publicKey.raw
-			var maybeMalleable = ecdsaSignature.raw
+			var maybeMalleable = signature.raw
 			var normalized = secp256k1_ecdsa_signature()
 
 			let codeForSignatureWasMalleable = 1

@@ -103,16 +103,16 @@ extension FFI.ECDSA.Recoverable {
 // MARK: Validate
 extension FFI.ECDSA.Recoverable {
 	static func isValid(
-		ecdsaSignature: FFI.ECDSA.Recoverable.Wrapped,
+		signature: FFI.ECDSA.Recoverable.Wrapped,
 		publicKey: FFI.PublicKey.Wrapped,
 		message: [UInt8],
 		options: K1.ECDSA.ValidationOptions = .default
 	) throws -> Bool {
 		do {
 			let publicKeyNonRecoverable = FFI.PublicKey.Wrapped(raw: publicKey.raw)
-			let signatureNonRecoverable = try FFI.ECDSA.Recoverable.nonRecoverable(ecdsaSignature)
+			let signatureNonRecoverable = try FFI.ECDSA.Recoverable.nonRecoverable(signature)
 			return try FFI.ECDSA.NonRecoverable.isValid(
-				ecdsaSignature: signatureNonRecoverable,
+				signature: signatureNonRecoverable,
 				publicKey: publicKeyNonRecoverable,
 				message: message,
 				options: options

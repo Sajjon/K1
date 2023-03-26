@@ -78,30 +78,55 @@ extension K1.ECDSA.SigningOptions.NonceFunction {
 %{
 	VARIANTS_OF_FEATURE = [
 		{
+			"scheme": "ECDSA",
 			"feature": "ECDSA.NonRecoverable",
-			"variant": "non recoverable"
+			"variant": "an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable",
+			"docSignParameterOptions": "Whether or not to consider malleable signatures valid",
+			"docValidationParameterOptions": "\n///   - options: Whether or not to consider malleable signatures valid.",
+			"validationOptionsArg": ",\noptions: K1.ECDSA.ValidationOptions = .default",
+			"validationOptionsFwd": ",\noptions: options",
 		},
 		{
+			"scheme": "ECDSA",
 			"feature": "ECDSA.Recoverable",
-			"variant": "recoverable"
+			"variant": "an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable",
+			"docSignParameterOptions": "Whether or not to consider malleable signatures valid",
+			"docValidationParameterOptions": "\n///   - options: Whether or not to consider malleable signatures valid.",
+			"validationOptionsArg": ",\noptions: K1.ECDSA.ValidationOptions = .default",
+			"validationOptionsFwd": ",\noptions: options",
+
+		},
+		{
+			"scheme": "Schnorr",
+			"feature": "Schnorr",
+			"variant": "Schnorr",
+			"docSignParameterOptions": "Optional auxiliary random data to use when forming nonce for the signature.",
+			"docValidationParameterOptions": "",
+			"validationOptionsArg": "",
+			"validationOptionsFwd": "",
 		}
 	]
 }%
 % for VARIANT_OF_FEATURE in VARIANTS_OF_FEATURE:
 %{
 	FEATURE = VARIANT_OF_FEATURE["feature"]
-	VARIANT =  VARIANT_OF_FEATURE["variant"]
+	SCHEME = VARIANT_OF_FEATURE["scheme"]
+	VARIANT = VARIANT_OF_FEATURE["variant"]
+	DOC_SIGN_PARAM_OPTIONS = VARIANT_OF_FEATURE["docSignParameterOptions"]
+	DOC_VALIDATION_PARAM_OPTIONS = VARIANT_OF_FEATURE["docValidationParameterOptions"]
+	VALIDATION_OPTIONS_ARG = VARIANT_OF_FEATURE["validationOptionsArg"]
+	VALIDATION_OPTIONS_FWD = VARIANT_OF_FEATURE["validationOptionsFwd"]
 }%
 // MARK: Sign + ${FEATURE}
 extension K1.${FEATURE}.PrivateKey {
-	/// Generates an Elliptic Curve Digital Signature Algorithm (ECDSA) ${VARIANT} signature of _hashed_ data you provide over the `secp256k1` elliptic curve.
+	/// Generates ${VARIANT} signature of _hashed_ data you provide over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - hashed: The _hashed_ data to sign.
-	///   - options: Whether or not to consider malleable signatures valid.
+	///   - options: ${DOC_SIGN_PARAM_OPTIONS}.
 	/// - Returns: The ${VARIANT} signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
 	public func signature(
 		for hashed: some DataProtocol,
-		options: K1.ECDSA.SigningOptions = .default
+		options: K1.${SCHEME}.SigningOptions = .default
 	) throws -> K1.${FEATURE}.Signature {
 		try K1.${FEATURE}.Signature(
 			wrapped: FFI.${FEATURE}.sign(
@@ -112,14 +137,14 @@ extension K1.${FEATURE}.PrivateKey {
 		)
 	}
 
-	/// Generates an Elliptic Curve Digital Signature Algorithm (ECDSA) ${VARIANT} signature of the digest you provide over the `secp256k1` elliptic curve.
+	/// Generates ${VARIANT} signature of the digest you provide over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - digest: The digest of the data to sign.
-	///   - options: Whether or not to consider malleable signatures valid.
+	///   - options: ${DOC_SIGN_PARAM_OPTIONS}.
 	/// - Returns: The ${VARIANT} signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
 	public func signature(
 		for digest: some Digest,
-		options: K1.ECDSA.SigningOptions = .default
+		options: K1.${SCHEME}.SigningOptions = .default
 	) throws -> K1.${FEATURE}.Signature {
 		try signature(
 			for: Data(digest),
@@ -127,14 +152,14 @@ extension K1.${FEATURE}.PrivateKey {
 		)
 	}
 
-	/// Generates an elliptic curve digital signature algorithm (ECDSA) ${VARIANT} signature of the given data over the `secp256k1` elliptic curve, using SHA-256 as a hash function.
+	/// Generates ${VARIANT} signature of the given data over the `secp256k1` elliptic curve, using SHA-256 as a hash function.
 	/// - Parameters:
 	///   - unhashed: The data hash and then to sign.
-	///   - options: Whether or not to consider malleable signatures valid.
+	///   - options: ${DOC_SIGN_PARAM_OPTIONS}.
 	/// - Returns: The ${VARIANT} signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
 	public func signature(
 		forUnhashed unhashed: some DataProtocol,
-		options: K1.ECDSA.SigningOptions = .default
+		options: K1.${SCHEME}.SigningOptions = .default
 	) throws -> K1.${FEATURE}.Signature {
 		try signature(
 			for: SHA256.hash(data: unhashed),
@@ -148,20 +173,17 @@ extension K1.${FEATURE}.PublicKey {
 	/// Verifies an elliptic curve digital signature algorithm (ECDSA) ${VARIANT} signature on some _hash_ over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - signature: The ${VARIANT} signature to check against the _hashed_ data.
-	///   - hashed: The _hashed_ data covered by the signature.
-	///   - options: Whether or not to consider malleable signatures valid.
+	///   - hashed: The _hashed_ data covered by the signature.${DOC_VALIDATION_PARAM_OPTIONS}
 	/// - Returns: A Boolean value that’s true if the ${VARIANT} signature is valid for the given _hashed_ data.
 	public func isValidSignature(
 		_ signature: K1.${FEATURE}.Signature,
-		hashed: some DataProtocol,
-		options: K1.ECDSA.ValidationOptions = .default
+		hashed: some DataProtocol${VALIDATION_OPTIONS_ARG}
 	) -> Bool {
 		do {
 			return try FFI.${FEATURE}.isValid(
-				ecdsaSignature: signature.wrapped,
+				signature: signature.wrapped,
 				publicKey: self.impl.wrapped,
-				message: [UInt8](hashed),
-				options: options
+				message: [UInt8](hashed)${VALIDATION_OPTIONS_FWD}
 			)
 		} catch {
 			return false
@@ -171,18 +193,15 @@ extension K1.${FEATURE}.PublicKey {
 	/// Verifies an elliptic curve digital signature algorithm (ECDSA) ${VARIANT} signature on a digest over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - signature: The ${VARIANT} signature to check against the given digest.
-	///   - digest: The digest covered by the signature.
-	///   - options: Whether or not to consider malleable signatures valid.
+	///   - digest: The digest covered by the signature.${DOC_VALIDATION_PARAM_OPTIONS}
 	/// - Returns: A Boolean value that’s true if the ${VARIANT} signature is valid for the given digest.
 	public func isValidSignature(
 		_ signature: K1.${FEATURE}.Signature,
-		digest: some Digest,
-		options: K1.ECDSA.ValidationOptions = .default
+		digest: some Digest${VALIDATION_OPTIONS_ARG}
 	) -> Bool {
 		isValidSignature(
 			signature,
-			hashed: Data(digest),
-			options: options
+			hashed: Data(digest)${VALIDATION_OPTIONS_FWD}
 		)
 	}
 
@@ -193,18 +212,15 @@ extension K1.${FEATURE}.PublicKey {
 	///
 	/// - Parameters:
 	///   - signature: The ${VARIANT} signature to check against the given digest.
-	///   - unhashed: The block of data covered by the signature.
-	///   - options: Whether or not to consider malleable signatures valid.
+	///   - unhashed: The block of data covered by the signature.${DOC_VALIDATION_PARAM_OPTIONS}
 	/// - Returns: A Boolean value that’s true if the ${VARIANT} signature is valid for the given block of data.
 	public func isValidSignature(
 		_ signature: K1.${FEATURE}.Signature,
-		unhashed: some DataProtocol,
-		options: K1.ECDSA.ValidationOptions = .default
+		unhashed: some DataProtocol${VALIDATION_OPTIONS_ARG}
 	) -> Bool {
 		isValidSignature(
 			signature,
-			digest: SHA256.hash(data: unhashed),
-			options: options
+			digest: SHA256.hash(data: unhashed)${VALIDATION_OPTIONS_FWD}
 		)
 	}
 }

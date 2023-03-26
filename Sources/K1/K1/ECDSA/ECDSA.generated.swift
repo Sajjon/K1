@@ -81,7 +81,7 @@ extension K1.ECDSA.NonRecoverable.PrivateKey {
 	/// - Parameters:
 	///   - hashed: The _hashed_ data to sign.
 	///   - options: Whether or not to consider malleable signatures valid.
-	/// - Returns: The non recoverable signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
+	/// - Returns: The an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
 	public func signature(
 		for hashed: some DataProtocol,
 		options: K1.ECDSA.SigningOptions = .default
@@ -99,7 +99,7 @@ extension K1.ECDSA.NonRecoverable.PrivateKey {
 	/// - Parameters:
 	///   - digest: The digest of the data to sign.
 	///   - options: Whether or not to consider malleable signatures valid.
-	/// - Returns: The non recoverable signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
+	/// - Returns: The an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
 	public func signature(
 		for digest: some Digest,
 		options: K1.ECDSA.SigningOptions = .default
@@ -110,11 +110,11 @@ extension K1.ECDSA.NonRecoverable.PrivateKey {
 		)
 	}
 
-	/// Generates an elliptic curve digital signature algorithm (ECDSA) non recoverable signature of the given data over the `secp256k1` elliptic curve, using SHA-256 as a hash function.
+	/// Generates an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature of the given data over the `secp256k1` elliptic curve, using SHA-256 as a hash function.
 	/// - Parameters:
 	///   - unhashed: The data hash and then to sign.
 	///   - options: Whether or not to consider malleable signatures valid.
-	/// - Returns: The non recoverable signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
+	/// - Returns: The an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
 	public func signature(
 		forUnhashed unhashed: some DataProtocol,
 		options: K1.ECDSA.SigningOptions = .default
@@ -128,12 +128,12 @@ extension K1.ECDSA.NonRecoverable.PrivateKey {
 
 // MARK: Verify + ECDSA.NonRecoverable
 extension K1.ECDSA.NonRecoverable.PublicKey {
-	/// Verifies an elliptic curve digital signature algorithm (ECDSA) non recoverable signature on some _hash_ over the `secp256k1` elliptic curve.
+	/// Verifies an elliptic curve digital signature algorithm (ECDSA) an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature on some _hash_ over the `secp256k1` elliptic curve.
 	/// - Parameters:
-	///   - signature: The non recoverable signature to check against the _hashed_ data.
+	///   - signature: The an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature to check against the _hashed_ data.
 	///   - hashed: The _hashed_ data covered by the signature.
 	///   - options: Whether or not to consider malleable signatures valid.
-	/// - Returns: A Boolean value that’s true if the non recoverable signature is valid for the given _hashed_ data.
+	/// - Returns: A Boolean value that’s true if the an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature is valid for the given _hashed_ data.
 	public func isValidSignature(
 		_ signature: K1.ECDSA.NonRecoverable.Signature,
 		hashed: some DataProtocol,
@@ -141,7 +141,7 @@ extension K1.ECDSA.NonRecoverable.PublicKey {
 	) -> Bool {
 		do {
 			return try FFI.ECDSA.NonRecoverable.isValid(
-				ecdsaSignature: signature.wrapped,
+				signature: signature.wrapped,
 				publicKey: self.impl.wrapped,
 				message: [UInt8](hashed),
 				options: options
@@ -151,12 +151,12 @@ extension K1.ECDSA.NonRecoverable.PublicKey {
 		}
 	}
 
-	/// Verifies an elliptic curve digital signature algorithm (ECDSA) non recoverable signature on a digest over the `secp256k1` elliptic curve.
+	/// Verifies an elliptic curve digital signature algorithm (ECDSA) an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature on a digest over the `secp256k1` elliptic curve.
 	/// - Parameters:
-	///   - signature: The non recoverable signature to check against the given digest.
+	///   - signature: The an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature to check against the given digest.
 	///   - digest: The digest covered by the signature.
 	///   - options: Whether or not to consider malleable signatures valid.
-	/// - Returns: A Boolean value that’s true if the non recoverable signature is valid for the given digest.
+	/// - Returns: A Boolean value that’s true if the an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature is valid for the given digest.
 	public func isValidSignature(
 		_ signature: K1.ECDSA.NonRecoverable.Signature,
 		digest: some Digest,
@@ -169,16 +169,16 @@ extension K1.ECDSA.NonRecoverable.PublicKey {
 		)
 	}
 
-	/// Verifies an elliptic curve digital signature algorithm (ECDSA) non recoverable signature on a block of data over the `secp256k1` elliptic curve.
+	/// Verifies an elliptic curve digital signature algorithm (ECDSA) an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature on a block of data over the `secp256k1` elliptic curve.
 	///
 	/// The function computes an SHA-256 hash from the data before verifying the signature. If you separately hash the data to be signed, use `isValidSignature(_:digest:input)` with the created digest. Or if you have access to a digest just as `some DataProtocol`, use
 	/// `isValidSignature(_:hashed:input)`.
 	///
 	/// - Parameters:
-	///   - signature: The non recoverable signature to check against the given digest.
+	///   - signature: The an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature to check against the given digest.
 	///   - unhashed: The block of data covered by the signature.
 	///   - options: Whether or not to consider malleable signatures valid.
-	/// - Returns: A Boolean value that’s true if the non recoverable signature is valid for the given block of data.
+	/// - Returns: A Boolean value that’s true if the an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature is valid for the given block of data.
 	public func isValidSignature(
 		_ signature: K1.ECDSA.NonRecoverable.Signature,
 		unhashed: some DataProtocol,
@@ -198,7 +198,7 @@ extension K1.ECDSA.Recoverable.PrivateKey {
 	/// - Parameters:
 	///   - hashed: The _hashed_ data to sign.
 	///   - options: Whether or not to consider malleable signatures valid.
-	/// - Returns: The recoverable signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
+	/// - Returns: The an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
 	public func signature(
 		for hashed: some DataProtocol,
 		options: K1.ECDSA.SigningOptions = .default
@@ -216,7 +216,7 @@ extension K1.ECDSA.Recoverable.PrivateKey {
 	/// - Parameters:
 	///   - digest: The digest of the data to sign.
 	///   - options: Whether or not to consider malleable signatures valid.
-	/// - Returns: The recoverable signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
+	/// - Returns: The an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
 	public func signature(
 		for digest: some Digest,
 		options: K1.ECDSA.SigningOptions = .default
@@ -227,11 +227,11 @@ extension K1.ECDSA.Recoverable.PrivateKey {
 		)
 	}
 
-	/// Generates an elliptic curve digital signature algorithm (ECDSA) recoverable signature of the given data over the `secp256k1` elliptic curve, using SHA-256 as a hash function.
+	/// Generates an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature of the given data over the `secp256k1` elliptic curve, using SHA-256 as a hash function.
 	/// - Parameters:
 	///   - unhashed: The data hash and then to sign.
 	///   - options: Whether or not to consider malleable signatures valid.
-	/// - Returns: The recoverable signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
+	/// - Returns: The an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
 	public func signature(
 		forUnhashed unhashed: some DataProtocol,
 		options: K1.ECDSA.SigningOptions = .default
@@ -245,12 +245,12 @@ extension K1.ECDSA.Recoverable.PrivateKey {
 
 // MARK: Verify + ECDSA.Recoverable
 extension K1.ECDSA.Recoverable.PublicKey {
-	/// Verifies an elliptic curve digital signature algorithm (ECDSA) recoverable signature on some _hash_ over the `secp256k1` elliptic curve.
+	/// Verifies an elliptic curve digital signature algorithm (ECDSA) an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature on some _hash_ over the `secp256k1` elliptic curve.
 	/// - Parameters:
-	///   - signature: The recoverable signature to check against the _hashed_ data.
+	///   - signature: The an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature to check against the _hashed_ data.
 	///   - hashed: The _hashed_ data covered by the signature.
 	///   - options: Whether or not to consider malleable signatures valid.
-	/// - Returns: A Boolean value that’s true if the recoverable signature is valid for the given _hashed_ data.
+	/// - Returns: A Boolean value that’s true if the an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature is valid for the given _hashed_ data.
 	public func isValidSignature(
 		_ signature: K1.ECDSA.Recoverable.Signature,
 		hashed: some DataProtocol,
@@ -258,7 +258,7 @@ extension K1.ECDSA.Recoverable.PublicKey {
 	) -> Bool {
 		do {
 			return try FFI.ECDSA.Recoverable.isValid(
-				ecdsaSignature: signature.wrapped,
+				signature: signature.wrapped,
 				publicKey: self.impl.wrapped,
 				message: [UInt8](hashed),
 				options: options
@@ -268,12 +268,12 @@ extension K1.ECDSA.Recoverable.PublicKey {
 		}
 	}
 
-	/// Verifies an elliptic curve digital signature algorithm (ECDSA) recoverable signature on a digest over the `secp256k1` elliptic curve.
+	/// Verifies an elliptic curve digital signature algorithm (ECDSA) an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature on a digest over the `secp256k1` elliptic curve.
 	/// - Parameters:
-	///   - signature: The recoverable signature to check against the given digest.
+	///   - signature: The an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature to check against the given digest.
 	///   - digest: The digest covered by the signature.
 	///   - options: Whether or not to consider malleable signatures valid.
-	/// - Returns: A Boolean value that’s true if the recoverable signature is valid for the given digest.
+	/// - Returns: A Boolean value that’s true if the an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature is valid for the given digest.
 	public func isValidSignature(
 		_ signature: K1.ECDSA.Recoverable.Signature,
 		digest: some Digest,
@@ -286,16 +286,16 @@ extension K1.ECDSA.Recoverable.PublicKey {
 		)
 	}
 
-	/// Verifies an elliptic curve digital signature algorithm (ECDSA) recoverable signature on a block of data over the `secp256k1` elliptic curve.
+	/// Verifies an elliptic curve digital signature algorithm (ECDSA) an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature on a block of data over the `secp256k1` elliptic curve.
 	///
 	/// The function computes an SHA-256 hash from the data before verifying the signature. If you separately hash the data to be signed, use `isValidSignature(_:digest:input)` with the created digest. Or if you have access to a digest just as `some DataProtocol`, use
 	/// `isValidSignature(_:hashed:input)`.
 	///
 	/// - Parameters:
-	///   - signature: The recoverable signature to check against the given digest.
+	///   - signature: The an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature to check against the given digest.
 	///   - unhashed: The block of data covered by the signature.
 	///   - options: Whether or not to consider malleable signatures valid.
-	/// - Returns: A Boolean value that’s true if the recoverable signature is valid for the given block of data.
+	/// - Returns: A Boolean value that’s true if the an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature is valid for the given block of data.
 	public func isValidSignature(
 		_ signature: K1.ECDSA.Recoverable.Signature,
 		unhashed: some DataProtocol,
@@ -305,6 +305,114 @@ extension K1.ECDSA.Recoverable.PublicKey {
 			signature,
 			digest: SHA256.hash(data: unhashed),
 			options: options
+		)
+	}
+}
+
+// MARK: Sign + Schnorr
+extension K1.Schnorr.PrivateKey {
+	/// Generates Schnorr signature of _hashed_ data you provide over the `secp256k1` elliptic curve.
+	/// - Parameters:
+	///   - hashed: The _hashed_ data to sign.
+	///   - options: Optional auxiliary random data to use when forming nonce for the signature..
+	/// - Returns: The Schnorr signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
+	public func signature(
+		for hashed: some DataProtocol,
+		options: K1.Schnorr.SigningOptions = .default
+	) throws -> K1.Schnorr.Signature {
+		try K1.Schnorr.Signature(
+			wrapped: FFI.Schnorr.sign(
+				hashedMessage: [UInt8](hashed),
+				privateKey: impl.wrapped,
+				options: options
+			)
+		)
+	}
+
+	/// Generates Schnorr signature of the digest you provide over the `secp256k1` elliptic curve.
+	/// - Parameters:
+	///   - digest: The digest of the data to sign.
+	///   - options: Optional auxiliary random data to use when forming nonce for the signature..
+	/// - Returns: The Schnorr signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
+	public func signature(
+		for digest: some Digest,
+		options: K1.Schnorr.SigningOptions = .default
+	) throws -> K1.Schnorr.Signature {
+		try signature(
+			for: Data(digest),
+			options: options
+		)
+	}
+
+	/// Generates Schnorr signature of the given data over the `secp256k1` elliptic curve, using SHA-256 as a hash function.
+	/// - Parameters:
+	///   - unhashed: The data hash and then to sign.
+	///   - options: Optional auxiliary random data to use when forming nonce for the signature..
+	/// - Returns: The Schnorr signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
+	public func signature(
+		forUnhashed unhashed: some DataProtocol,
+		options: K1.Schnorr.SigningOptions = .default
+	) throws -> K1.Schnorr.Signature {
+		try signature(
+			for: SHA256.hash(data: unhashed),
+			options: options
+		)
+	}
+}
+
+// MARK: Verify + Schnorr
+extension K1.Schnorr.PublicKey {
+	/// Verifies an elliptic curve digital signature algorithm (ECDSA) Schnorr signature on some _hash_ over the `secp256k1` elliptic curve.
+	/// - Parameters:
+	///   - signature: The Schnorr signature to check against the _hashed_ data.
+	///   - hashed: The _hashed_ data covered by the signature.
+	/// - Returns: A Boolean value that’s true if the Schnorr signature is valid for the given _hashed_ data.
+	public func isValidSignature(
+		_ signature: K1.Schnorr.Signature,
+		hashed: some DataProtocol
+	) -> Bool {
+		do {
+			return try FFI.Schnorr.isValid(
+				signature: signature.wrapped,
+				publicKey: self.impl.wrapped,
+				message: [UInt8](hashed)
+			)
+		} catch {
+			return false
+		}
+	}
+
+	/// Verifies an elliptic curve digital signature algorithm (ECDSA) Schnorr signature on a digest over the `secp256k1` elliptic curve.
+	/// - Parameters:
+	///   - signature: The Schnorr signature to check against the given digest.
+	///   - digest: The digest covered by the signature.
+	/// - Returns: A Boolean value that’s true if the Schnorr signature is valid for the given digest.
+	public func isValidSignature(
+		_ signature: K1.Schnorr.Signature,
+		digest: some Digest
+	) -> Bool {
+		isValidSignature(
+			signature,
+			hashed: Data(digest)
+		)
+	}
+
+	/// Verifies an elliptic curve digital signature algorithm (ECDSA) Schnorr signature on a block of data over the `secp256k1` elliptic curve.
+	///
+	/// The function computes an SHA-256 hash from the data before verifying the signature. If you separately hash the data to be signed, use `isValidSignature(_:digest:input)` with the created digest. Or if you have access to a digest just as `some DataProtocol`, use
+	/// `isValidSignature(_:hashed:input)`.
+	///
+	/// - Parameters:
+	///   - signature: The Schnorr signature to check against the given digest.
+	///   - unhashed: The block of data covered by the signature.
+	/// - Returns: A Boolean value that’s true if the Schnorr signature is valid for the given block of data.
+	public func isValidSignature(
+		_ signature: K1.Schnorr.Signature,
+		unhashed: some DataProtocol
+	) -> Bool {
+		isValidSignature(
+			signature,
+			digest: SHA256.hash(data: unhashed)
 		)
 	}
 }
