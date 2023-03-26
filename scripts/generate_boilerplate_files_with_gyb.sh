@@ -20,7 +20,5 @@ find . -name '*.gyb' |                                               \
         ./scripts/gyb --line-directive '' -o "$swiftfilename" "$file"; \
         swiftformat "$swiftfilename";									\
 		swiftfile="${swiftfilename%.swift}.generated.swift";					\
-		chflags nouchg "$swiftfile"; 								\
 		mv "$swiftfilename" "$swiftfile";									\
-		chflags uchg "$swiftfile"; 								\
     done

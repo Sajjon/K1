@@ -5,7 +5,7 @@ import secp256k1
 extension K1.Format {
 	/// Bridging value used by libsecp256k1 key specifying the format
 	/// of the imported key, i.e. how many bytes.
-	public var rawValue: UInt32 {
+	var rawValue: UInt32 {
 		let value: Int32
 		switch self {
 		case .compressed: value = SECP256K1_EC_COMPRESSED
@@ -19,7 +19,7 @@ extension K1.Format {
 // MARK: - K1.Format
 extension K1 {
 	// Bridging type for: `secp256k1_ec_pubkey_serialize`
-	public enum Format: UInt32, CaseIterable {
+	enum Format: UInt32, CaseIterable {
 		case compressed, uncompressed
 	}
 }

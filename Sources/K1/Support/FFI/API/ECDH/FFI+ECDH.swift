@@ -10,7 +10,7 @@ extension FFI {
 // MARK: - FFI.ECDH.SerializeFunction
 extension FFI.ECDH {
 	enum SerializeFunction {
-		/// Using the `libsecp256k1` default behaviour.
+		/// Using the `libsecp256k1` default behavior.
 		///
 		/// SHA256 hashes the **compressed** shared point.
 		/// Accepts arbitrary data passed through hash function as well.

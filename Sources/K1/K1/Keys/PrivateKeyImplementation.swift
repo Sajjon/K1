@@ -89,7 +89,7 @@ extension K1._PrivateKeyImplementation {
 	init(derRepresentation: some RandomAccessCollection<UInt8>) throws {
 		let bytes = Array(derRepresentation)
 
-		// We have to try to parse this twice because we have no informaton about what kind of key this is.
+		// We have to try to parse this twice because we have no information about what kind of key this is.
 		// We try with PKCS#8 first, and then fall back to SEC.1.
 		do {
 			let key = try ASN1.PKCS8PrivateKey(asn1Encoded: bytes)
@@ -153,7 +153,7 @@ extension K1._PrivateKeyImplementation {
 
 // MARK: - Equatable
 extension K1._PrivateKeyImplementation {
-	/// Constant-time comparision.
+	/// Constant-time comparison.
 	static func == (lhs: Self, rhs: Self) -> Bool {
 		lhs.wrapped.secureBytes == rhs.wrapped.secureBytes
 	}
