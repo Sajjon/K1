@@ -56,7 +56,7 @@ private extension XCTestCase {
 			let recid = try signatureRecoverableFromMessage.compact().recoveryID
 
 			XCTAssertEqual(
-				signatureRecoverableFromMessage.rawRepresentation.hex,
+				signatureRecoverableFromMessage.internalRepresentation.hex,
 				expectedSignature.internalRepresentation.hex + "\(Data([UInt8(recid.rawValue)]).hex)"
 			)
 

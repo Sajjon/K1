@@ -59,7 +59,7 @@ extension K1.ECDSA.Recoverable.Signature {
 
 // MARK: Serialize
 extension K1.ECDSA.Recoverable.Signature {
-	internal var rawRepresentation: Data {
+	internal var internalRepresentation: Data {
 		Data(wrapped.bytes)
 	}
 
