@@ -91,9 +91,7 @@ extension K1.ECDSA.SigningOptions.NonceFunction {
 				#if swift(>=5.8)
 				nonce32?.update(from: secureBytes.bytes, count: count)
 				#else
-				secureBytes.withUnsafeBytes {
-					nonce32?.assign(from: $0.baseAddress!.assumingMemoryBound(to: UInt8.self), count: count)
-				}
+				nonce32?.assign(from: secureBytes.bytes, count: count)
 				#endif
 
 				// Returns: 1 if a nonce was successfully generated. 0 will cause signing to fail.
