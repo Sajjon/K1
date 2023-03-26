@@ -21,4 +21,5 @@ find . -name '*.gyb' |                                               \
         swiftformat "$swiftfilename";									\
 		swiftfile="${swiftfilename%.swift}.generated.swift";					\
 		mv "$swiftfilename" "$swiftfile";									\
+		echo "🔮🐍 GYB generated file: '$swiftfile'";							\
     done

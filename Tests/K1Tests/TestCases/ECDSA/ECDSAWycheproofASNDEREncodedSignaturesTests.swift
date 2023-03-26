@@ -64,7 +64,7 @@ private struct SignatureWycheproofDERTestVector: WycheproofTestVector {
 		let derData = try Data(hex: sig)
 		let signature = try K1.ECDSA.NonRecoverable.Signature(derRepresentation: derData)
 		if self.result == "valid" {
-			try XCTAssertEqual(sig, signature.derRepresentation().hex)
+			XCTAssertEqual(sig, signature.derRepresentation.hex)
 		}
 		return signature
 	}

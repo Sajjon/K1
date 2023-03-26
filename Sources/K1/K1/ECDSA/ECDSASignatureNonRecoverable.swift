@@ -26,15 +26,25 @@ extension K1.ECDSA.NonRecoverable {
 
 // MARK: Inits
 extension K1.ECDSA.NonRecoverable.Signature {
-	public init(compactRepresentation: some DataProtocol) throws {
-		try self.init(
-			wrapped: FFI.ECDSA.NonRecoverable.from(compactBytes: [UInt8](compactRepresentation))
-		)
-	}
-
+	/// Creates a `secp256k1` ECDSA signature from a Distinguished Encoding Rules (DER) encoded representation.
+	/// - Parameter derRepresentation: A DER-encoded representation of the signature.
 	public init(derRepresentation: some DataProtocol) throws {
 		try self.init(
 			wrapped: FFI.ECDSA.NonRecoverable.from(derRepresentation: [UInt8](derRepresentation))
+		)
+	}
+
+	/// Creates a `secp256k1` ECDSA signature from the raw representation.
+	///
+	/// Expects 64 bytes on format: `R || S`, as defined in [rfc4754][rfc]. In
+	/// `libsecp256k1` this representation is called "compact".
+	///
+	/// - Parameter rawRepresentation: A raw representation of the ECDSA signature as a collection of contiguous bytes.
+	///
+	/// [rfc]: https://tools.ietf.org/html/rfc4754
+	public init(rawRepresentation: some DataProtocol) throws {
+		try self.init(
+			wrapped: FFI.ECDSA.NonRecoverable.from(compactBytes: [UInt8](rawRepresentation))
 		)
 	}
 }
@@ -48,21 +58,43 @@ extension K1.ECDSA.NonRecoverable.Signature {
 
 // MARK: Serialize
 extension K1.ECDSA.NonRecoverable.Signature {
-	internal var rawRepresentation: Data {
+	var internalRepresentation: Data {
 		Data(wrapped.bytes)
 	}
 
-	public func compactRepresentation() throws -> Data {
-		try FFI.ECDSA.NonRecoverable.compact(wrapped)
+	/// A raw data representation of a `secp256k1` ECDSA non recoverable signature.
+	///
+	/// Returns 64 bytes on format: `R || S`, as defined in [rfc4754][rfc]. In
+	/// `libsecp256k1` this representation is called "compact".
+	public var rawRepresentation: Data {
+		do {
+			return try FFI.ECDSA.NonRecoverable.compact(wrapped)
+		} catch {
+			fatalError("Should never fail to convert ECDSA signatures to rawRepresentation.")
+		}
 	}
 
-	public func derRepresentation() throws -> Data {
-		try FFI.ECDSA.NonRecoverable.der(wrapped)
+	/// A Distinguished Encoding Rules (DER) encoded representation of a
+	/// `secp256k1` ECDSA non recoverable signature.
+	public var derRepresentation: Data {
+		do {
+			return try FFI.ECDSA.NonRecoverable.der(wrapped)
+		} catch {
+			fatalError("Should never fail to convert ECDSA signatures to DER representation.")
+		}
 	}
 }
 
 // MARK: Recover
 extension K1.ECDSA.NonRecoverable.Signature {
+	/// Recovers a public key from a `secp256k1` ECDSA signature, the message signed
+	/// and a `recoveryID`.
+	///
+	/// - Parameters:
+	///   - recoveryID: The recoveryID produced when a recoverable signature was produced.
+	///   - message: The message that was signed to produce this ECDSA signature.
+	/// - Returns: The public key which corresponds to the private key which used to produce this
+	/// signature by signing the `message`.
 	public func recoverPublicKey(
 		recoveryID: K1.ECDSA.Recoverable.Signature.RecoveryID,
 		message: some DataProtocol
@@ -83,6 +115,7 @@ extension K1.ECDSA.NonRecoverable.Signature {
 
 // MARK: Equatable
 extension K1.ECDSA.NonRecoverable.Signature {
+	/// Compares two ECDSA signatures.
 	public static func == (lhs: Self, rhs: Self) -> Bool {
 		lhs.wrapped.withUnsafeBytes { lhsBytes in
 			rhs.wrapped.withUnsafeBytes { rhsBytes in

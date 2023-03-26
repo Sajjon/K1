@@ -7,7 +7,7 @@ import Foundation
 extension K1.KeyAgreement {
 	// MARK: KeyAgreement + PrivateKey
 	/// A `secp256k1` private key used for key agreement.
-	public struct PrivateKey: Sendable, Hashable, K1PrivateKeyProtocol {
+	public struct PrivateKey: Sendable, Hashable {
 		typealias Impl = K1._PrivateKeyImplementation
 		public typealias PublicKey = K1.KeyAgreement.PublicKey
 
@@ -109,7 +109,7 @@ extension K1.KeyAgreement {
 
 	// MARK: KeyAgreement + PublicKey
 	/// A `secp256k1` public key used for key agreement.
-	public struct PublicKey: Sendable, Hashable, K1PublicKeyProtocol {
+	public struct PublicKey: Sendable, Hashable {
 		typealias Impl = K1._PublicKeyImplementation
 		internal let impl: Impl
 		internal init(impl: Impl) {
@@ -206,7 +206,7 @@ extension K1.Schnorr {
 	// MARK: Schnorr + PrivateKey
 	/// A `secp256k1` private key used to create cryptographic signatures,
 	/// more specifically Schnorr signatures.
-	public struct PrivateKey: Sendable, Hashable, K1PrivateKeyProtocol {
+	public struct PrivateKey: Sendable, Hashable {
 		typealias Impl = K1._PrivateKeyImplementation
 		public typealias PublicKey = K1.Schnorr.PublicKey
 
@@ -309,7 +309,7 @@ extension K1.Schnorr {
 	// MARK: Schnorr + PublicKey
 	/// A `secp256k1` public key used to verify cryptographic signatures,
 	/// more specifically Schnorr signatures
-	public struct PublicKey: Sendable, Hashable, K1PublicKeyProtocol {
+	public struct PublicKey: Sendable, Hashable {
 		typealias Impl = K1._PublicKeyImplementation
 		internal let impl: Impl
 		internal init(impl: Impl) {
@@ -406,7 +406,7 @@ extension K1.ECDSA.NonRecoverable {
 	// MARK: ECDSA.NonRecoverable + PrivateKey
 	/// A `secp256k1` private key used to create cryptographic signatures,
 	/// more specifically ECDSA signatures, that do not offer recovery of the public key.
-	public struct PrivateKey: Sendable, Hashable, K1PrivateKeyProtocol {
+	public struct PrivateKey: Sendable, Hashable {
 		typealias Impl = K1._PrivateKeyImplementation
 		public typealias PublicKey = K1.ECDSA.NonRecoverable.PublicKey
 
@@ -509,7 +509,7 @@ extension K1.ECDSA.NonRecoverable {
 	// MARK: ECDSA.NonRecoverable + PublicKey
 	/// A `secp256k1` public key used to verify cryptographic signatures,
 	/// more specifically ECDSA signatures, that do not offer recovery of the public key.
-	public struct PublicKey: Sendable, Hashable, K1PublicKeyProtocol {
+	public struct PublicKey: Sendable, Hashable {
 		typealias Impl = K1._PublicKeyImplementation
 		internal let impl: Impl
 		internal init(impl: Impl) {
@@ -606,7 +606,7 @@ extension K1.ECDSA.Recoverable {
 	// MARK: ECDSA.Recoverable + PrivateKey
 	/// A `secp256k1` private key used to create cryptographic signatures,
 	/// more specifically ECDSA signatures that offers recovery of the public key.
-	public struct PrivateKey: Sendable, Hashable, K1PrivateKeyProtocol {
+	public struct PrivateKey: Sendable, Hashable {
 		typealias Impl = K1._PrivateKeyImplementation
 		public typealias PublicKey = K1.ECDSA.Recoverable.PublicKey
 
@@ -709,7 +709,7 @@ extension K1.ECDSA.Recoverable {
 	// MARK: ECDSA.Recoverable + PublicKey
 	/// A `secp256k1` public key used to verify cryptographic signatures.
 	/// more specifically ECDSA signatures that offers recovery of the public key.
-	public struct PublicKey: Sendable, Hashable, K1PublicKeyProtocol {
+	public struct PublicKey: Sendable, Hashable {
 		typealias Impl = K1._PublicKeyImplementation
 		internal let impl: Impl
 		internal init(impl: Impl) {
@@ -801,3 +801,27 @@ extension K1.ECDSA.Recoverable {
 		}
 	}
 }
+
+// MARK: - K1.KeyAgreement.PrivateKey + _K1PrivateKeyProtocol
+extension K1.KeyAgreement.PrivateKey: _K1PrivateKeyProtocol {}
+
+// MARK: - K1.KeyAgreement.PublicKey + _K1PublicKeyProtocol
+extension K1.KeyAgreement.PublicKey: _K1PublicKeyProtocol {}
+
+// MARK: - K1.Schnorr.PrivateKey + _K1PrivateKeyProtocol
+extension K1.Schnorr.PrivateKey: _K1PrivateKeyProtocol {}
+
+// MARK: - K1.Schnorr.PublicKey + _K1PublicKeyProtocol
+extension K1.Schnorr.PublicKey: _K1PublicKeyProtocol {}
+
+// MARK: - K1.ECDSA.NonRecoverable.PrivateKey + _K1PrivateKeyProtocol
+extension K1.ECDSA.NonRecoverable.PrivateKey: _K1PrivateKeyProtocol {}
+
+// MARK: - K1.ECDSA.NonRecoverable.PublicKey + _K1PublicKeyProtocol
+extension K1.ECDSA.NonRecoverable.PublicKey: _K1PublicKeyProtocol {}
+
+// MARK: - K1.ECDSA.Recoverable.PrivateKey + _K1PrivateKeyProtocol
+extension K1.ECDSA.Recoverable.PrivateKey: _K1PrivateKeyProtocol {}
+
+// MARK: - K1.ECDSA.Recoverable.PublicKey + _K1PublicKeyProtocol
+extension K1.ECDSA.Recoverable.PublicKey: _K1PublicKeyProtocol {}

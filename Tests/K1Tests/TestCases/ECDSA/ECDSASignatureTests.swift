@@ -1,6 +1,6 @@
 import CryptoKit
 import Foundation
-import K1
+@testable import K1
 import XCTest
 
 final class ECDSASignatureTests: XCTestCase {
@@ -9,7 +9,6 @@ final class ECDSASignatureTests: XCTestCase {
 		let message = "Send Bob 3 BTC".data(using: .utf8)!
 
 		let signature = try alice.signature(forUnhashed: message)
-
 		let isSignatureValid = alice.publicKey.isValidSignature(signature, unhashed: message)
 		XCTAssertTrue(isSignatureValid, "Signature should be valid.")
 	}
@@ -27,7 +26,6 @@ final class ECDSASignatureTests: XCTestCase {
 				forUnhashed: message,
 				options: .init(nonceFunction: .random)
 			)
-
 			let isSignatureValid = alice.publicKey.isValidSignature(
 				signature,
 				unhashed: message

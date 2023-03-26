@@ -1,34 +1,34 @@
 import CryptoKit
 import Foundation
 
-// MARK: - K1KeyExportable
-public protocol K1KeyExportable {
+// MARK: - _K1KeyExportable
+protocol _K1KeyExportable {
 	var rawRepresentation: Data { get }
-	var x963Representation: Data { get }
 	var derRepresentation: Data { get }
 	var pemRepresentation: String { get }
+	var x963Representation: Data { get }
 }
 
-// MARK: - K1KeyImportable
-public protocol K1KeyImportable {
+// MARK: - _K1KeyImportable
+protocol _K1KeyImportable {
 	init(rawRepresentation: some ContiguousBytes) throws
-	init(x963Representation: some ContiguousBytes) throws
 	init(derRepresentation: some RandomAccessCollection<UInt8>) throws
 	init(pemRepresentation: String) throws
+	init(x963Representation: some ContiguousBytes) throws
 }
 
-public typealias K1KeyPortable = K1KeyImportable & K1KeyExportable
+typealias _K1KeyPortable = _K1KeyImportable & _K1KeyExportable
 
-// MARK: - K1PrivateKeyProtocol
-public protocol K1PrivateKeyProtocol: K1KeyPortable {
-	associatedtype PublicKey: K1PublicKeyProtocol
+// MARK: - _K1PrivateKeyProtocol
+protocol _K1PrivateKeyProtocol: _K1KeyPortable {
+	associatedtype PublicKey: _K1PublicKeyProtocol
 	var publicKey: PublicKey { get }
 	init()
 }
 
 // MARK: - K1._PrivateKeyImplementation
 extension K1 {
-	struct _PrivateKeyImplementation: Sendable, Hashable, K1PrivateKeyProtocol {
+	struct _PrivateKeyImplementation: Sendable, Hashable, _K1PrivateKeyProtocol {
 		typealias Wrapped = FFI.PrivateKey.Wrapped
 		internal let wrapped: Wrapped
 

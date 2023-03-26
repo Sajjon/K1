@@ -23,8 +23,8 @@ final class ECDASignaturePublicKeyRecoveryTests: XCTestCase {
 	func test_conversionRoundtrips() throws {
 		let recoverySignatureHex = "acf9e195e094f2f40eb619b9878817ff951b9b11fac37cf0d7290098bbefb574f8606281a2231a3fc781045f2ea4df086936263bbfa8d15ca17fe70e0c3d6e5601"
 		let recoverableSigRaw = try Data(hex: recoverySignatureHex)
-		let recoverableSig = try K1.ECDSA.Recoverable.Signature(rawRepresentation: recoverableSigRaw)
-		XCTAssertEqual(recoverableSig.rawRepresentation.hex, recoverySignatureHex)
+		let recoverableSig = try K1.ECDSA.Recoverable.Signature(internalRepresentation: recoverableSigRaw)
+		XCTAssertEqual(recoverableSig.internalRepresentation.hex, recoverySignatureHex)
 
 		let compactRSV = "74b5efbb980029d7f07cc3fa119b1b95ff178887b919b60ef4f294e095e1f9ac566e3d0c0ee77fa15cd1a8bf3b26366908dfa42e5f0481c73f1a23a2816260f801"
 		try XCTAssertEqual(recoverableSig.compact().serialize(format: .rsv).hex, compactRSV)
@@ -32,8 +32,8 @@ final class ECDASignaturePublicKeyRecoveryTests: XCTestCase {
 		try XCTAssertEqual(recoverableSig.compact().serialize(format: .vrs).hex, compactVRS)
 
 		try XCTAssertEqual(
-			recoverableSig.rawRepresentation.hex,
-			K1.ECDSA.Recoverable.Signature(compact: .init(rawRepresentation: Data(hex: compactVRS), format: .vrs)).rawRepresentation.hex
+			recoverableSig.internalRepresentation.hex,
+			K1.ECDSA.Recoverable.Signature(compact: .init(rawRepresentation: Data(hex: compactVRS), format: .vrs)).internalRepresentation.hex
 		)
 
 		let compactRecoverableSig = try recoverableSig.compact()
@@ -47,10 +47,10 @@ final class ECDASignaturePublicKeyRecoveryTests: XCTestCase {
 		try XCTAssertEqual(K1.ECDSA.Recoverable.Signature(compact: compactRecoverableSigRS, recoveryID: recid), K1.ECDSA.Recoverable.Signature(compact: compactRecoverableSig))
 		try XCTAssertEqual(K1.ECDSA.Recoverable.Signature.Compact(compact: compactRecoverableSigRS, recoveryID: recid), compactRecoverableSig)
 
-		let nonRecoverable = try K1.ECDSA.NonRecoverable.Signature(compactRepresentation: compactRecoverableSig.compact)
+		let nonRecoverable = try K1.ECDSA.NonRecoverable.Signature(rawRepresentation: compactRecoverableSig.compact)
 
 		try XCTAssertEqual(nonRecoverable, recoverableSig.nonRecoverable())
-		let nonRecovDer = try nonRecoverable.derRepresentation()
+		let nonRecovDer = nonRecoverable.derRepresentation
 		let nonRecoveryDERHex = "3044022074b5efbb980029d7f07cc3fa119b1b95ff178887b919b60ef4f294e095e1f9ac0220566e3d0c0ee77fa15cd1a8bf3b26366908dfa42e5f0481c73f1a23a2816260f8"
 		XCTAssertEqual(nonRecovDer.hex, nonRecoveryDERHex)
 
@@ -118,7 +118,7 @@ struct RecoveryTestVector: Decodable, Equatable {
 
 	func recoverableSignature() throws -> K1.ECDSA.Recoverable.Signature {
 		try K1.ECDSA.Recoverable.Signature(
-			rawRepresentation: Data(hex: signature)
+			internalRepresentation: Data(hex: signature)
 		)
 	}
 

@@ -42,9 +42,9 @@ private struct SignatureWycheproofP1364TestVector: WycheproofTestVector {
 
 	func expectedSignature() throws -> Signature {
 		let raw = try Data(hex: sig)
-		let signature = try Signature(compactRepresentation: raw)
+		let signature = try Signature(rawRepresentation: raw)
 		if self.result == "valid" {
-			try XCTAssertEqual(sig, signature.compactRepresentation().hex)
+			XCTAssertEqual(sig, signature.rawRepresentation.hex)
 		}
 		return signature
 	}

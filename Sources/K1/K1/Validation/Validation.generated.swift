@@ -8,7 +8,7 @@ import Foundation
 
 // MARK: Verify + ECDSA.NonRecoverable
 extension K1.ECDSA.NonRecoverable.PublicKey {
-	/// Verifies an elliptic curve digital signature algorithm (ECDSA) an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature on some _hash_ over the `secp256k1` elliptic curve.
+	/// Verifies an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature on some _hash_ over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - signature: The an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature to check against the _hashed_ data.
 	///   - hashed: The _hashed_ data covered by the signature.
@@ -31,7 +31,7 @@ extension K1.ECDSA.NonRecoverable.PublicKey {
 		}
 	}
 
-	/// Verifies an elliptic curve digital signature algorithm (ECDSA) an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature on a digest over the `secp256k1` elliptic curve.
+	/// Verifies an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature on a digest over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - signature: The an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature to check against the given digest.
 	///   - digest: The digest covered by the signature.
@@ -49,7 +49,7 @@ extension K1.ECDSA.NonRecoverable.PublicKey {
 		)
 	}
 
-	/// Verifies an elliptic curve digital signature algorithm (ECDSA) an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature on a block of data over the `secp256k1` elliptic curve.
+	/// Verifies an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature on a block of data over the `secp256k1` elliptic curve.
 	///
 	/// The function computes an SHA-256 hash from the data before verifying the signature. If you separately hash the data to be signed, use `isValidSignature(_:digest:input)` with the created digest. Or if you have access to a digest just as `some DataProtocol`, use
 	/// `isValidSignature(_:hashed:input)`.
@@ -74,7 +74,7 @@ extension K1.ECDSA.NonRecoverable.PublicKey {
 
 // MARK: Verify + ECDSA.Recoverable
 extension K1.ECDSA.Recoverable.PublicKey {
-	/// Verifies an elliptic curve digital signature algorithm (ECDSA) an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature on some _hash_ over the `secp256k1` elliptic curve.
+	/// Verifies an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature on some _hash_ over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - signature: The an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature to check against the _hashed_ data.
 	///   - hashed: The _hashed_ data covered by the signature.
@@ -97,7 +97,7 @@ extension K1.ECDSA.Recoverable.PublicKey {
 		}
 	}
 
-	/// Verifies an elliptic curve digital signature algorithm (ECDSA) an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature on a digest over the `secp256k1` elliptic curve.
+	/// Verifies an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature on a digest over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - signature: The an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature to check against the given digest.
 	///   - digest: The digest covered by the signature.
@@ -115,7 +115,7 @@ extension K1.ECDSA.Recoverable.PublicKey {
 		)
 	}
 
-	/// Verifies an elliptic curve digital signature algorithm (ECDSA) an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature on a block of data over the `secp256k1` elliptic curve.
+	/// Verifies an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature on a block of data over the `secp256k1` elliptic curve.
 	///
 	/// The function computes an SHA-256 hash from the data before verifying the signature. If you separately hash the data to be signed, use `isValidSignature(_:digest:input)` with the created digest. Or if you have access to a digest just as `some DataProtocol`, use
 	/// `isValidSignature(_:hashed:input)`.
@@ -140,7 +140,7 @@ extension K1.ECDSA.Recoverable.PublicKey {
 
 // MARK: Verify + Schnorr
 extension K1.Schnorr.PublicKey {
-	/// Verifies an elliptic curve digital signature algorithm (ECDSA) Schnorr signature on some _hash_ over the `secp256k1` elliptic curve.
+	/// Verifies Schnorr signature on some _hash_ over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - signature: The Schnorr signature to check against the _hashed_ data.
 	///   - hashed: The _hashed_ data covered by the signature.
@@ -160,7 +160,7 @@ extension K1.Schnorr.PublicKey {
 		}
 	}
 
-	/// Verifies an elliptic curve digital signature algorithm (ECDSA) Schnorr signature on a digest over the `secp256k1` elliptic curve.
+	/// Verifies Schnorr signature on a digest over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - signature: The Schnorr signature to check against the given digest.
 	///   - digest: The digest covered by the signature.
@@ -175,7 +175,7 @@ extension K1.Schnorr.PublicKey {
 		)
 	}
 
-	/// Verifies an elliptic curve digital signature algorithm (ECDSA) Schnorr signature on a block of data over the `secp256k1` elliptic curve.
+	/// Verifies Schnorr signature on a block of data over the `secp256k1` elliptic curve.
 	///
 	/// The function computes an SHA-256 hash from the data before verifying the signature. If you separately hash the data to be signed, use `isValidSignature(_:digest:input)` with the created digest. Or if you have access to a digest just as `some DataProtocol`, use
 	/// `isValidSignature(_:hashed:input)`.
