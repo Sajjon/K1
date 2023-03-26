@@ -82,6 +82,7 @@ extension K1.ECDSA.SigningOptions.NonceFunction {
 			"feature": "ECDSA.NonRecoverable",
 			"variant": "an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable",
 			"docSignParameterOptions": "Whether or not to consider malleable signatures valid",
+			"docSignReturnExtra": " The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.",
 			"docValidationParameterOptions": "\n///   - options: Whether or not to consider malleable signatures valid.",
 			"validationOptionsArg": ",\noptions: K1.ECDSA.ValidationOptions = .default",
 			"validationOptionsFwd": ",\noptions: options",
@@ -91,16 +92,17 @@ extension K1.ECDSA.SigningOptions.NonceFunction {
 			"feature": "ECDSA.Recoverable",
 			"variant": "an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable",
 			"docSignParameterOptions": "Whether or not to consider malleable signatures valid",
+			"docSignReturnExtra": " The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.",
 			"docValidationParameterOptions": "\n///   - options: Whether or not to consider malleable signatures valid.",
 			"validationOptionsArg": ",\noptions: K1.ECDSA.ValidationOptions = .default",
 			"validationOptionsFwd": ",\noptions: options",
-
 		},
 		{
 			"scheme": "Schnorr",
 			"feature": "Schnorr",
 			"variant": "Schnorr",
-			"docSignParameterOptions": "Optional auxiliary random data to use when forming nonce for the signature.",
+			"docSignParameterOptions": "Optional auxiliary random data to use when forming nonce for the signature",
+			"docSignReturnExtra": "",
 			"docValidationParameterOptions": "",
 			"validationOptionsArg": "",
 			"validationOptionsFwd": "",
@@ -113,6 +115,7 @@ extension K1.ECDSA.SigningOptions.NonceFunction {
 	SCHEME = VARIANT_OF_FEATURE["scheme"]
 	VARIANT = VARIANT_OF_FEATURE["variant"]
 	DOC_SIGN_PARAM_OPTIONS = VARIANT_OF_FEATURE["docSignParameterOptions"]
+	DOC_SIGN_RETURN_EXTRA = VARIANT_OF_FEATURE["docSignReturnExtra"]
 	DOC_VALIDATION_PARAM_OPTIONS = VARIANT_OF_FEATURE["docValidationParameterOptions"]
 	VALIDATION_OPTIONS_ARG = VARIANT_OF_FEATURE["validationOptionsArg"]
 	VALIDATION_OPTIONS_FWD = VARIANT_OF_FEATURE["validationOptionsFwd"]
@@ -123,7 +126,7 @@ extension K1.${FEATURE}.PrivateKey {
 	/// - Parameters:
 	///   - hashed: The _hashed_ data to sign.
 	///   - options: ${DOC_SIGN_PARAM_OPTIONS}.
-	/// - Returns: The ${VARIANT} signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
+	/// - Returns: The ${VARIANT} signature corresponding to the data.${DOC_SIGN_RETURN_EXTRA}
 	public func signature(
 		for hashed: some DataProtocol,
 		options: K1.${SCHEME}.SigningOptions = .default
@@ -141,7 +144,7 @@ extension K1.${FEATURE}.PrivateKey {
 	/// - Parameters:
 	///   - digest: The digest of the data to sign.
 	///   - options: ${DOC_SIGN_PARAM_OPTIONS}.
-	/// - Returns: The ${VARIANT} signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
+	/// - Returns: The ${VARIANT} signature corresponding to the data.${DOC_SIGN_RETURN_EXTRA}
 	public func signature(
 		for digest: some Digest,
 		options: K1.${SCHEME}.SigningOptions = .default
@@ -156,7 +159,7 @@ extension K1.${FEATURE}.PrivateKey {
 	/// - Parameters:
 	///   - unhashed: The data hash and then to sign.
 	///   - options: ${DOC_SIGN_PARAM_OPTIONS}.
-	/// - Returns: The ${VARIANT} signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
+	/// - Returns: The ${VARIANT} signature corresponding to the data.${DOC_SIGN_RETURN_EXTRA}
 	public func signature(
 		forUnhashed unhashed: some DataProtocol,
 		options: K1.${SCHEME}.SigningOptions = .default

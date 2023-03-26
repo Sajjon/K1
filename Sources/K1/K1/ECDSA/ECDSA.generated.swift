@@ -314,8 +314,8 @@ extension K1.Schnorr.PrivateKey {
 	/// Generates Schnorr signature of _hashed_ data you provide over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - hashed: The _hashed_ data to sign.
-	///   - options: Optional auxiliary random data to use when forming nonce for the signature..
-	/// - Returns: The Schnorr signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
+	///   - options: Optional auxiliary random data to use when forming nonce for the signature.
+	/// - Returns: The Schnorr signature corresponding to the data.
 	public func signature(
 		for hashed: some DataProtocol,
 		options: K1.Schnorr.SigningOptions = .default
@@ -332,8 +332,8 @@ extension K1.Schnorr.PrivateKey {
 	/// Generates Schnorr signature of the digest you provide over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - digest: The digest of the data to sign.
-	///   - options: Optional auxiliary random data to use when forming nonce for the signature..
-	/// - Returns: The Schnorr signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
+	///   - options: Optional auxiliary random data to use when forming nonce for the signature.
+	/// - Returns: The Schnorr signature corresponding to the data.
 	public func signature(
 		for digest: some Digest,
 		options: K1.Schnorr.SigningOptions = .default
@@ -347,8 +347,8 @@ extension K1.Schnorr.PrivateKey {
 	/// Generates Schnorr signature of the given data over the `secp256k1` elliptic curve, using SHA-256 as a hash function.
 	/// - Parameters:
 	///   - unhashed: The data hash and then to sign.
-	///   - options: Optional auxiliary random data to use when forming nonce for the signature..
-	/// - Returns: The Schnorr signature corresponding to the data. The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call.
+	///   - options: Optional auxiliary random data to use when forming nonce for the signature.
+	/// - Returns: The Schnorr signature corresponding to the data.
 	public func signature(
 		forUnhashed unhashed: some DataProtocol,
 		options: K1.Schnorr.SigningOptions = .default
