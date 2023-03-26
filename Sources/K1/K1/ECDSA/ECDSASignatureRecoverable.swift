@@ -41,11 +41,11 @@ extension K1.ECDSA.Recoverable.Signature {
 		try self.init(compact: .init(compact: compact, recoveryID: recoveryID))
 	}
 
-	public init(
-		rawRepresentation: some DataProtocol
+	init(
+		internalRepresentation: some DataProtocol
 	) throws {
 		try self.init(
-			wrapped: FFI.ECDSA.Recoverable.deserialize(rawRepresentation: rawRepresentation)
+			wrapped: FFI.ECDSA.Recoverable.deserialize(rawRepresentation: internalRepresentation)
 		)
 	}
 }
