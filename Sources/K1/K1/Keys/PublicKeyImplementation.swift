@@ -1,14 +1,14 @@
 import Foundation
 
-// MARK: - K1PublicKeyProtocol
-public protocol K1PublicKeyProtocol: K1KeyPortable {
+// MARK: - _K1PublicKeyProtocol
+protocol _K1PublicKeyProtocol: _K1KeyPortable {
 	init(compressedRepresentation: some ContiguousBytes) throws
 	var compressedRepresentation: Data { get }
 }
 
 // MARK: - K1._PublicKeyImplementation
 extension K1 {
-	struct _PublicKeyImplementation: Sendable, Hashable, K1PublicKeyProtocol {
+	struct _PublicKeyImplementation: Sendable, Hashable, _K1PublicKeyProtocol {
 		typealias Wrapped = FFI.PublicKey.Wrapped
 		internal let wrapped: Wrapped
 

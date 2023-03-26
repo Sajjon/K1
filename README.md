@@ -16,46 +16,45 @@ Just like that K1 vendors these key pairs:
 
 Just like you can convert between e.g. `Curve25519.KeyAgreement.PrivateKey` and  `Curve25519.Signing.PrivateKey` back and forth using any of the initializers and serializer, you can convert between all PrivateKeys and all PublicKeys of all features in K1.
 
-All keys conform to `K1KeyExportable` protocol below to serialize the Private/PubliKey:
+All keys can be serialized using these computed properties:
 
 ```swift
-public protocol K1KeyExportable {
+{
     var rawRepresentation: Data { get }
-    var x963Representation: Data { get }
     var derRepresentation: Data { get }
     var pemRepresentation: String { get }
+    var x963Representation: Data { get }
 }
 ```
 
-All keys conform to `K1KeyImportable` protocol below to deserialize to Private/PubliKey:
+All keys can be deserialize using these initializer:
 
 ```swift
-public protocol K1KeyImportable {
+{
     init(rawRepresentation: some ContiguousBytes) throws
-    init(x963Representation: some ContiguousBytes) throws
     init(derRepresentation: some RandomAccessCollection<UInt8>) throws
     init(pemRepresentation: String) throws
+    init(x963Representation: some ContiguousBytes) throws
 }
 ```
 
-Furthermore, all PrivateKey's conform to this protocol
+Furthermore, all PrivateKey's have these additional APIs:
 
 ```swift
-protocol K1PrivateKeyProtocol: K1KeyPortable {
-    associatedtype PublicKey: K1PublicKeyProtocol
-    var publicKey: PublicKey { get }
+{
     init()
+    associatedtype PublicKey
+    var publicKey: PublicKey { get }
 }
 ```
 
-Furthermore, all PublicKey's conform to this protocol
+Furthermore, all PublicKeys's have these additional APIs:
 
 ```swift
-public protocol K1PublicKeyProtocol: K1KeyPortable {
+{
     init(compressedRepresentation: some ContiguousBytes) throws
     var compressedRepresentation: Data { get }
 }
-
 ```
 
 
@@ -185,8 +184,8 @@ It is worth noting that some Schnorr implementations are incompatible with [BIP3
 # ECDH
 
 This library vendors three different EC Diffie-Hellman (ECDH) key exchange functions:
-1. `ASN1 x9.63` - No hash, return only the `X` coordinate of the point - `sharedSecretFromKeyAgreement -> SharedSecret`
-2. `libsecp256k1` - SHA-256 hash the compressed point - `ecdh -> Data`
+1. `ASN1 x9.63` - No hash, return only the `X` coordinate of the point - `sharedSecretFromKeyAgreement:with -> SharedSecret`
+2. `libsecp256k1` - SHA-256 hash the compressed point - `ecdh:with -> SharedSecret`
 3. Custom - No hash, return point uncompressed - `ecdhPoint -> Data`
 
 ```swift

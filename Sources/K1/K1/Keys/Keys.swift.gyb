@@ -47,7 +47,7 @@ import Foundation
 extension K1.${FEATURE} {
 	// MARK: ${FEATURE} + PrivateKey
 	${PRIVATEKEY_TYPE_DOC}
-	public struct PrivateKey: Sendable, Hashable, K1PrivateKeyProtocol {
+	public struct PrivateKey: Sendable, Hashable {
 		
 		typealias Impl = K1._PrivateKeyImplementation
 		public typealias PublicKey = K1.${FEATURE}.PublicKey
@@ -151,7 +151,7 @@ extension K1.${FEATURE} {
 
 	// MARK: ${FEATURE} + PublicKey
 	${PUBLICKEY_TYPE_DOC}
-	public struct PublicKey: Sendable, Hashable, K1PublicKeyProtocol {
+	public struct PublicKey: Sendable, Hashable {
 		
 		typealias Impl = K1._PublicKeyImplementation
 		internal let impl: Impl
@@ -245,6 +245,15 @@ extension K1.${FEATURE} {
 
 	}
 }
+% end
+
+% for KEY_FOR_FEATURE_WITH_DOCS in LIST_KEY_FOR_FEATURE_WITH_DOCS:
+%{
+	FEATURE = KEY_FOR_FEATURE_WITH_DOCS["feature"]
+}%
+extension K1.${FEATURE}.PrivateKey: _K1PrivateKeyProtocol {}
+extension K1.${FEATURE}.PublicKey: _K1PublicKeyProtocol {}
+% end
 
 % end
-% end
+
