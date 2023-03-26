@@ -6,7 +6,9 @@ extension K1 {
 
 // MARK: - K1.ECDSA.ValidationOptions
 extension K1.ECDSA {
+	/// Additional parameters used during validation of ECDSA signatures.
 	public struct ValidationOptions {
+		/// Whether or not to consider malleable signatures valid.
 		public let malleabilityStrictness: MalleabilityStrictness
 
 		public init(malleabilityStrictness: MalleabilityStrictness) {
@@ -16,6 +18,7 @@ extension K1.ECDSA {
 }
 
 extension K1.ECDSA.ValidationOptions {
+	/// The default behavior of ECDSA signature validation.
 	public static let `default`: Self = .init(
 		malleabilityStrictness: .rejected
 	)
@@ -34,7 +37,9 @@ extension K1.ECDSA.ValidationOptions {
 
 // MARK: - K1.ECDSA.SigningOptions
 extension K1.ECDSA {
+	/// Additional parameters used during signing, affects the signature produced.
 	public struct SigningOptions: Sendable, Hashable {
+		/// Behavior of nonce generation used durring signing.
 		public let nonceFunction: NonceFunction
 
 		public init(nonceFunction: NonceFunction) {
@@ -44,22 +49,29 @@ extension K1.ECDSA {
 }
 
 extension K1.ECDSA.SigningOptions {
+	/// The default behavior used during ECDSA signing.
 	public static let `default`: Self = .init(nonceFunction: .deterministic())
 
+	/// Behavior of nonce generation used durring signing.
 	public enum NonceFunction: Sendable, Hashable {
+		/// Use securely generate random data as nonce during ECDSA signing.
 		case random
 
-		/// RFC6979
+		/// Use deterministic nonces as per [`RFC6979`][rfc6979] during ECDSA signing.
+		///
+		/// [rfc6979]: https://www.rfc-editor.org/rfc/rfc6979
 		case deterministic(arbitraryData: RFC6979ArbitraryData? = nil)
 	}
 }
 
 // MARK: - K1.ECDSA.SigningOptions.NonceFunction.RFC6979ArbitraryData
 extension K1.ECDSA.SigningOptions.NonceFunction {
+	/// Optional arbitrary data passed during nonce generation using RFC6979.
 	public struct RFC6979ArbitraryData: Sendable, Hashable {
 		public let arbitraryData: [UInt8]
+		public static let byteCount = Curve.Field.byteCount
 		public init(arbitraryData: [UInt8]) throws {
-			guard arbitraryData.count == Curve.Field.byteCount else {
+			guard arbitraryData.count == Self.byteCount else {
 				throw K1.Error.incorrectByteCountOfArbitraryDataForNonceFunction
 			}
 			self.arbitraryData = arbitraryData
