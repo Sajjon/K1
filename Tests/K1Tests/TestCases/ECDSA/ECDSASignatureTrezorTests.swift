@@ -54,7 +54,17 @@ private extension XCTestCase {
 			let signatureRecoverableFromMessage = try privateKeyRecoverable.signature(for: messageDigest)
 			try XCTAssertEqual(signatureRecoverableFromMessage.nonRecoverable(), expectedSignature)
 			let recid = try signatureRecoverableFromMessage.compact().recoveryID
-			XCTAssertEqual(signatureRecoverableFromMessage.rawRepresentation.hex, expectedSignature.rawRepresentation.hex + "\(Data([UInt8(recid.rawValue)]).hex)")
+
+			XCTAssertEqual(
+				signatureRecoverableFromMessage.rawRepresentation.hex,
+				expectedSignature.internalRepresentation.hex + "\(Data([UInt8(recid.rawValue)]).hex)"
+			)
+
+			try XCTAssertEqual(
+				signatureRecoverableFromMessage.compact().serialize(format: .rsv).hex,
+				expectedSignature.rawRepresentation.hex + "\(Data([UInt8(recid.rawValue)]).hex)"
+			)
+
 			numberOfTestsRun += 1
 		}
 		return .init(numberOfTestsRun: numberOfTestsRun, idsOmittedTests: [])
@@ -86,9 +96,9 @@ private struct SignatureTrezorTestVector: SignatureTestVector {
 	func expectedSignature() throws -> Signature {
 		let derData = try Data(hex: expected.der)
 		let signature = try K1.ECDSA.NonRecoverable.Signature(derRepresentation: derData)
-		try XCTAssertEqual(signature.derRepresentation().hex, expected.der)
-		try XCTAssertEqual(
-			signature.compactRepresentation().hex,
+		XCTAssertEqual(signature.derRepresentation.hex, expected.der)
+		XCTAssertEqual(
+			signature.rawRepresentation.hex,
 			[
 				expected.r,
 				expected.s,
@@ -96,7 +106,7 @@ private struct SignatureTrezorTestVector: SignatureTestVector {
 		)
 
 		try XCTAssertEqual(
-			K1.ECDSA.NonRecoverable.Signature(compactRepresentation: Data(hex: expected.r + expected.s)),
+			K1.ECDSA.NonRecoverable.Signature(rawRepresentation: Data(hex: expected.r + expected.s)),
 			signature
 		)
 

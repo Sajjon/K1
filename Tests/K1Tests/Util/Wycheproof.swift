@@ -98,8 +98,8 @@ extension XCTestCase {
 		XCTAssertEqual(key.pemRepresentation, group.keyPem)
 		XCTAssertEqual(keyFromPEM, key)
 
-		let compactXRaw = try Data(hex: group.key.wx)
-		let compactYRaw = try Data(hex: group.key.wy)
+		let keyCompactXRaw = try Data(hex: group.key.wx)
+		let keyCompactYRaw = try Data(hex: group.key.wy)
 		func ensure32Bytes(_ compactComponent: Data) throws -> Data {
 			if compactComponent.count == Curve.Field.byteCount {
 				return compactComponent
@@ -117,11 +117,11 @@ extension XCTestCase {
 			}
 			return Data(compactComponent)
 		}
-		let xOnly = try ensure32Bytes(compactXRaw)
-		let yOnly = try ensure32Bytes(compactYRaw)
+		let pubKeyXOnly = try ensure32Bytes(keyCompactXRaw)
+		let pubKeyYOnly = try ensure32Bytes(keyCompactYRaw)
 
-		let fromRaw = try K1.ECDSA.NonRecoverable.PublicKey(rawRepresentation: xOnly + yOnly)
-		XCTAssertEqual(fromRaw, key)
+		let pubKeyFromRaw = try K1.ECDSA.NonRecoverable.PublicKey(rawRepresentation: pubKeyXOnly + pubKeyYOnly)
+		XCTAssertEqual(pubKeyFromRaw, key)
 
 		var numberOfTestsRun = 0
 		var idsOfOmittedTests = [Int]()

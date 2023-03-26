@@ -74,6 +74,7 @@ extension K1.ECDSA.Recoverable.Signature {
 		)
 	}
 
+	/// A tuple of `R||S` and `recoveryID` from a recoverable ECDSA signature.
 	public struct Compact: Sendable, Hashable {
 		/// Compact aka `IEEE P1363` aka `R||S`.
 		public let compact: Data
@@ -163,6 +164,12 @@ extension K1.ECDSA.Recoverable.Signature.RecoveryID {
 
 // MARK: Recovery
 extension K1.ECDSA.Recoverable.Signature {
+	/// Recovers a public key from a `secp256k1` this ECDSA signature and the message signed.
+	///
+	/// - Parameters:
+	///   - message: The message that was signed to produce this ECDSA signature.
+	/// - Returns: The public key which corresponds to the private key which used to produce this
+	/// signature by signing the `message`.
 	public func recoverPublicKey(
 		message: some DataProtocol
 	) throws -> K1.ECDSA.Recoverable.PublicKey {
@@ -176,6 +183,7 @@ extension K1.ECDSA.Recoverable.Signature {
 
 // MARK: Conversion
 extension K1.ECDSA.Recoverable.Signature {
+	/// Converts this recoverable ECDSA signature to a non-recoverable version.
 	public func nonRecoverable() throws -> K1.ECDSA.NonRecoverable.Signature {
 		try K1.ECDSA.NonRecoverable.Signature(
 			wrapped: FFI.ECDSA.Recoverable.nonRecoverable(self.wrapped)
@@ -185,6 +193,7 @@ extension K1.ECDSA.Recoverable.Signature {
 
 // MARK: Equatable
 extension K1.ECDSA.Recoverable.Signature {
+	/// Compares two ECDSA signatures.
 	public static func == (lhs: Self, rhs: Self) -> Bool {
 		lhs.wrapped.withUnsafeBytes { lhsBytes in
 			rhs.wrapped.withUnsafeBytes { rhsBytes in
