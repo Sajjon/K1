@@ -73,7 +73,8 @@ let package = Package(
 			],
 			exclude: [
 				"K1/Keys/Keys.swift.gyb",
-				"K1/ECDSA/ECDSA.swift.gyb",
+				"K1/Signing/Signing.swift.gyb",
+				"K1/Validation/Validation.swift.gyb",
 			],
 			swiftSettings: [
 				.define("CRYPTO_IN_SWIFTPM_FORCE_BUILD_API"),
