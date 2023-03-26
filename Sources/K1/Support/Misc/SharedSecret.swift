@@ -19,7 +19,7 @@ extension CryptoKit.SharedSecret {
 		let __sharedSecret = __SharedSecret(ss: .init(bytes: data))
 		let sharedSecret = unsafeBitCast(__sharedSecret, to: SharedSecret.self)
 		guard sharedSecret.withUnsafeBytes({ Data($0).count == data.count }) else {
-			throw K1.Error.failedToProduceSharedSecret
+			throw K1.Error.internalFailure(.sharedSecretIncorrectSize)
 		}
 
 		self = sharedSecret

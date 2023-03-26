@@ -121,7 +121,7 @@ private extension SchnorrSignatureBitcoinCoreTests {
 		guard !vector.invalidPublicKey else {
 			XCTAssertThrowsError(try parsePublicKey(), "") { anyError in
 				if let error = anyError as? K1.Error {
-					XCTAssertEqual(error, K1.Error.failedToDeserializePublicKey)
+					XCTAssertEqual(error, K1.Error.underlyingLibsecp256k1Error(.publicKeyParse))
 				} else {
 					XCTFail("Failed to cast error")
 				}

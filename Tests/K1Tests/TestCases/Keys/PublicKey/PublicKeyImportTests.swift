@@ -7,7 +7,7 @@ final class PublicKeyImportTests: XCTestCase {
 		let raw = try Data(hex: "deadbeef")
 		try assert(
 			K1.ECDSA.NonRecoverable.PublicKey(x963Representation: raw),
-			throws: K1.Error.incorrectByteCountOfX963PublicKey(got: 4, expected: 65)
+			throws: K1.Error.incorrectKeySize
 		)
 	}
 
@@ -15,7 +15,7 @@ final class PublicKeyImportTests: XCTestCase {
 		let raw = Data(repeating: 0xDE, count: 66)
 		try assert(
 			K1.ECDSA.NonRecoverable.PublicKey(x963Representation: raw),
-			throws: K1.Error.incorrectByteCountOfX963PublicKey(got: 66, expected: 65)
+			throws: K1.Error.incorrectKeySize
 		)
 	}
 
@@ -23,7 +23,7 @@ final class PublicKeyImportTests: XCTestCase {
 		let raw = Data(repeating: 0x04, count: 65)
 		try assert(
 			K1.ECDSA.NonRecoverable.PublicKey(x963Representation: raw),
-			throws: K1.Error.failedToDeserializePublicKey
+			throws: K1.Error.underlyingLibsecp256k1Error(.publicKeyParse)
 		)
 	}
 
@@ -31,7 +31,7 @@ final class PublicKeyImportTests: XCTestCase {
 		let raw = Data(repeating: 0x03, count: 33)
 		try assert(
 			K1.ECDSA.NonRecoverable.PublicKey(compressedRepresentation: raw),
-			throws: K1.Error.failedToDeserializePublicKey
+			throws: K1.Error.underlyingLibsecp256k1Error(.publicKeyParse)
 		)
 	}
 
@@ -58,7 +58,7 @@ final class PublicKeyImportTests: XCTestCase {
 
 		try assert(
 			K1.ECDSA.NonRecoverable.PublicKey(x963Representation: raw),
-			throws: K1.Error.failedToDeserializePublicKey
+			throws: K1.Error.underlyingLibsecp256k1Error(.publicKeyParse)
 		)
 	}
 }

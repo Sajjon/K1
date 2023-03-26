@@ -9,10 +9,7 @@ extension FFI.Schnorr {
 
 		init(bytes: [UInt8]) throws {
 			guard bytes.count == Self.byteCount else {
-				throw K1.Error.failedToInitSchnorrSignatureInvalidByteCount(
-					got: bytes.count,
-					expected: Self.byteCount
-				)
+				throw K1.Error.incorrectParameterSize
 			}
 			self.bytes = bytes
 		}

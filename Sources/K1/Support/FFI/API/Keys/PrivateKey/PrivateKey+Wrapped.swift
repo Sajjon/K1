@@ -10,14 +10,11 @@ extension FFI {
 
 			fileprivate init(secureBytes: SecureBytes) throws {
 				guard secureBytes.count == Curve.Field.byteCount else {
-					throw K1.Error.failedToInitializePrivateKeyIncorrectByteCount(
-						got: secureBytes.count,
-						expected: Curve.Field.byteCount
-					)
+					throw K1.Error.incorrectKeySize
 				}
 
 				if secureBytes.allSatisfy({ $0 == .zero }) {
-					throw K1.Error.invalidPrivateKeyMustNotBeZero
+					throw K1.Error.invalidKey
 				}
 
 				self.secureBytes = secureBytes
@@ -25,8 +22,12 @@ extension FFI {
 				self.publicKey = try secureBytes.withUnsafeMutableBytes { seckey in
 					var raw = secp256k1_pubkey()
 
-					try FFI.call(ifFailThrow: .invalidPrivateKeyMustBeSmallerThanOrder) { context in
-						secp256k1_ec_pubkey_create(context, &raw, seckey.baseAddress!)
+					try FFI.call(ifFailThrow: .publicKeyCreate) { context in
+						secp256k1_ec_pubkey_create(
+							context,
+							&raw,
+							seckey.baseAddress!
+						)
 					}
 
 					return FFI.PublicKey.Wrapped(raw: raw)

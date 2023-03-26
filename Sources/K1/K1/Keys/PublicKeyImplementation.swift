@@ -61,7 +61,7 @@ extension K1._PublicKeyImplementation {
 	init(pemRepresentation: String) throws {
 		let pem = try ASN1.PEMDocument(pemString: pemRepresentation)
 		guard pem.type == Self.pemType else {
-			throw K1.Error.invalidPEMDocument
+			throw K1.ASN1Error.invalidPEMDocument
 		}
 		self = try .init(derRepresentation: pem.derBytes)
 	}

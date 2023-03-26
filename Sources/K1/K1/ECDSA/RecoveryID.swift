@@ -17,14 +17,14 @@ extension K1.ECDSA.Recoverable.Signature {
 extension K1.ECDSA.Recoverable.Signature.RecoveryID {
 	public init(byte: UInt8) throws {
 		guard let self_ = Self(rawValue: byte) else {
-			throw K1.Error.invalidRecoveryID(got: Int(byte))
+			throw K1.Error.invalidParameter
 		}
 		self = self_
 	}
 
 	public init(recid: Int32) throws {
 		guard recid <= 3, recid >= 0 else {
-			throw K1.Error.invalidRecoveryID(got: Int(recid))
+			throw K1.Error.invalidParameter
 		}
 		try self.init(byte: UInt8(recid))
 	}

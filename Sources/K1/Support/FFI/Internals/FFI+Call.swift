@@ -9,7 +9,7 @@ final class FFI {
 			/* "Create a secp256k1 context object." */
 			let context = secp256k1_context_create(Context.sign.rawValue | Context.verify.rawValue)
 		else {
-			throw K1.Error.failedToCreateContextForSecp256k1
+			throw K1.Error.underlyingLibsecp256k1Error(.failedToCreateContextForSecp256k1)
 		}
 
 		self.context = context
@@ -43,18 +43,18 @@ extension FFI {
 	}
 
 	func call(
-		ifFailThrow error: K1.Error,
+		ifFailThrow error: FFI.Error,
 		_ method: (OpaquePointer) -> Int32
 	) throws {
 		let result = callWithResultCode(method)
 		let successCode = 1
 		guard result == successCode else {
-			throw error
+			throw K1.Error.underlyingLibsecp256k1Error(error)
 		}
 	}
 
 	static func call(
-		ifFailThrow error: K1.Error,
+		ifFailThrow error: FFI.Error,
 		_ method: (OpaquePointer) -> Int32
 	) throws {
 		try toC { ffi in

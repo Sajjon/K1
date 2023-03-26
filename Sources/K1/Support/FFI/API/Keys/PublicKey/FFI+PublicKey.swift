@@ -19,7 +19,7 @@ extension FFI.PublicKey {
 		try contiguousBytes.withUnsafeBytes { bufferPointer throws -> Wrapped in
 			let expected = Self.x963ByteCount
 			guard bufferPointer.count == expected else {
-				throw K1.Error.incorrectByteCountOfX963PublicKey(got: bufferPointer.count, expected: expected)
+				throw K1.Error.incorrectKeySize
 			}
 			return try Self._deserialize(bytes: [UInt8](bufferPointer))
 		}
@@ -32,14 +32,9 @@ extension FFI.PublicKey {
 		try contiguousBytes.withUnsafeBytes { bufferPointer throws -> Wrapped in
 			let expected = Self.rawByteCount
 			guard bufferPointer.count == expected else {
-				throw K1.Error.incorrectByteCountOfRawPublicKey(got: bufferPointer.count, expected: expected)
+				throw K1.Error.incorrectKeySize
 			}
-			// We can simply prepend `04` and parse as x963Representation
-			do {
-				return try Self.deserialize(x963Representation: [0x04] + [UInt8](bufferPointer))
-			} catch {
-				throw K1.Error.unableToDeserializePublicKeyFromRawRepresentation
-			}
+			return try Self.deserialize(x963Representation: [0x04] + [UInt8](bufferPointer))
 		}
 	}
 
@@ -50,7 +45,7 @@ extension FFI.PublicKey {
 		try contiguousBytes.withUnsafeBytes { bufferPointer throws -> Wrapped in
 			let expected = Self.compressedByteCount
 			guard bufferPointer.count == expected else {
-				throw K1.Error.incorrectByteCountOfCompressedPublicKey(got: bufferPointer.count, expected: expected)
+				throw K1.Error.incorrectKeySize
 			}
 			return try Self._deserialize(bytes: [UInt8](bufferPointer))
 		}
@@ -59,7 +54,7 @@ extension FFI.PublicKey {
 	private static func _deserialize(bytes: [UInt8]) throws -> Wrapped {
 		var raw = secp256k1_pubkey()
 		try FFI.call(
-			ifFailThrow: .failedToDeserializePublicKey
+			ifFailThrow: .publicKeyParse
 		) { context in
 			secp256k1_ec_pubkey_parse(
 				context,
@@ -81,7 +76,7 @@ extension FFI.PublicKey {
 		var byteCount = format.length
 		var out = [UInt8](repeating: 0x00, count: byteCount)
 		var publicKeyRaw = wrapped.raw
-		try FFI.call(ifFailThrow: .failedToSerializePublicKey) { context in
+		try FFI.call(ifFailThrow: .publicKeySerialize) { context in
 			secp256k1_ec_pubkey_serialize(
 				context,
 				&out,

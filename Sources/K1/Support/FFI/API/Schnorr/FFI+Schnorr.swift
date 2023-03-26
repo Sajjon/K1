@@ -16,7 +16,7 @@ extension FFI.Schnorr {
 		try FFI.toC { ffi -> Bool in
 			var publicKeyX = secp256k1_xonly_pubkey()
 			var publicKeyRaw = publicKey.raw
-			try FFI.call(ifFailThrow: .failedToSchnorrVerifyGettingXFromPubKey) { context in
+			try FFI.call(ifFailThrow: .xonlyPublicKeyFromPublicKey) { context in
 				secp256k1_xonly_pubkey_from_pubkey(
 					context,
 					&publicKeyX,
@@ -48,10 +48,7 @@ extension FFI.Schnorr {
 		guard
 			message.count == Curve.Field.byteCount
 		else {
-			throw K1.Error.unableToSignMessageHasInvalidLength(
-				got: message.count,
-				expected: Curve.Field.byteCount
-			)
+			throw K1.Error.incorrectParameterSize
 		}
 
 		var signatureOut = [UInt8](repeating: 0, count: FFI.Schnorr.Wrapped.byteCount)
@@ -59,7 +56,7 @@ extension FFI.Schnorr {
 		var keyPair = secp256k1_keypair()
 
 		try FFI.call(
-			ifFailThrow: .failedToInitializeKeyPairForSchnorrSigning
+			ifFailThrow: .keypairCreate
 		) { context in
 			secp256k1_keypair_create(
 				context,
@@ -69,7 +66,7 @@ extension FFI.Schnorr {
 		}
 
 		try FFI.call(
-			ifFailThrow: .failedToSchnorrSignDigest
+			ifFailThrow: .schnorrSign
 		) { context in
 			secp256k1_schnorrsig_sign32(
 				context,
