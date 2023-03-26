@@ -86,7 +86,7 @@ extension K1.ECDSA.SigningOptions.NonceFunction {
 			) -> Int32 /* Returns: 1 if a nonce was successfully generated. 0 will cause signing to fail. */ in
 
 				SecureBytes(count: Curve.Field.byteCount).withUnsafeBytes {
-					nonce32?.assign(from: $0.baseAddress!.assumingMemoryBound(to: UInt8.self), count: $0.count)
+					nonce32?.update(from: $0.baseAddress!.assumingMemoryBound(to: UInt8.self), count: $0.count)
 				}
 
 				// Returns: 1 if a nonce was successfully generated. 0 will cause signing to fail.
