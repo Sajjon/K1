@@ -85,6 +85,9 @@ let package = Package(
 			dependencies: [
 				"K1",
 			],
+			exclude: [
+				"TestCases/Keys/PublicKey/PublicKeyEncodingTests.swift.gyb",
+			],
 			resources: [
 				.process("TestVectors/"),
 			]

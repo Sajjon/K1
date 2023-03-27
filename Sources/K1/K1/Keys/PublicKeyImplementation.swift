@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - _K1PublicKeyProtocol
-protocol _K1PublicKeyProtocol: _K1KeyPortable {
+protocol _K1PublicKeyProtocol: _K1KeyPortable, Sendable, Hashable {
 	init(compressedRepresentation: some ContiguousBytes) throws
 	var compressedRepresentation: Data { get }
 }

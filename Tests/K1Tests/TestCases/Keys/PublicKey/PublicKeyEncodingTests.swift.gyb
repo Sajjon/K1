@@ -1,0 +1,110 @@
+import Foundation
+@testable import K1
+import XCTest
+
+
+private extension XCTestCase {
+	func doTest<PubKey: _K1PublicKeyProtocol & Equatable, Encoding: Equatable>(
+		original makeOriginal: @autoclosure () -> PubKey,
+		serialize: KeyPath<PubKey, Encoding>,
+		deserialize: (Encoding) throws -> PubKey
+	) throws {
+		try doTestSerializationRoundtrip(
+			original: makeOriginal(),
+			serialize: serialize,
+			deserialize: deserialize
+		)
+	}
+}
+
+public func doTestSerializationRoundtrip<T, Enc>(
+	original makeOriginal: @autoclosure () -> T,
+	serialize: KeyPath<T, Enc>,
+	deserialize: (Enc) throws -> T
+) throws where T: Hashable, Enc: Equatable {
+	let count = 100
+	var unique = Set<T>()
+	for _ in 0 ..< count {
+		let original = makeOriginal()
+		unique.insert(original)
+		let serialized = original[keyPath: serialize]
+		let deserialized = try deserialize(serialized)
+		XCTAssertEqual(deserialized, original)
+		let reserialized = deserialized[keyPath: serialize]
+		XCTAssertEqual(reserialized, serialized)
+	}
+	XCTAssertEqual(unique.count, count)
+}
+
+
+
+%{
+	FEATURES = ["Schnorr", "ECDSA.NonRecoverable", "ECDSA.Recoverable", "KeyAgreement"]
+}%
+
+% for FEATURE in FEATURES:
+%{
+	MODULE = "K1." + FEATURE
+	PUBLIC_KEY_TYPE = MODULE + ".PublicKey"
+}%
+
+extension ${PUBLIC_KEY_TYPE} {
+	init() {
+		let pubKey = ${MODULE}.PrivateKey().publicKey
+		try! self.init(compressedRepresentation: pubKey.compressedRepresentation)
+	}
+}
+
+// MARK: ${PUBLIC_KEY_TYPE} Tests
+final class ${FEATURE.replace('.','')+"PublicKey"}EncodingDecodingRoundtripTests: XCTestCase {
+	
+	func test_pubkey_raw_is_x963_minus_prefix() throws {
+		
+		let privateKey = ${MODULE}.PrivateKey()
+		let publicKey = privateKey.publicKey
+
+		XCTAssertEqual(publicKey.rawRepresentation.hex, Data(publicKey.x963Representation.dropFirst()).hex)
+	}
+
+	func testRawRoundtrip() throws {
+		try doTest(
+			original: ${PUBLIC_KEY_TYPE}(),
+			serialize: \.rawRepresentation,
+			deserialize: ${PUBLIC_KEY_TYPE}.init(rawRepresentation:)
+		)
+	}
+
+	func testCompressedRoundtrip() throws {
+		try doTest(
+			original: ${PUBLIC_KEY_TYPE}(),
+			serialize: \.compressedRepresentation,
+			deserialize: ${PUBLIC_KEY_TYPE}.init(compressedRepresentation:)
+		)
+	}
+
+	func testx963Roundtrip() throws {
+		try doTest(
+			original: ${PUBLIC_KEY_TYPE}(),
+			serialize: \.x963Representation,
+			deserialize: ${PUBLIC_KEY_TYPE}.init(x963Representation:)
+		)
+	}
+
+	func testDERRoundtrip() throws {
+		try doTest(
+			original: ${PUBLIC_KEY_TYPE}(),
+			serialize: \.derRepresentation,
+			deserialize: ${PUBLIC_KEY_TYPE}.init(derRepresentation:)
+		)
+	}
+
+	func testPEMRoundtrip() throws {
+		try doTest(
+			original: ${PUBLIC_KEY_TYPE}(),
+			serialize: \.pemRepresentation,
+			deserialize: ${PUBLIC_KEY_TYPE}.init(pemRepresentation:)
+		)
+	}
+}
+
+% end
