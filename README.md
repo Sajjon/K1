@@ -5,7 +5,10 @@
 
 _K1_ is Swift wrapper around [libsecp256k1 (bitcoin-core/secp256k1)][lib], offering ECDSA, Schnorr ([BIP340][bip340]) and ECDH features.
 
-# API
+# Documentation
+Read [full documentation on here][doc].
+
+## Quick overview
 The API of K1 maps almost 1:1 with Apple's [CryptoKit][ck], vendoring a set of keypairs, one per feature. E.g. in CryptoKit you have `Curve25519.KeyAgreement.PrivateKey` and `Curve25519.KeyAgreement.PublicKey` which are seperate for `Curve25519.Signing.PrivateKey` and `Curve25519.Signing.PublicKey`. 
 
 Just like that K1 vendors these key pairs:
@@ -58,7 +61,7 @@ Furthermore, all PublicKeys's have these additional APIs:
 ```
 
 
-# ECDSA (Elliptic Curve Digital Signature Algorithm)
+## ECDSA (Elliptic Curve Digital Signature Algorithm)
 
 There exists two set of ECDSA key pairs:
 - A key pair for signatures from which you can recover the public key, specifically: `K1.ECDSA.Recoverable.PrivateKey` and `K1.ECDSA.Recoverable.PublicKey`
@@ -68,22 +71,22 @@ For each private key there exists two different `signature:for:options` (one tak
 
 The `option` is a `K1.ECDSA.SigningOptions` struct, which by default specifies [`RFC6979`][rfc6979] deterministic signing, as per Bitcoin standard, however, you can change to use secure random nonce instead.
 
-## NonRecoverable 
+### NonRecoverable 
 
-### Sign
+#### Sign
 
 ```swift
 let alice = K1.ECDA.NonRecovarable.PrivateKey()
 ```
 
-#### Hashed (Data)
+##### Hashed (Data)
 
 ```swift
 let hashedMessage: Data = // from somewhere
 let signature = try alice.signature(for: hashedMessage)
 ```
 
-#### Digest 
+##### Digest 
 
 ```swift
 let message: Data = // from somewhere
@@ -91,7 +94,7 @@ let digest = SHA256.hash(data: message)
 let signature = try alice.signature(for: digest)
 ```
 
-#### Hash and Sign
+##### Hash and Sign
 
 The `forUnhashed` will `SHA256` hash the message and then sign it. 
 
@@ -100,9 +103,9 @@ let message: Data = // from somewhere
 let signature = try alice.signature(forUnhashed: message)
 ```
 
-### Validate
+#### Validate
 
-#### Hashed (Data)
+##### Hashed (Data)
 
 ```swift
 let hashedMessage: Data = // from somewhere
@@ -114,7 +117,7 @@ assert(
 ) // PASS
 ```
 
-#### Digest
+##### Digest
 
 ```swift
 let message: Data = // from somewhere
@@ -126,7 +129,7 @@ assert(
 ) // PASS
 ```
 
-#### Hash and Validate
+##### Hash and Validate
 
 ```swift
 let message: Data = // from somewhere
@@ -138,7 +141,7 @@ assert(
 ```
 
 
-## Recoverable
+### Recoverable
 
 All signing and validation APIs are identical to the `NonRecoverable` namespace.
 
@@ -154,9 +157,9 @@ assert(
 ```
 
 
-# Schnorr Signature Scheme
+## Schnorr Signature Scheme
 
-## Sign
+### Sign
 
 ```swift
 let alice = K1.Schnorr.PrivateKey()
@@ -165,7 +168,7 @@ let signature = try alice.signature(forUnhashed: message)
 
 There exists other sign variants, `signature:for:options` (hashed data) and `signature:for:options` (`Digest`) if you already have a hashed message. All three variants takes a `K1.Schnorr.SigningOptions` struct where you can pass `auxiliaryRandomData` to be signed.
 
-## Validate
+### Validate
 
 ```swift
 let publicKey: K1.Schnorr.PublicKey = alice.publicKey
@@ -174,14 +177,14 @@ assert(publicKey.isValidSignature(signature, unhashed: message)) // PASS
 
 Or alternatively `isValidSignature:digest` or `isValidSignature:hashed`.
 
-#### Schnorr Scheme
+##### Schnorr Scheme
 
 The Schnorr signature implementation is [BIP340][bip340], since we use _libsecp256k1_ which only provides the [BIP340][bip340] Schnorr scheme. 
 
 It is worth noting that some Schnorr implementations are incompatible with [BIP340][bip340] and thus this library, e.g. [Zilliqa's](https://github.com/Zilliqa/schnorr/blob/master/src/libSchnorr/src/Schnorr.cpp#L86-L242) ([kudelski report](https://docs.zilliqa.com/zilliqa-schnorr-audit-by-kudelski_public-release.pdf), [libsecp256k1 proposal](https://github.com/bitcoin-core/secp256k1/issues/1070), [Twitter thread](https://twitter.com/AmritKummer/status/1489645007699066886?s=20&t=eDgd5221qEPOVyStY0A8SA)).
 
 
-# ECDH
+## ECDH
 
 This library vendors three different EC Diffie-Hellman (ECDH) key exchange functions:
 1. `ASN1 x9.63` - No hash, return only the `X` coordinate of the point - `sharedSecretFromKeyAgreement:with -> SharedSecret`
@@ -193,7 +196,7 @@ let alice = try K1.KeyAgreement.PrivateKey()
 let bob = try K1.KeyAgreement.PrivateKey()
 ```
 
-## `ASN1 x9.63` ECDH
+### `ASN1 x9.63` ECDH
 Returning only the `X` coordinate of the point, following [ANSI X9.63][x963] standards, embedded in a [`CryptoKit.SharedSecret`][ckss], which is useful since you can use `CryptoKit` key derivation functions on this SharedSecret, e.g. [`x963DerivedSymmetricKey`](https://developer.apple.com/documentation/cryptokit/sharedsecret/x963derivedsymmetrickey(using:sharedinfo:outputbytecount:)) or [`hkdfDerivedSymmetricKey`](https://developer.apple.com/documentation/cryptokit/sharedsecret/hkdfderivedsymmetrickey(using:salt:sharedinfo:outputbytecount:)).
 
 You can retrieve the `X` coordinate as raw data using `withUnsafeBytes` if you need to.
@@ -209,7 +212,7 @@ ab.withUnsafeBytes {
 }
 ```
 
-## `libsecp256k1` ECDH
+### `libsecp256k1` ECDH
 
 Using `libsecp256k1` default behaviour, returning a SHA-256 hash of the **compressed** point, embedded in a [`CryptoKit.SharedSecret`][ckss], which is useful since you can use `CryptoKit` key derivation functions.
 
@@ -223,9 +226,9 @@ ab.withUnsafeBytes {
 }
 ```
 
-## Custom ECDH
+### Custom ECDH
 
-Returns an entire uncompresed EC point, without hashing it. Might be useful if you wanna construct your own cryptographic functions, e.g. some custom ECIES.
+Returns an entire uncompressed EC point, without hashing it. Might be useful if you wanna construct your own cryptographic functions, e.g. some custom ECIES.
 
 ```swift
 let ab: Data = try alice.ecdhPoint(with: bob.publicKey) 
@@ -237,7 +240,7 @@ assert(ab.count == 65) // pass
 
 
 # Acknowledgements
-`K1` is a Swift wrapper around [libsecp256k1][lib], so this library would not exist without the Bitcoin Core developers. Massive thank you for a wonder ful library! I've included it as a submodule, without any changes to the code, i.e. with copyright headers in files intact.
+`K1` is a Swift wrapper around [libsecp256k1][lib], so this library would not exist without the Bitcoin Core developers. Massive thank you for a wonderful library! I've included it as a submodule, without any changes to the code, i.e. with copyright headers in files intact.
 
 `K1` uses some code from [`swift-crypto`][swc], which has been copied over with relevant copyright header. Since [`swift-crypto`][swc] is licensed under [Apache](https://github.com/apple/swift-crypto/blob/main/LICENSE.txt), so is this library.
 
@@ -284,7 +287,7 @@ More conveniently you can run the bash script `./scripts/generate_boilerplate_fi
 - [oleganza/CoreBitcoin](https://github.com/oleganza/CoreBitcoin) (OpenSSL as ECC impl, ObjC + Swift, ⚠️ possibly unsafe, ❌ No Schnorr)  
 - [Sajjon/EllipticCurveKit](https://github.com/Sajjon/EllipticCurveKit) (Custom ECC impl (mine), ☣️ unsafe, ✅ Schnorr support)
 
-
+[doc]: https://swiftpackageindex.com/sajjon/k1/documentation/k1/k1/ecdsa
 [ck]: https://developer.apple.com/documentation/cryptokit
 [BIP340]: https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
 [lib]: https://github.com/bitcoin-core/secp256k1
