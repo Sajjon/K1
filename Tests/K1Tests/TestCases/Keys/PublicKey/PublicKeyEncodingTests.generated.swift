@@ -1,3 +1,7 @@
+// MARK: - Generated file, do NOT edit
+// any edits of this file WILL be overwritten and thus discarded
+// see section `gyb` in `README` for details.
+
 import Foundation
 @testable import K1
 import XCTest
