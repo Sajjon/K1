@@ -6,7 +6,7 @@
 _K1_ is Swift wrapper around [libsecp256k1 (bitcoin-core/secp256k1)][lib], offering ECDSA, Schnorr ([BIP340][bip340]) and ECDH features.
 
 # Documentation
-Read [full documentation on here][doc].
+Read full documentation [here on SwiftPackageIndex][doc].
 
 ## Quick overview
 The API of K1 maps almost 1:1 with Apple's [CryptoKit][ck], vendoring a set of keypairs, one per feature. E.g. in CryptoKit you have `Curve25519.KeyAgreement.PrivateKey` and `Curve25519.KeyAgreement.PublicKey` which are seperate for `Curve25519.Signing.PrivateKey` and `Curve25519.Signing.PublicKey`. 
