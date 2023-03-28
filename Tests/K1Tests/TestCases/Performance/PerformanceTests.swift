@@ -20,15 +20,15 @@ final class PerformanceTests: XCTestCase {
 						schnorrPublicKey
 					)
 
-					let ecdsaPrivateKey = K1.ECDSA.Recoverable.PrivateKey()
+					let ecdsaPrivateKey = K1.ECDSAWithKeyRecovery.PrivateKey()
 					let ecdsaPublicKey = ecdsaPrivateKey.publicKey
 
 					try XCTAssertEqual(
-						K1.ECDSA.Recoverable.PublicKey(compressedRepresentation: ecdsaPublicKey.compressedRepresentation),
+						K1.ECDSAWithKeyRecovery.PublicKey(compressedRepresentation: ecdsaPublicKey.compressedRepresentation),
 						ecdsaPublicKey
 					)
 					try XCTAssertEqual(
-						K1.ECDSA.Recoverable.PublicKey(x963Representation: ecdsaPublicKey.x963Representation),
+						K1.ECDSAWithKeyRecovery.PublicKey(x963Representation: ecdsaPublicKey.x963Representation),
 						ecdsaPublicKey
 					)
 
@@ -40,15 +40,15 @@ final class PerformanceTests: XCTestCase {
 						)
 					)
 					try XCTAssertEqual(
-						K1.ECDSA.Recoverable.Signature(compact: ecdsa.compact()),
+						K1.ECDSAWithKeyRecovery.Signature(compact: ecdsa.compact()),
 						ecdsa
 					)
 					try XCTAssertEqual(
-						K1.ECDSA.NonRecoverable.Signature(rawRepresentation: ecdsa.nonRecoverable().rawRepresentation),
+						K1.ECDSA.Signature(rawRepresentation: ecdsa.nonRecoverable().rawRepresentation),
 						ecdsa.nonRecoverable()
 					)
 					try XCTAssertEqual(
-						K1.ECDSA.NonRecoverable.Signature(derRepresentation: ecdsa.nonRecoverable().derRepresentation),
+						K1.ECDSA.Signature(derRepresentation: ecdsa.nonRecoverable().derRepresentation),
 						ecdsa.nonRecoverable()
 					)
 

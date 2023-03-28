@@ -10,14 +10,14 @@ import protocol CryptoKit.Digest
 	VARIANTS_OF_FEATURE = [
 		{
 			"scheme": "ECDSA",
-			"feature": "ECDSA.NonRecoverable",
+			"feature": "ECDSA",
 			"variant": "an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable",
 			"docSignParameterOptions": "Whether or not to consider malleable signatures valid",
 			"docSignReturnExtra": " The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call."
 		},
 		{
 			"scheme": "ECDSA",
-			"feature": "ECDSA.Recoverable",
+			"feature": "ECDSAWithKeyRecovery",
 			"variant": "an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable",
 			"docSignParameterOptions": "Whether or not to consider malleable signatures valid",
 			"docSignReturnExtra": " The signing algorithm uses deterministic or random nonces, dependent on `options`, thus either deterministically producing the same signature or the same data and key, or different on every call."

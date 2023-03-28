@@ -6,8 +6,8 @@ import protocol CryptoKit.Digest
 import struct CryptoKit.SHA256
 import Foundation
 
-// MARK: Verify + ECDSA.NonRecoverable
-extension K1.ECDSA.NonRecoverable.PublicKey {
+// MARK: Verify + ECDSA
+extension K1.ECDSA.PublicKey {
 	/// Verifies an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature on some _hash_ over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - signature: The an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature to check against the _hashed_ data.
@@ -15,12 +15,12 @@ extension K1.ECDSA.NonRecoverable.PublicKey {
 	///   - options: Whether or not to consider malleable signatures valid.
 	/// - Returns: A Boolean value that’s true if the an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature is valid for the given _hashed_ data.
 	public func isValidSignature(
-		_ signature: K1.ECDSA.NonRecoverable.Signature,
+		_ signature: K1.ECDSA.Signature,
 		hashed: some DataProtocol,
 		options: K1.ECDSA.ValidationOptions = .default
 	) -> Bool {
 		do {
-			return try FFI.ECDSA.NonRecoverable.isValid(
+			return try FFI.ECDSA.isValid(
 				signature: signature.wrapped,
 				publicKey: self.impl.wrapped,
 				message: [UInt8](hashed),
@@ -38,7 +38,7 @@ extension K1.ECDSA.NonRecoverable.PublicKey {
 	///   - options: Whether or not to consider malleable signatures valid.
 	/// - Returns: A Boolean value that’s true if the an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature is valid for the given digest.
 	public func isValidSignature(
-		_ signature: K1.ECDSA.NonRecoverable.Signature,
+		_ signature: K1.ECDSA.Signature,
 		digest: some Digest,
 		options: K1.ECDSA.ValidationOptions = .default
 	) -> Bool {
@@ -60,7 +60,7 @@ extension K1.ECDSA.NonRecoverable.PublicKey {
 	///   - options: Whether or not to consider malleable signatures valid.
 	/// - Returns: A Boolean value that’s true if the an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature is valid for the given block of data.
 	public func isValidSignature(
-		_ signature: K1.ECDSA.NonRecoverable.Signature,
+		_ signature: K1.ECDSA.Signature,
 		unhashed: some DataProtocol,
 		options: K1.ECDSA.ValidationOptions = .default
 	) -> Bool {
@@ -72,8 +72,8 @@ extension K1.ECDSA.NonRecoverable.PublicKey {
 	}
 }
 
-// MARK: Verify + ECDSA.Recoverable
-extension K1.ECDSA.Recoverable.PublicKey {
+// MARK: Verify + ECDSAWithKeyRecovery
+extension K1.ECDSAWithKeyRecovery.PublicKey {
 	/// Verifies an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature on some _hash_ over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - signature: The an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature to check against the _hashed_ data.
@@ -81,12 +81,12 @@ extension K1.ECDSA.Recoverable.PublicKey {
 	///   - options: Whether or not to consider malleable signatures valid.
 	/// - Returns: A Boolean value that’s true if the an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature is valid for the given _hashed_ data.
 	public func isValidSignature(
-		_ signature: K1.ECDSA.Recoverable.Signature,
+		_ signature: K1.ECDSAWithKeyRecovery.Signature,
 		hashed: some DataProtocol,
 		options: K1.ECDSA.ValidationOptions = .default
 	) -> Bool {
 		do {
-			return try FFI.ECDSA.Recoverable.isValid(
+			return try FFI.ECDSAWithKeyRecovery.isValid(
 				signature: signature.wrapped,
 				publicKey: self.impl.wrapped,
 				message: [UInt8](hashed),
@@ -104,7 +104,7 @@ extension K1.ECDSA.Recoverable.PublicKey {
 	///   - options: Whether or not to consider malleable signatures valid.
 	/// - Returns: A Boolean value that’s true if the an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature is valid for the given digest.
 	public func isValidSignature(
-		_ signature: K1.ECDSA.Recoverable.Signature,
+		_ signature: K1.ECDSAWithKeyRecovery.Signature,
 		digest: some Digest,
 		options: K1.ECDSA.ValidationOptions = .default
 	) -> Bool {
@@ -126,7 +126,7 @@ extension K1.ECDSA.Recoverable.PublicKey {
 	///   - options: Whether or not to consider malleable signatures valid.
 	/// - Returns: A Boolean value that’s true if the an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature is valid for the given block of data.
 	public func isValidSignature(
-		_ signature: K1.ECDSA.Recoverable.Signature,
+		_ signature: K1.ECDSAWithKeyRecovery.Signature,
 		unhashed: some DataProtocol,
 		options: K1.ECDSA.ValidationOptions = .default
 	) -> Bool {

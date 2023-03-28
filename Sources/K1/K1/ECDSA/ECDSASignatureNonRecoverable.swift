@@ -2,20 +2,12 @@ import protocol CryptoKit.Digest
 import struct CryptoKit.SHA256
 import Foundation
 
-// MARK: - K1.ECDSA.NonRecoverable
+// MARK: - K1.ECDSA.Signature
 extension K1.ECDSA {
-	/// A mechanism used to create or verify a cryptographic signature using the `secp256k1` elliptic curve digital signature algorithm (ECDSA), signatures that do not offer recovery of the public key.
-	public enum NonRecoverable {
-		// Just a namespace
-	}
-}
-
-// MARK: - K1.ECDSA.NonRecoverable.Signature
-extension K1.ECDSA.NonRecoverable {
 	/// A `secp256k1` elliptic curve digital signature algorithm (ECDSA) signature,
 	/// from which users can recover a public key with the message that was signed.
 	public struct Signature: Sendable, Hashable, ContiguousBytes {
-		typealias Wrapped = FFI.ECDSA.NonRecoverable.Wrapped
+		typealias Wrapped = FFI.ECDSA.Wrapped
 		internal let wrapped: Wrapped
 
 		init(wrapped: Wrapped) {
@@ -25,12 +17,12 @@ extension K1.ECDSA.NonRecoverable {
 }
 
 // MARK: Inits
-extension K1.ECDSA.NonRecoverable.Signature {
+extension K1.ECDSA.Signature {
 	/// Creates a `secp256k1` ECDSA signature from a Distinguished Encoding Rules (DER) encoded representation.
 	/// - Parameter derRepresentation: A DER-encoded representation of the signature.
 	public init(derRepresentation: some DataProtocol) throws {
 		try self.init(
-			wrapped: FFI.ECDSA.NonRecoverable.from(derRepresentation: [UInt8](derRepresentation))
+			wrapped: FFI.ECDSA.from(derRepresentation: [UInt8](derRepresentation))
 		)
 	}
 
@@ -44,20 +36,20 @@ extension K1.ECDSA.NonRecoverable.Signature {
 	/// [rfc]: https://tools.ietf.org/html/rfc4754
 	public init(rawRepresentation: some DataProtocol) throws {
 		try self.init(
-			wrapped: FFI.ECDSA.NonRecoverable.from(compactBytes: [UInt8](rawRepresentation))
+			wrapped: FFI.ECDSA.from(compactBytes: [UInt8](rawRepresentation))
 		)
 	}
 }
 
 // MARK: ContiguousBytes
-extension K1.ECDSA.NonRecoverable.Signature {
+extension K1.ECDSA.Signature {
 	public func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
 		try wrapped.withUnsafeBytes(body)
 	}
 }
 
 // MARK: Serialize
-extension K1.ECDSA.NonRecoverable.Signature {
+extension K1.ECDSA.Signature {
 	var internalRepresentation: Data {
 		Data(wrapped.bytes)
 	}
@@ -68,7 +60,7 @@ extension K1.ECDSA.NonRecoverable.Signature {
 	/// `libsecp256k1` this representation is called "compact".
 	public var rawRepresentation: Data {
 		do {
-			return try FFI.ECDSA.NonRecoverable.compact(wrapped)
+			return try FFI.ECDSA.compact(wrapped)
 		} catch {
 			fatalError("Should never fail to convert ECDSA signatures to rawRepresentation.")
 		}
@@ -78,7 +70,7 @@ extension K1.ECDSA.NonRecoverable.Signature {
 	/// `secp256k1` ECDSA non recoverable signature.
 	public var derRepresentation: Data {
 		do {
-			return try FFI.ECDSA.NonRecoverable.der(wrapped)
+			return try FFI.ECDSA.der(wrapped)
 		} catch {
 			fatalError("Should never fail to convert ECDSA signatures to DER representation.")
 		}
@@ -86,7 +78,7 @@ extension K1.ECDSA.NonRecoverable.Signature {
 }
 
 // MARK: Recover
-extension K1.ECDSA.NonRecoverable.Signature {
+extension K1.ECDSA.Signature {
 	/// Recovers a public key from a `secp256k1` ECDSA signature, the message signed
 	/// and a `recoveryID`.
 	///
@@ -96,25 +88,25 @@ extension K1.ECDSA.NonRecoverable.Signature {
 	/// - Returns: The public key which corresponds to the private key which used to produce this
 	/// signature by signing the `message`.
 	public func recoverPublicKey(
-		recoveryID: K1.ECDSA.Recoverable.Signature.RecoveryID,
+		recoveryID: K1.ECDSAWithKeyRecovery.Signature.RecoveryID,
 		message: some DataProtocol
-	) throws -> K1.ECDSA.NonRecoverable.PublicKey {
-		let wrapped = try FFI.ECDSA.NonRecoverable.recoverPublicKey(
+	) throws -> K1.ECDSA.PublicKey {
+		let wrapped = try FFI.ECDSA.recoverPublicKey(
 			self.wrapped,
 			recoveryID: recoveryID.recid,
 			message: [UInt8](message)
 		)
 		let impl = K1._PublicKeyImplementation(wrapped: wrapped)
-		return K1.ECDSA.NonRecoverable.PublicKey(impl: impl)
+		return K1.ECDSA.PublicKey(impl: impl)
 	}
 }
 
-extension K1.ECDSA.NonRecoverable.Signature {
-	internal static let byteCount = FFI.ECDSA.Recoverable.byteCount
+extension K1.ECDSA.Signature {
+	internal static let byteCount = FFI.ECDSAWithKeyRecovery.byteCount
 }
 
 // MARK: Equatable
-extension K1.ECDSA.NonRecoverable.Signature {
+extension K1.ECDSA.Signature {
 	/// Compares two ECDSA signatures.
 	public static func == (lhs: Self, rhs: Self) -> Bool {
 		lhs.wrapped.withUnsafeBytes { lhsBytes in
@@ -126,7 +118,7 @@ extension K1.ECDSA.NonRecoverable.Signature {
 }
 
 // MARK: Hashable
-extension K1.ECDSA.NonRecoverable.Signature {
+extension K1.ECDSA.Signature {
 	public func hash(into hasher: inout Hasher) {
 		wrapped.withUnsafeBytes {
 			hasher.combine(bytes: $0)

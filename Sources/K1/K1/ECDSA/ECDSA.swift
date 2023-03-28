@@ -1,6 +1,6 @@
 // MARK: - K1.ECDSA
 extension K1 {
-	/// A mechanism used to create or verify a cryptographic signature using the `secp256k1` elliptic curve digital signature algorithm (ECDSA).
+	/// A mechanism used to create or verify a cryptographic signature using the `secp256k1` elliptic curve digital signature algorithm (ECDSA), signatures that do not offer recovery of the public key.
 	public enum ECDSA {}
 }
 

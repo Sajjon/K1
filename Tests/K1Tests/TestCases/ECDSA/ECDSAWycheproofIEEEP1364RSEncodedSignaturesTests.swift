@@ -26,7 +26,7 @@ final class ECDSA_Wycheproof_IEEE_P1364_RS_EncodedSignaturesTests: XCTestCase {
 // MARK: - SignatureWycheproofP1364TestVector
 private struct SignatureWycheproofP1364TestVector: WycheproofTestVector {
 	typealias MessageDigest = SHA256.Digest
-	typealias Signature = K1.ECDSA.NonRecoverable.Signature
+	typealias Signature = K1.ECDSA.Signature
 
 	let comment: String
 	let msg: String
