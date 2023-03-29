@@ -36,11 +36,6 @@ extension K1.ECDSAWithKeyRecovery.Signature {
 		)
 	}
 
-	/// Compact aka `IEEE P1363` aka `R||S`.
-	public init(compact: Data, recoveryID: RecoveryID) throws {
-		try self.init(compact: .init(compact: compact, recoveryID: recoveryID))
-	}
-
 	init(
 		internalRepresentation: some DataProtocol
 	) throws {
@@ -63,7 +58,7 @@ extension K1.ECDSAWithKeyRecovery.Signature {
 		Data(wrapped.bytes)
 	}
 
-	/// Compact aka `IEEE P1363` aka `R||S` with `RecoveryID`
+	/// Compact aka `IEEE P1363` aka `R||S` and `V` (`RecoveryID`).
 	public func compact() throws -> Compact {
 		let (rs, recid) = try FFI.ECDSAWithKeyRecovery.serializeCompact(
 			wrapped
@@ -74,7 +69,9 @@ extension K1.ECDSAWithKeyRecovery.Signature {
 		)
 	}
 
-	/// A tuple of `R||S` and `recoveryID` from a recoverable ECDSA signature.
+	/// A tuple of `R||S` and `V` (`RecoveryID`) from a recoverable ECDSA signature.
+	///
+	/// Can be serialized into data using `serialize:format` method.
 	public struct Compact: Sendable, Hashable {
 		/// Compact aka `IEEE P1363` aka `R||S`.
 		public let compact: Data
@@ -99,7 +96,10 @@ extension K1.ECDSAWithKeyRecovery.Signature.Compact {
 	public static let byteCountRS = 2 * Curve.Field.byteCount
 	public static let byteCount = Self.byteCountRS + 1
 
-	/// Takes either `R || S || V` data or `V || R || S` data, as per specification of `format`.
+	/// Creates a compact recoverable ECDSA signature from a `rawRepresentation` on `format`,
+	/// either `R || S || V`  or `V || R || S`.
+	///
+	/// You can initialize a `K1.ECDSA.Recoverable.Signature` by using the `init:compact` initializer.
 	public init(
 		rawRepresentation: some DataProtocol,
 		format: SerializationFormat
@@ -121,6 +121,11 @@ extension K1.ECDSAWithKeyRecovery.Signature.Compact {
 		}
 	}
 
+	/// A serialization format of a `K1.ECDSA.Recoverable.Signature.Compact`, use to
+	/// deserialize data into such a type, or used to serialize from that type into data.
+	///
+	/// Controls the order of the three components `R`, `S` and `V` (`RecoveryID`), specifyin
+	/// either `R || S || V` called `.rsv` or `V || R || S` called `vrs`.
 	public enum SerializationFormat {
 		/// `R || S || V` - the format `libsecp256k1` v0.3.0 uses as internal representation
 		/// This is the default value of this library.
@@ -141,7 +146,13 @@ extension K1.ECDSAWithKeyRecovery.Signature.Compact {
 		compact
 	}
 
-	func serialize(format: SerializationFormat) -> Data {
+	/// Serializes this compact recoverable ECDSA signature to Data on either `rsv` or `vsr` according to `format`
+	///
+	/// Returns 65 bytes on either format  `R || S || V` or `V || R || S`.
+	///
+	/// - Parameter format: Specified of order of `R`, `S` and `RecoveryID` (`V`), either `R || S || V` or `V || R || S`.
+	/// - Returns: Serialized data representation of the signature.
+	public func serialize(format: SerializationFormat) -> Data {
 		switch format {
 		case .rsv:
 			return rs + v
