@@ -44,7 +44,7 @@ final class ECDASignaturePublicKeyRecoveryTests: XCTestCase {
 		XCTAssertEqual(compactRecoverableSig.recoveryID, recid)
 
 		let compactRecoverableSigRS = try Data(hex: compactRecoverableSigRSHex)
-		try XCTAssertEqual(K1.ECDSA.Recoverable.Signature(compact: compactRecoverableSigRS, recoveryID: recid), K1.ECDSA.Recoverable.Signature(compact: compactRecoverableSig))
+		try XCTAssertEqual(K1.ECDSA.Recoverable.Signature(compact: .init(compact: compactRecoverableSigRS, recoveryID: recid)), K1.ECDSA.Recoverable.Signature(compact: compactRecoverableSig))
 		try XCTAssertEqual(K1.ECDSA.Recoverable.Signature.Compact(compact: compactRecoverableSigRS, recoveryID: recid), compactRecoverableSig)
 
 		let nonRecoverable = try K1.ECDSA.NonRecoverable.Signature(rawRepresentation: compactRecoverableSig.compact)
