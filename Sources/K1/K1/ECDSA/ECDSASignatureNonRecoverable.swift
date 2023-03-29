@@ -85,30 +85,6 @@ extension K1.ECDSA.NonRecoverable.Signature {
 	}
 }
 
-// MARK: Recover
-extension K1.ECDSA.NonRecoverable.Signature {
-	/// Recovers a public key from a `secp256k1` ECDSA signature, the message signed
-	/// and a `recoveryID`.
-	///
-	/// - Parameters:
-	///   - recoveryID: The recoveryID produced when a recoverable signature was produced.
-	///   - message: The message that was signed to produce this ECDSA signature.
-	/// - Returns: The public key which corresponds to the private key which used to produce this
-	/// signature by signing the `message`.
-	public func recoverPublicKey(
-		recoveryID: K1.ECDSA.Recoverable.Signature.RecoveryID,
-		message: some DataProtocol
-	) throws -> K1.ECDSA.NonRecoverable.PublicKey {
-		let wrapped = try FFI.ECDSA.NonRecoverable.recoverPublicKey(
-			self.wrapped,
-			recoveryID: recoveryID.recid,
-			message: [UInt8](message)
-		)
-		let impl = K1._PublicKeyImplementation(wrapped: wrapped)
-		return K1.ECDSA.NonRecoverable.PublicKey(impl: impl)
-	}
-}
-
 extension K1.ECDSA.NonRecoverable.Signature {
 	internal static let byteCount = FFI.ECDSA.Recoverable.byteCount
 }

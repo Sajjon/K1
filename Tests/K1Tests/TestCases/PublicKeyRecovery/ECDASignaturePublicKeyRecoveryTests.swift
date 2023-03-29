@@ -89,12 +89,6 @@ private extension ECDASignaturePublicKeyRecoveryTests {
 
 			XCTAssertTrue(recoveredPublicKey.isValidSignature(recoverableSig, hashed: hashedMessage))
 
-			let recoveredWithID = try recoverableSig.nonRecoverable().recoverPublicKey(
-				recoveryID: vector.recoveryID,
-				message: hashedMessage
-			)
-			try XCTAssertEqual(expectedPublicKey, .init(x963Representation: recoveredWithID.x963Representation))
-
 			numberOfTestsRun += 1
 		}
 		return .init(numberOfTestsRun: numberOfTestsRun, idsOmittedTests: [])
