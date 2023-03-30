@@ -21,14 +21,14 @@ import Foundation
 			"docPK": "/// A `secp256k1` public key used to verify cryptographic signatures,\n\t/// more specifically Schnorr signatures"
 		},
 		{
-			"feature": "ECDSA.NonRecoverable",
+			"feature": "ECDSA",
 			"purposeSK": "signing",
 			"purposePK": "verifying signatures",
 			"docSK": "/// A `secp256k1` private key used to create cryptographic signatures,\n\t/// more specifically ECDSA signatures, that do not offer recovery of the public key.",
 			"docPK": "/// A `secp256k1` public key used to verify cryptographic signatures,\n\t/// more specifically ECDSA signatures, that do not offer recovery of the public key."
 		},
 		{
-			"feature": "ECDSA.Recoverable",
+			"feature": "ECDSA.KeyRecovery",
 			"purposeSK": "signing",
 			"purposePK": "verifying signatures",
 			"docSK": "/// A `secp256k1` private key used to create cryptographic signatures,\n\t/// more specifically ECDSA signatures that offers recovery of the public key.",

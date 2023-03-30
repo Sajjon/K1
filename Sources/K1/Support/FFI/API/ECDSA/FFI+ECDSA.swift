@@ -6,9 +6,9 @@ extension FFI {
 	public enum ECDSA {}
 }
 
+// MARK: - FFI.ECDSA.KeyRecovery
 extension FFI.ECDSA {
-	public enum Recoverable {}
-	public enum NonRecoverable {}
+	public enum KeyRecovery {}
 }
 
 // MARK: - RawECDSASignature

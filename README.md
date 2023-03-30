@@ -14,8 +14,8 @@ The API of K1 maps almost 1:1 with Apple's [CryptoKit][ck], vendoring a set of k
 Just like that K1 vendors these key pairs:
 - `K1.KeyAgreement.PrivateKey` / `K1.KeyAgreement.PublicKey` for key agreement (ECDH)
 - `K1.Schnorr.PrivateKey` / `K1.Schnorr.PublicKey` for sign / verify methods using Schnorr signature scheme
-- `K1.ECDSA.Recoverable.PrivateKey` / `K1.ECDSA.Recoverable.PublicKey` for sign / verify methods using ECDSA (producing/validating signature where public key is recoverable)
-- `K1.ECDSA.NonRecoverable.PrivateKey` / `K1.ECDSA.NonRecoverable.PublicKey` for sign / verify methods using ECDSA (producing/validating signature where public key is **not** recoverable)
+- `K1.ECDSA.KeyRecovery.PrivateKey` / `K1.ECDSA.KeyRecovery.PublicKey` for sign / verify methods using ECDSA (producing/validating signature where public key is recoverable)
+- `K1.ECDSA.PrivateKey` / `K1.ECDSA.PublicKey` for sign / verify methods using ECDSA (producing/validating signature where public key is **not** recoverable)
 
 Just like you can convert between e.g. `Curve25519.KeyAgreement.PrivateKey` and  `Curve25519.Signing.PrivateKey` back and forth using any of the initializers and serializer, you can convert between all PrivateKeys and all PublicKeys of all features in K1.
 
@@ -64,8 +64,8 @@ Furthermore, all PublicKeys's have these additional APIs:
 ## ECDSA (Elliptic Curve Digital Signature Algorithm)
 
 There exists two set of ECDSA key pairs:
-- A key pair for signatures from which you can recover the public key, specifically: `K1.ECDSA.Recoverable.PrivateKey` and `K1.ECDSA.Recoverable.PublicKey`
-- A key pair for signatures from which you can **not** recover the public key, specifically: `K1.ECDSA.NonRecoverable.PrivateKey` and `K1.ECDSA.NonRecoverable.PublicKey`
+- A key pair for signatures from which you can recover the public key, specifically: `K1.ECDSA.KeyRecovery.PrivateKey` and `K1.ECDSA.KeyRecovery.PublicKey`
+- A key pair for signatures from which you can **not** recover the public key, specifically: `K1.ECDSA.PrivateKey` and `K1.ECDSA.PublicKey`
 
 For each private key there exists two different `signature:for:options` (one taking hashed data and taking `Digest` as argument) methods and one `signature:forUnhashed:options`.
 
@@ -76,7 +76,7 @@ The `option` is a `K1.ECDSA.SigningOptions` struct, which by default specifies [
 #### Sign
 
 ```swift
-let alice = K1.ECDA.NonRecovarable.PrivateKey()
+let alice = K1.ECDSA.PrivateKey()
 ```
 
 ##### Hashed (Data)
@@ -109,8 +109,8 @@ let signature = try alice.signature(forUnhashed: message)
 
 ```swift
 let hashedMessage: Data = // from somewhere
-let publicKey: K1.ECDSA.NonRecoverable.PublicKey = alice.publcKey
-let signature: K1.ECDSA.NonRecoverable.Signature // from above
+let publicKey: K1.ECDSA.PublicKey = alice.publcKey
+let signature: K1.ECDSA.Signature // from above
 
 assert(
     publicKey.isValidSignature(signature, hashed: hashedMessage)
@@ -122,7 +122,7 @@ assert(
 ```swift
 let message: Data = // from somewhere
 let digest = SHA256.hash(data: message)
-let signature: K1.ECDSA.NonRecoverable.Signature // from above
+let signature: K1.ECDSA.Signature // from above
 
 assert(
     publicKey.isValidSignature(signature, digest: digest)
@@ -133,7 +133,7 @@ assert(
 
 ```swift
 let message: Data = // from somewhere
-let signature: K1.ECDSA.NonRecoverable.Signature // from above
+let signature: K1.ECDSA.Signature // from above
 
 assert(
     publicKey.isValidSignature(signature, unhashed: message)
@@ -146,11 +146,11 @@ assert(
 All signing and validation APIs are identical to the `NonRecoverable` namespace.
 
 ```swift
-let alice = K1.ECDA.Recovarable.PrivateKey()
+let alice = K1.ECDSA.KeyRecovery.PrivateKey()
 let message: Data = // from somewhere
 let digest = SHA256.hash(data: message)
-let signature: K1.ECDSA.Recoverable.Signature = try alice.signature(for: digest)
-let publicKey: K1.ECDSA.Recoverable.PublicKey = alice.publicKey
+let signature: K1.ECDSA.KeyRecovery.Signature = try alice.signature(for: digest)
+let publicKey: K1.ECDSA.KeyRecovery.PublicKey = alice.publicKey
 assert(
     publicKey.isValidSignature(signature, digest: digest)
 ) // PASS

@@ -2,20 +2,20 @@ import protocol CryptoKit.Digest
 import struct CryptoKit.SHA256
 import Foundation
 
-// MARK: - K1.ECDSA.Recoverable
+// MARK: - K1.ECDSA.KeyRecovery
 extension K1.ECDSA {
-	/// A mechanism used to create or verify a cryptographic signature using the `secp256k1` elliptic curve digital signature algorithm (ECDSA), signatures that do offers recovery of the public key.
-	public enum Recoverable {
+	/// A mechanism used to create or verify a cryptographic signature using the `secp256k1` elliptic curve digital signature algorithm (ECDSA), signatures that do offers recovery of the public key, using the message that was signed as input.
+	public enum KeyRecovery {
 		// Just a namespace
 	}
 }
 
-// MARK: - K1.ECDSA.Recoverable.Signature
-extension K1.ECDSA.Recoverable {
+// MARK: - K1.ECDSA.KeyRecovery.Signature
+extension K1.ECDSA.KeyRecovery {
 	/// A `secp256k1` elliptic curve digital signature algorithm (ECDSA) signature,
 	/// from which users **cannot** recover the public key, not without the `RecoveryID`.
 	public struct Signature: Sendable, Hashable, ContiguousBytes {
-		typealias Wrapped = FFI.ECDSA.Recoverable.Wrapped
+		typealias Wrapped = FFI.ECDSA.KeyRecovery.Wrapped
 		internal let wrapped: Wrapped
 
 		internal init(wrapped: Wrapped) {
@@ -25,11 +25,11 @@ extension K1.ECDSA.Recoverable {
 }
 
 // MARK: Init
-extension K1.ECDSA.Recoverable.Signature {
+extension K1.ECDSA.KeyRecovery.Signature {
 	/// Compact aka `IEEE P1363` aka `R||S`.
 	public init(compact: Compact) throws {
 		try self.init(
-			wrapped: FFI.ECDSA.Recoverable.deserialize(
+			wrapped: FFI.ECDSA.KeyRecovery.deserialize(
 				compact: [UInt8](compact.compact),
 				recoveryID: compact.recoveryID.recid
 			)
@@ -40,27 +40,27 @@ extension K1.ECDSA.Recoverable.Signature {
 		internalRepresentation: some DataProtocol
 	) throws {
 		try self.init(
-			wrapped: FFI.ECDSA.Recoverable.deserialize(rawRepresentation: internalRepresentation)
+			wrapped: FFI.ECDSA.KeyRecovery.deserialize(rawRepresentation: internalRepresentation)
 		)
 	}
 }
 
 // MARK: ContiguousBytes
-extension K1.ECDSA.Recoverable.Signature {
+extension K1.ECDSA.KeyRecovery.Signature {
 	public func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
 		try wrapped.withUnsafeBytes(body)
 	}
 }
 
 // MARK: Serialize
-extension K1.ECDSA.Recoverable.Signature {
+extension K1.ECDSA.KeyRecovery.Signature {
 	internal var internalRepresentation: Data {
 		Data(wrapped.bytes)
 	}
 
 	/// Compact aka `IEEE P1363` aka `R||S` and `V` (`RecoveryID`).
 	public func compact() throws -> Compact {
-		let (rs, recid) = try FFI.ECDSA.Recoverable.serializeCompact(
+		let (rs, recid) = try FFI.ECDSA.KeyRecovery.serializeCompact(
 			wrapped
 		)
 		return try .init(
@@ -92,14 +92,14 @@ extension K1.ECDSA.Recoverable.Signature {
 	}
 }
 
-extension K1.ECDSA.Recoverable.Signature.Compact {
+extension K1.ECDSA.KeyRecovery.Signature.Compact {
 	public static let byteCountRS = 2 * Curve.Field.byteCount
 	public static let byteCount = Self.byteCountRS + 1
 
 	/// Creates a compact recoverable ECDSA signature from a `rawRepresentation` on `format`,
 	/// either `R || S || V`  or `V || R || S`.
 	///
-	/// You can initialize a `K1.ECDSA.Recoverable.Signature` by using the `init:compact` initializer.
+	/// You can initialize a `K1.ECDSA.KeyRecovery.Signature` by using the `init:compact` initializer.
 	public init(
 		rawRepresentation: some DataProtocol,
 		format: SerializationFormat
@@ -121,7 +121,7 @@ extension K1.ECDSA.Recoverable.Signature.Compact {
 		}
 	}
 
-	/// A serialization format of a `K1.ECDSA.Recoverable.Signature.Compact`, use to
+	/// A serialization format of a `K1.ECDSA.KeyRecovery.Signature.Compact`, use to
 	/// deserialize data into such a type, or used to serialize from that type into data.
 	///
 	/// Controls the order of the three components `R`, `S` and `V` (`RecoveryID`), specifyin
@@ -162,7 +162,7 @@ extension K1.ECDSA.Recoverable.Signature.Compact {
 	}
 }
 
-extension K1.ECDSA.Recoverable.Signature.RecoveryID {
+extension K1.ECDSA.KeyRecovery.Signature.RecoveryID {
 	var vData: Data {
 		Data(
 			[UInt8(rawValue)]
@@ -171,7 +171,7 @@ extension K1.ECDSA.Recoverable.Signature.RecoveryID {
 }
 
 // MARK: Recovery
-extension K1.ECDSA.Recoverable.Signature {
+extension K1.ECDSA.KeyRecovery.Signature {
 	/// Recovers a public key from a `secp256k1` this ECDSA signature and the message signed.
 	///
 	/// - Parameters:
@@ -180,27 +180,27 @@ extension K1.ECDSA.Recoverable.Signature {
 	/// signature by signing the `message`.
 	public func recoverPublicKey(
 		message: some DataProtocol
-	) throws -> K1.ECDSA.Recoverable.PublicKey {
-		let wrapped = try FFI.ECDSA.Recoverable.recover(wrapped, message: [UInt8](message))
+	) throws -> K1.ECDSA.KeyRecovery.PublicKey {
+		let wrapped = try FFI.ECDSA.KeyRecovery.recover(wrapped, message: [UInt8](message))
 		let impl = K1._PublicKeyImplementation(wrapped: wrapped)
-		return K1.ECDSA.Recoverable.PublicKey(
+		return K1.ECDSA.KeyRecovery.PublicKey(
 			impl: impl
 		)
 	}
 }
 
 // MARK: Conversion
-extension K1.ECDSA.Recoverable.Signature {
+extension K1.ECDSA.KeyRecovery.Signature {
 	/// Converts this recoverable ECDSA signature to a non-recoverable version.
-	public func nonRecoverable() throws -> K1.ECDSA.NonRecoverable.Signature {
-		try K1.ECDSA.NonRecoverable.Signature(
-			wrapped: FFI.ECDSA.Recoverable.nonRecoverable(self.wrapped)
+	public func nonRecoverable() throws -> K1.ECDSA.Signature {
+		try K1.ECDSA.Signature(
+			wrapped: FFI.ECDSA.KeyRecovery.nonRecoverable(self.wrapped)
 		)
 	}
 }
 
 // MARK: Equatable
-extension K1.ECDSA.Recoverable.Signature {
+extension K1.ECDSA.KeyRecovery.Signature {
 	/// Compares two ECDSA signatures.
 	public static func == (lhs: Self, rhs: Self) -> Bool {
 		lhs.wrapped.withUnsafeBytes { lhsBytes in
@@ -212,7 +212,7 @@ extension K1.ECDSA.Recoverable.Signature {
 }
 
 // MARK: Hashable
-extension K1.ECDSA.Recoverable.Signature {
+extension K1.ECDSA.KeyRecovery.Signature {
 	public func hash(into hasher: inout Hasher) {
 		wrapped.withUnsafeBytes {
 			hasher.combine(bytes: $0)
