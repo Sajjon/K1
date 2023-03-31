@@ -44,12 +44,12 @@ final class PerformanceTests: XCTestCase {
 						ecdsa
 					)
 					try XCTAssertEqual(
-						K1.ECDSA.Signature(rawRepresentation: ecdsa.nonRecoverable().rawRepresentation),
-						ecdsa.nonRecoverable()
+						K1.ECDSA.Signature(rawRepresentation: ecdsa.convertToNormal().rawRepresentation),
+						ecdsa.convertToNormal()
 					)
 					try XCTAssertEqual(
-						K1.ECDSA.Signature(derRepresentation: ecdsa.nonRecoverable().derRepresentation),
-						ecdsa.nonRecoverable()
+						K1.ECDSA.Signature(derRepresentation: ecdsa.convertToNormal().derRepresentation),
+						ecdsa.convertToNormal()
 					)
 
 					let schnorr = try schnorrPrivateKey.signature(for: message)

@@ -191,8 +191,8 @@ extension K1.ECDSA.KeyRecovery.Signature {
 
 // MARK: Conversion
 extension K1.ECDSA.KeyRecovery.Signature {
-	/// Converts this recoverable ECDSA signature to a non-recoverable version.
-	public func nonRecoverable() throws -> K1.ECDSA.Signature {
+	/// Converts this recoverable ECDSA signature to a normal ECDSA signature.
+	public func convertToNormal() throws -> K1.ECDSA.Signature {
 		try K1.ECDSA.Signature(
 			wrapped: FFI.ECDSA.KeyRecovery.nonRecoverable(self.wrapped)
 		)

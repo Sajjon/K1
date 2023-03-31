@@ -52,7 +52,7 @@ private extension XCTestCase {
 
 			let privateKeyRecoverable = try K1.ECDSA.KeyRecovery.PrivateKey(rawRepresentation: privateKey.rawRepresentation)
 			let signatureRecoverableFromMessage = try privateKeyRecoverable.signature(for: messageDigest)
-			try XCTAssertEqual(signatureRecoverableFromMessage.nonRecoverable(), expectedSignature)
+			try XCTAssertEqual(signatureRecoverableFromMessage.convertToNormal(), expectedSignature)
 			let recid = try signatureRecoverableFromMessage.compact().recoveryID
 
 			XCTAssertEqual(
