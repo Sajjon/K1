@@ -2,7 +2,7 @@ import Foundation
 import secp256k1
 
 // MARK: Deserialize
-extension FFI.ECDSA.NonRecoverable {
+extension FFI.ECDSA {
 	static let byteCount = 2 * Curve.Field.byteCount
 
 	/// Compact aka `IEEE P1363` aka `R||S`.
@@ -24,7 +24,7 @@ extension FFI.ECDSA.NonRecoverable {
 }
 
 // MARK: Serialize
-extension FFI.ECDSA.NonRecoverable {
+extension FFI.ECDSA {
 	static func compact(_ wrapped: Wrapped) throws -> Data {
 		var out = [UInt8](repeating: 0, count: Self.byteCount)
 		var rawSignature = wrapped.raw
@@ -57,7 +57,7 @@ extension FFI.ECDSA.NonRecoverable {
 }
 
 // MARK: Recover
-extension FFI.ECDSA.NonRecoverable {
+extension FFI.ECDSA {
 	static func recoverPublicKey(
 		_ wrapped: Wrapped,
 		recoveryID: Int32,
@@ -66,7 +66,7 @@ extension FFI.ECDSA.NonRecoverable {
 		guard message.count == Curve.Field.byteCount else {
 			throw K1.Error.incorrectParameterSize
 		}
-		let nonRecoverableCompact = try FFI.ECDSA.NonRecoverable.compact(wrapped)
+		let nonRecoverableCompact = try FFI.ECDSA.compact(wrapped)
 		return try Self.recoverPublicKey(
 			nonRecoverableCompact: nonRecoverableCompact,
 			recoveryID: recoveryID,
@@ -106,9 +106,9 @@ extension FFI.ECDSA.NonRecoverable {
 }
 
 // MARK: Validate
-extension FFI.ECDSA.NonRecoverable {
+extension FFI.ECDSA {
 	static func isValid(
-		signature: FFI.ECDSA.NonRecoverable.Wrapped,
+		signature: FFI.ECDSA.Wrapped,
 		publicKey: FFI.PublicKey.Wrapped,
 		message: [UInt8],
 		options: K1.ECDSA.ValidationOptions = .default
@@ -153,14 +153,14 @@ extension FFI.ECDSA.NonRecoverable {
 }
 
 // MARK: Sign
-extension FFI.ECDSA.NonRecoverable {
+extension FFI.ECDSA {
 	/// Produces a **non recoverable** ECDSA signature from a hashed `message`
 	static func sign(
 		hashedMessage: [UInt8],
 		privateKey: FFI.PrivateKey.Wrapped,
 		options: K1.ECDSA.SigningOptions = .default
-	) throws -> FFI.ECDSA.NonRecoverable.Wrapped {
-		try FFI.ECDSA._sign(
+	) throws -> FFI.ECDSA.Wrapped {
+		try FFI._ecdsa(
 			message: hashedMessage,
 			privateKey: privateKey,
 			options: options

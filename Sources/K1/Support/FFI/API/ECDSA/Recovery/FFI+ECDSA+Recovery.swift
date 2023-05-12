@@ -2,8 +2,8 @@ import Foundation
 import secp256k1
 
 // MARK: Deserialize
-extension FFI.ECDSA.Recoverable {
-	static let byteCount = FFI.ECDSA.NonRecoverable.byteCount + 1
+extension FFI.ECDSAWithKeyRecovery {
+	static let byteCount = FFI.ECDSA.byteCount + 1
 
 	static func deserialize(
 		rawRepresentation: some DataProtocol
@@ -32,11 +32,11 @@ extension FFI.ECDSA.Recoverable {
 }
 
 // MARK: Serialize
-extension FFI.ECDSA.Recoverable {
+extension FFI.ECDSAWithKeyRecovery {
 	static func serializeCompact(
 		_ wrapped: Wrapped
 	) throws -> (rs: [UInt8], recoveryID: Int32) {
-		var rs = [UInt8](repeating: 0, count: FFI.ECDSA.NonRecoverable.byteCount)
+		var rs = [UInt8](repeating: 0, count: FFI.ECDSA.byteCount)
 		var recoveryID: Int32 = 0
 		var rawSignature = wrapped.raw
 		try FFI.call(
@@ -54,10 +54,10 @@ extension FFI.ECDSA.Recoverable {
 }
 
 // MARK: Convert
-extension FFI.ECDSA.Recoverable {
+extension FFI.ECDSAWithKeyRecovery {
 	static func nonRecoverable(
 		_ wrapped: Wrapped
-	) throws -> FFI.ECDSA.NonRecoverable.Wrapped {
+	) throws -> FFI.ECDSA.Wrapped {
 		var nonRecoverable = secp256k1_ecdsa_signature()
 		var recoverable = wrapped.raw
 
@@ -76,7 +76,7 @@ extension FFI.ECDSA.Recoverable {
 }
 
 // MARK: Recover
-extension FFI.ECDSA.Recoverable {
+extension FFI.ECDSAWithKeyRecovery {
 	static func recover(
 		_ wrapped: Wrapped,
 		message: [UInt8]
@@ -101,17 +101,17 @@ extension FFI.ECDSA.Recoverable {
 }
 
 // MARK: Validate
-extension FFI.ECDSA.Recoverable {
+extension FFI.ECDSAWithKeyRecovery {
 	static func isValid(
-		signature: FFI.ECDSA.Recoverable.Wrapped,
+		signature: FFI.ECDSAWithKeyRecovery.Wrapped,
 		publicKey: FFI.PublicKey.Wrapped,
 		message: [UInt8],
 		options: K1.ECDSA.ValidationOptions = .default
 	) throws -> Bool {
 		do {
 			let publicKeyNonRecoverable = FFI.PublicKey.Wrapped(raw: publicKey.raw)
-			let signatureNonRecoverable = try FFI.ECDSA.Recoverable.nonRecoverable(signature)
-			return try FFI.ECDSA.NonRecoverable.isValid(
+			let signatureNonRecoverable = try FFI.ECDSAWithKeyRecovery.nonRecoverable(signature)
+			return try FFI.ECDSA.isValid(
 				signature: signatureNonRecoverable,
 				publicKey: publicKeyNonRecoverable,
 				message: message,
@@ -124,14 +124,14 @@ extension FFI.ECDSA.Recoverable {
 }
 
 // MARK: Sign
-extension FFI.ECDSA.Recoverable {
+extension FFI.ECDSAWithKeyRecovery {
 	/// Produces a **recoverable** ECDSA signature from a hashed `message`
 	static func sign(
 		hashedMessage: [UInt8],
 		privateKey: K1._PrivateKeyImplementation.Wrapped,
 		options: K1.ECDSA.SigningOptions = .default
-	) throws -> FFI.ECDSA.Recoverable.Wrapped {
-		try FFI.ECDSA._sign(
+	) throws -> FFI.ECDSAWithKeyRecovery.Wrapped {
+		try FFI._ecdsa(
 			message: hashedMessage,
 			privateKey: privateKey,
 			options: options

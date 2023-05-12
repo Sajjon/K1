@@ -6,8 +6,8 @@ import protocol CryptoKit.Digest
 import struct CryptoKit.SHA256
 import Foundation
 
-// MARK: Sign + ECDSA.NonRecoverable
-extension K1.ECDSA.NonRecoverable.PrivateKey {
+// MARK: Sign + ECDSA
+extension K1.ECDSA.PrivateKey {
 	/// Generates an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature of _hashed_ data you provide over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - hashed: The _hashed_ data to sign.
@@ -16,9 +16,9 @@ extension K1.ECDSA.NonRecoverable.PrivateKey {
 	public func signature(
 		for hashed: some DataProtocol,
 		options: K1.ECDSA.SigningOptions = .default
-	) throws -> K1.ECDSA.NonRecoverable.Signature {
-		try K1.ECDSA.NonRecoverable.Signature(
-			wrapped: FFI.ECDSA.NonRecoverable.sign(
+	) throws -> K1.ECDSA.Signature {
+		try K1.ECDSA.Signature(
+			wrapped: FFI.ECDSA.sign(
 				hashedMessage: [UInt8](hashed),
 				privateKey: impl.wrapped,
 				options: options
@@ -34,7 +34,7 @@ extension K1.ECDSA.NonRecoverable.PrivateKey {
 	public func signature(
 		for digest: some Digest,
 		options: K1.ECDSA.SigningOptions = .default
-	) throws -> K1.ECDSA.NonRecoverable.Signature {
+	) throws -> K1.ECDSA.Signature {
 		try signature(
 			for: Data(digest),
 			options: options
@@ -49,7 +49,7 @@ extension K1.ECDSA.NonRecoverable.PrivateKey {
 	public func signature(
 		forUnhashed unhashed: some DataProtocol,
 		options: K1.ECDSA.SigningOptions = .default
-	) throws -> K1.ECDSA.NonRecoverable.Signature {
+	) throws -> K1.ECDSA.Signature {
 		try signature(
 			for: SHA256.hash(data: unhashed),
 			options: options
@@ -57,8 +57,8 @@ extension K1.ECDSA.NonRecoverable.PrivateKey {
 	}
 }
 
-// MARK: Sign + ECDSA.Recoverable
-extension K1.ECDSA.Recoverable.PrivateKey {
+// MARK: Sign + ECDSAWithKeyRecovery
+extension K1.ECDSAWithKeyRecovery.PrivateKey {
 	/// Generates an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature of _hashed_ data you provide over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - hashed: The _hashed_ data to sign.
@@ -67,9 +67,9 @@ extension K1.ECDSA.Recoverable.PrivateKey {
 	public func signature(
 		for hashed: some DataProtocol,
 		options: K1.ECDSA.SigningOptions = .default
-	) throws -> K1.ECDSA.Recoverable.Signature {
-		try K1.ECDSA.Recoverable.Signature(
-			wrapped: FFI.ECDSA.Recoverable.sign(
+	) throws -> K1.ECDSAWithKeyRecovery.Signature {
+		try K1.ECDSAWithKeyRecovery.Signature(
+			wrapped: FFI.ECDSAWithKeyRecovery.sign(
 				hashedMessage: [UInt8](hashed),
 				privateKey: impl.wrapped,
 				options: options
@@ -85,7 +85,7 @@ extension K1.ECDSA.Recoverable.PrivateKey {
 	public func signature(
 		for digest: some Digest,
 		options: K1.ECDSA.SigningOptions = .default
-	) throws -> K1.ECDSA.Recoverable.Signature {
+	) throws -> K1.ECDSAWithKeyRecovery.Signature {
 		try signature(
 			for: Data(digest),
 			options: options
@@ -100,7 +100,7 @@ extension K1.ECDSA.Recoverable.PrivateKey {
 	public func signature(
 		forUnhashed unhashed: some DataProtocol,
 		options: K1.ECDSA.SigningOptions = .default
-	) throws -> K1.ECDSA.Recoverable.Signature {
+	) throws -> K1.ECDSAWithKeyRecovery.Signature {
 		try signature(
 			for: SHA256.hash(data: unhashed),
 			options: options

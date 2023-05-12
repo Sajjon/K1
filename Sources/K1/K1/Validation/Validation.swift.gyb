@@ -10,7 +10,7 @@ import protocol CryptoKit.Digest
 	VARIANTS_OF_FEATURE = [
 		{
 			"scheme": "ECDSA",
-			"feature": "ECDSA.NonRecoverable",
+			"feature": "ECDSA",
 			"variant": "an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable",
 			"docValidationParameterOptions": "\n///   - options: Whether or not to consider malleable signatures valid.",
 			"validationOptionsArg": ",\noptions: K1.ECDSA.ValidationOptions = .default",
@@ -18,7 +18,7 @@ import protocol CryptoKit.Digest
 		},
 		{
 			"scheme": "ECDSA",
-			"feature": "ECDSA.Recoverable",
+			"feature": "ECDSAWithKeyRecovery",
 			"variant": "an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable",
 			"docValidationParameterOptions": "\n///   - options: Whether or not to consider malleable signatures valid.",
 			"validationOptionsArg": ",\noptions: K1.ECDSA.ValidationOptions = .default",

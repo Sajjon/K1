@@ -3,12 +3,8 @@ import secp256k1
 
 // MARK: - FFI.ECDSA
 extension FFI {
+	public enum ECDSAWithKeyRecovery {}
 	public enum ECDSA {}
-}
-
-extension FFI.ECDSA {
-	public enum Recoverable {}
-	public enum NonRecoverable {}
 }
 
 // MARK: - RawECDSASignature
@@ -31,8 +27,8 @@ protocol WrappedECDSASignature {
 }
 
 // MARK: ECDSA Shared
-extension FFI.ECDSA {
-	internal static func _sign<WrappedSignature>(
+extension FFI {
+	internal static func _ecdsa<WrappedSignature>(
 		message: [UInt8],
 		privateKey: FFI.PrivateKey.Wrapped,
 		options: K1.ECDSA.SigningOptions = .default

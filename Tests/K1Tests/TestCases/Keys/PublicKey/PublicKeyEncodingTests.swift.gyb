@@ -42,7 +42,7 @@ public func doTestSerializationRoundtrip<T, Enc>(
 
 
 %{
-	FEATURES = ["Schnorr", "ECDSA.NonRecoverable", "ECDSA.Recoverable", "KeyAgreement"]
+	FEATURES = ["Schnorr", "ECDSA", "ECDSAWithKeyRecovery", "KeyAgreement"]
 }%
 
 % for FEATURE in FEATURES:

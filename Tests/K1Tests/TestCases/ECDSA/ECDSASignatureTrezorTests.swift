@@ -32,8 +32,8 @@ private extension XCTestCase {
 	) throws -> ResultOfTestGroup {
 		var numberOfTestsRun = 0
 		for vector in group.tests {
-			let privateKey = try K1.ECDSA.NonRecoverable.PrivateKey(rawRepresentation: Data(hex: vector.privateKey))
-			let publicKey: K1.ECDSA.NonRecoverable.PublicKey = privateKey.publicKey
+			let privateKey = try K1.ECDSA.PrivateKey(rawRepresentation: Data(hex: vector.privateKey))
+			let publicKey: K1.ECDSA.PublicKey = privateKey.publicKey
 
 			let expectedSignature = try vector.expectedSignature()
 			let messageDigest = try vector.messageDigest()
@@ -50,7 +50,7 @@ private extension XCTestCase {
 			XCTAssertNotEqual(signatureRandom, expectedSignature)
 			XCTAssertTrue(publicKey.isValidSignature(signatureRandom, digest: messageDigest))
 
-			let privateKeyRecoverable = try K1.ECDSA.Recoverable.PrivateKey(rawRepresentation: privateKey.rawRepresentation)
+			let privateKeyRecoverable = try K1.ECDSAWithKeyRecovery.PrivateKey(rawRepresentation: privateKey.rawRepresentation)
 			let signatureRecoverableFromMessage = try privateKeyRecoverable.signature(for: messageDigest)
 			try XCTAssertEqual(signatureRecoverableFromMessage.nonRecoverable(), expectedSignature)
 			let recid = try signatureRecoverableFromMessage.compact().recoveryID
@@ -74,7 +74,7 @@ private extension XCTestCase {
 // MARK: - SignatureTrezorTestVector
 private struct SignatureTrezorTestVector: SignatureTestVector {
 	typealias MessageDigest = SHA256.Digest
-	typealias Signature = K1.ECDSA.NonRecoverable.Signature
+	typealias Signature = K1.ECDSA.Signature
 
 	let msg: String
 	let privateKey: String
@@ -95,7 +95,7 @@ private struct SignatureTrezorTestVector: SignatureTestVector {
 
 	func expectedSignature() throws -> Signature {
 		let derData = try Data(hex: expected.der)
-		let signature = try K1.ECDSA.NonRecoverable.Signature(derRepresentation: derData)
+		let signature = try K1.ECDSA.Signature(derRepresentation: derData)
 		XCTAssertEqual(signature.derRepresentation.hex, expected.der)
 		XCTAssertEqual(
 			signature.rawRepresentation.hex,
@@ -106,7 +106,7 @@ private struct SignatureTrezorTestVector: SignatureTestVector {
 		)
 
 		try XCTAssertEqual(
-			K1.ECDSA.NonRecoverable.Signature(rawRepresentation: Data(hex: expected.r + expected.s)),
+			K1.ECDSA.Signature(rawRepresentation: Data(hex: expected.r + expected.s)),
 			signature
 		)
 

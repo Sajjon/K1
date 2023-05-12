@@ -88,13 +88,13 @@ extension XCTestCase {
 			throw ECDSASignatureTestError(description: errorMessage)
 		}
 		let keyBytes = try Array(hex: group.key.uncompressed)
-		let key = try K1.ECDSA.NonRecoverable.PublicKey(x963Representation: keyBytes)
+		let key = try K1.ECDSA.PublicKey(x963Representation: keyBytes)
 
-		let keyFromDER = try K1.ECDSA.NonRecoverable.PublicKey(derRepresentation: Data(hex: group.keyDer))
+		let keyFromDER = try K1.ECDSA.PublicKey(derRepresentation: Data(hex: group.keyDer))
 		XCTAssertEqual(key.derRepresentation.hex, group.keyDer)
 		XCTAssertEqual(keyFromDER, key)
 
-		let keyFromPEM = try K1.ECDSA.NonRecoverable.PublicKey(pemRepresentation: group.keyPem)
+		let keyFromPEM = try K1.ECDSA.PublicKey(pemRepresentation: group.keyPem)
 		XCTAssertEqual(key.pemRepresentation, group.keyPem)
 		XCTAssertEqual(keyFromPEM, key)
 
@@ -120,7 +120,7 @@ extension XCTestCase {
 		let pubKeyXOnly = try ensure32Bytes(keyCompactXRaw)
 		let pubKeyYOnly = try ensure32Bytes(keyCompactYRaw)
 
-		let pubKeyFromRaw = try K1.ECDSA.NonRecoverable.PublicKey(rawRepresentation: pubKeyXOnly + pubKeyYOnly)
+		let pubKeyFromRaw = try K1.ECDSA.PublicKey(rawRepresentation: pubKeyXOnly + pubKeyYOnly)
 		XCTAssertEqual(pubKeyFromRaw, key)
 
 		var numberOfTestsRun = 0
@@ -211,7 +211,7 @@ protocol SignatureTestVector: Codable {
 }
 
 // MARK: - WycheproofTestVector
-protocol WycheproofTestVector: SignatureTestVector where Signature == K1.ECDSA.NonRecoverable.Signature {
+protocol WycheproofTestVector: SignatureTestVector where Signature == K1.ECDSA.Signature {
 	var flags: [String] { get }
 	var tcId: Int { get }
 	var result: String { get }
