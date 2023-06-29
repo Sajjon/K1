@@ -41,6 +41,7 @@ let package = Package(
 		.target(
 			name: "secp256k1",
 			exclude: [
+				"libsecp256k1/cmake",
 				"libsecp256k1/src/asm",
 				"libsecp256k1/src/bench.c",
 				"libsecp256k1/src/bench_ecmult.c",
