@@ -5,7 +5,7 @@ import XCTest
 
 final class SchnorrSignatureTests: XCTestCase {
 	func testSchnorr() throws {
-		let alice = K1.Schnorr.UnsafePrivateKey()
+		let alice = K1.Schnorr.PrivateKey()
 		let message = "Send Bob 3 BTC".data(using: .utf8)!
 		let signature = try alice.signature(forUnhashed: message)
 		let isSignatureValid = alice.publicKey.isValidSignature(signature, unhashed: message)
@@ -16,7 +16,7 @@ final class SchnorrSignatureTests: XCTestCase {
 		func doTest(aux: K1.Schnorr.SigningOptions.AuxiliaryRandomData, expectUnique: Bool) throws {
 			let count = 100
 			var signatures = Set<K1.Schnorr.Signature>()
-			let alice = K1.Schnorr.UnsafePrivateKey()
+			let alice = K1.Schnorr.PrivateKey()
 			let message = "Send Bob 3 BTC".data(using: .utf8)!
 			let hashed = SHA256.hash(data: message)
 			for _ in 0 ..< count {

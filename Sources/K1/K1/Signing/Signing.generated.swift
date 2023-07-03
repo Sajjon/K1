@@ -7,7 +7,7 @@ import struct CryptoKit.SHA256
 import Foundation
 
 // MARK: Sign + ECDSA
-extension K1.ECDSA.UnsafePrivateKey {
+extension K1.ECDSA.PrivateKey {
 	/// Generates an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature of _hashed_ data you provide over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - hashed: The _hashed_ data to sign.
@@ -109,7 +109,7 @@ extension K1.ECDSA.SafePrivateKey {
 }
 
 // MARK: Sign + ECDSAWithKeyRecovery
-extension K1.ECDSAWithKeyRecovery.UnsafePrivateKey {
+extension K1.ECDSAWithKeyRecovery.PrivateKey {
 	/// Generates an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature of _hashed_ data you provide over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - hashed: The _hashed_ data to sign.
@@ -211,7 +211,7 @@ extension K1.ECDSAWithKeyRecovery.SafePrivateKey {
 }
 
 // MARK: Sign + Schnorr
-extension K1.Schnorr.UnsafePrivateKey {
+extension K1.Schnorr.PrivateKey {
 	/// Generates Schnorr signature of _hashed_ data you provide over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - hashed: The _hashed_ data to sign.

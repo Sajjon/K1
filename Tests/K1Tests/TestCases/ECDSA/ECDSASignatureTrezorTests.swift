@@ -32,7 +32,7 @@ private extension XCTestCase {
 	) throws -> ResultOfTestGroup {
 		var numberOfTestsRun = 0
 		for vector in group.tests {
-			let privateKey = try K1.ECDSA.UnsafePrivateKey(rawRepresentation: Data(hex: vector.privateKey))
+			let privateKey = try K1.ECDSA.PrivateKey(rawRepresentation: Data(hex: vector.privateKey))
 			let publicKey: K1.ECDSA.PublicKey = privateKey.publicKey
 
 			let expectedSignature = try vector.expectedSignature()
@@ -50,7 +50,7 @@ private extension XCTestCase {
 			XCTAssertNotEqual(signatureRandom, expectedSignature)
 			XCTAssertTrue(publicKey.isValidSignature(signatureRandom, digest: messageDigest))
 
-			let privateKeyRecoverable = try K1.ECDSAWithKeyRecovery.UnsafePrivateKey(rawRepresentation: privateKey.rawRepresentation)
+			let privateKeyRecoverable = try K1.ECDSAWithKeyRecovery.PrivateKey(rawRepresentation: privateKey.rawRepresentation)
 			let signatureRecoverableFromMessage = try privateKeyRecoverable.signature(for: messageDigest)
 			try XCTAssertEqual(signatureRecoverableFromMessage.nonRecoverable(), expectedSignature)
 			let recid = try signatureRecoverableFromMessage.compact().recoveryID

@@ -16,7 +16,7 @@ extension K1 {
 %{
 	SAFETY_VARIANTS = [
 		{
-			"safetyVariantName": "Unsafe",
+			"safetyVariantName": "",
 			"isSafe": False
 		},
 		{

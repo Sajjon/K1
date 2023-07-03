@@ -9,7 +9,7 @@ import protocol CryptoKit.Digest
 %{
 	SAFETY_VARIANTS = [
 		{
-			"safetyVariantName": "Unsafe",
+			"safetyVariantName": "",
 			"isSafe": False
 		},
 		{

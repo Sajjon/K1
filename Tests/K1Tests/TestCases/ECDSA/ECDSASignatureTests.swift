@@ -5,7 +5,7 @@ import XCTest
 
 final class ECDSASignatureTests: XCTestCase {
 	func testECDSADeterministic() throws {
-		let alice = K1.ECDSA.UnsafePrivateKey()
+		let alice = K1.ECDSA.PrivateKey()
 		let message = "Send Bob 3 BTC".data(using: .utf8)!
 
 		let signature = try alice.signature(forUnhashed: message)
@@ -15,7 +15,7 @@ final class ECDSASignatureTests: XCTestCase {
 
 	func testECDSARandom() throws {
 		continueAfterFailure = false
-		let alice = K1.ECDSA.UnsafePrivateKey()
+		let alice = K1.ECDSA.PrivateKey()
 		let message = "Send Bob 3 BTC".data(using: .utf8)!
 
 		let requestedNumberOfSignatures = 1000

@@ -41,7 +41,7 @@ public func doTestSerializationRoundtrip<T, Enc>(
 
 extension K1.Schnorr.PublicKey {
 	init() {
-		let pubKey = K1.Schnorr.UnsafePrivateKey().publicKey
+		let pubKey = K1.Schnorr.PrivateKey().publicKey
 		try! self.init(compressedRepresentation: pubKey.compressedRepresentation)
 	}
 }
@@ -49,7 +49,7 @@ extension K1.Schnorr.PublicKey {
 // MARK: - SchnorrPublicKeyEncodingDecodingRoundtripTests
 final class SchnorrPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 	func test_pubkey_raw_is_x963_minus_prefix() throws {
-		let privateKey = K1.Schnorr.UnsafePrivateKey()
+		let privateKey = K1.Schnorr.PrivateKey()
 		let publicKey = privateKey.publicKey
 
 		XCTAssertEqual(publicKey.rawRepresentation.hex, Data(publicKey.x963Representation.dropFirst()).hex)
@@ -98,7 +98,7 @@ final class SchnorrPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 
 extension K1.ECDSA.PublicKey {
 	init() {
-		let pubKey = K1.ECDSA.UnsafePrivateKey().publicKey
+		let pubKey = K1.ECDSA.PrivateKey().publicKey
 		try! self.init(compressedRepresentation: pubKey.compressedRepresentation)
 	}
 }
@@ -106,7 +106,7 @@ extension K1.ECDSA.PublicKey {
 // MARK: - ECDSAPublicKeyEncodingDecodingRoundtripTests
 final class ECDSAPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 	func test_pubkey_raw_is_x963_minus_prefix() throws {
-		let privateKey = K1.ECDSA.UnsafePrivateKey()
+		let privateKey = K1.ECDSA.PrivateKey()
 		let publicKey = privateKey.publicKey
 
 		XCTAssertEqual(publicKey.rawRepresentation.hex, Data(publicKey.x963Representation.dropFirst()).hex)
@@ -155,7 +155,7 @@ final class ECDSAPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 
 extension K1.ECDSAWithKeyRecovery.PublicKey {
 	init() {
-		let pubKey = K1.ECDSAWithKeyRecovery.UnsafePrivateKey().publicKey
+		let pubKey = K1.ECDSAWithKeyRecovery.PrivateKey().publicKey
 		try! self.init(compressedRepresentation: pubKey.compressedRepresentation)
 	}
 }
@@ -163,7 +163,7 @@ extension K1.ECDSAWithKeyRecovery.PublicKey {
 // MARK: - ECDSAWithKeyRecoveryPublicKeyEncodingDecodingRoundtripTests
 final class ECDSAWithKeyRecoveryPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 	func test_pubkey_raw_is_x963_minus_prefix() throws {
-		let privateKey = K1.ECDSAWithKeyRecovery.UnsafePrivateKey()
+		let privateKey = K1.ECDSAWithKeyRecovery.PrivateKey()
 		let publicKey = privateKey.publicKey
 
 		XCTAssertEqual(publicKey.rawRepresentation.hex, Data(publicKey.x963Representation.dropFirst()).hex)
@@ -212,7 +212,7 @@ final class ECDSAWithKeyRecoveryPublicKeyEncodingDecodingRoundtripTests: XCTestC
 
 extension K1.KeyAgreement.PublicKey {
 	init() {
-		let pubKey = K1.KeyAgreement.UnsafePrivateKey().publicKey
+		let pubKey = K1.KeyAgreement.PrivateKey().publicKey
 		try! self.init(compressedRepresentation: pubKey.compressedRepresentation)
 	}
 }
@@ -220,7 +220,7 @@ extension K1.KeyAgreement.PublicKey {
 // MARK: - KeyAgreementPublicKeyEncodingDecodingRoundtripTests
 final class KeyAgreementPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 	func test_pubkey_raw_is_x963_minus_prefix() throws {
-		let privateKey = K1.KeyAgreement.UnsafePrivateKey()
+		let privateKey = K1.KeyAgreement.PrivateKey()
 		let publicKey = privateKey.publicKey
 
 		XCTAssertEqual(publicKey.rawRepresentation.hex, Data(publicKey.x963Representation.dropFirst()).hex)

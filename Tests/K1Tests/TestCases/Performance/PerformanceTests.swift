@@ -8,7 +8,7 @@ final class PerformanceTests: XCTestCase {
 		measure {
 			do {
 				for _ in 0 ..< 10 {
-					let schnorrUnsafePrivateKey = K1.Schnorr.UnsafePrivateKey()
+					let schnorrUnsafePrivateKey = K1.Schnorr.PrivateKey()
 					let schnorrPublicKey = schnorrUnsafePrivateKey.publicKey
 
 					try XCTAssertEqual(
@@ -20,7 +20,7 @@ final class PerformanceTests: XCTestCase {
 						schnorrPublicKey
 					)
 
-					let ecdsaUnsafePrivateKey = K1.ECDSAWithKeyRecovery.UnsafePrivateKey()
+					let ecdsaUnsafePrivateKey = K1.ECDSAWithKeyRecovery.PrivateKey()
 					let ecdsaPublicKey = ecdsaUnsafePrivateKey.publicKey
 
 					try XCTAssertEqual(
@@ -64,9 +64,9 @@ final class PerformanceTests: XCTestCase {
 						schnorr
 					)
 
-					let aliceUnsafePrivateKey = try K1.KeyAgreement.UnsafePrivateKey(x963Representation: ecdsaUnsafePrivateKey.x963Representation)
+					let aliceUnsafePrivateKey = try K1.KeyAgreement.PrivateKey(x963Representation: ecdsaUnsafePrivateKey.x963Representation)
 					let alicePublicKey = aliceUnsafePrivateKey.publicKey
-					let bobUnsafePrivateKey = K1.KeyAgreement.UnsafePrivateKey()
+					let bobUnsafePrivateKey = K1.KeyAgreement.PrivateKey()
 					let bobPublicKey = bobUnsafePrivateKey.publicKey
 
 					var ab = try aliceUnsafePrivateKey.sharedSecretFromKeyAgreement(with: bobPublicKey)

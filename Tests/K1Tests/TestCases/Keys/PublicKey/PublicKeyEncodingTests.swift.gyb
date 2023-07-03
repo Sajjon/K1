@@ -53,7 +53,7 @@ public func doTestSerializationRoundtrip<T, Enc>(
 
 extension ${PUBLIC_KEY_TYPE} {
 	init() {
-		let pubKey = ${MODULE}.UnsafePrivateKey().publicKey
+		let pubKey = ${MODULE}.PrivateKey().publicKey
 		try! self.init(compressedRepresentation: pubKey.compressedRepresentation)
 	}
 }
@@ -63,7 +63,7 @@ final class ${FEATURE.replace('.','')+"PublicKey"}EncodingDecodingRoundtripTests
 	
 	func test_pubkey_raw_is_x963_minus_prefix() throws {
 		
-		let privateKey = ${MODULE}.UnsafePrivateKey()
+		let privateKey = ${MODULE}.PrivateKey()
 		let publicKey = privateKey.publicKey
 
 		XCTAssertEqual(publicKey.rawRepresentation.hex, Data(publicKey.x963Representation.dropFirst()).hex)

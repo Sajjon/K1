@@ -13,7 +13,7 @@ extension K1 {
 	}
 }
 
-extension K1.KeyAgreement.UnsafePrivateKey {
+extension K1.KeyAgreement.PrivateKey {
 	/// Computes a shared secret with the provided public key from another party,
 	/// returning only the `X` coordinate of the point, following [ANSI X9.63][ansix963] standards.
 	///

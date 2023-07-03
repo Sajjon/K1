@@ -7,7 +7,7 @@ import Foundation
 extension K1.KeyAgreement {
 	// MARK: KeyAgreement + PrivateKey
 	/// A `secp256k1` private key used for key agreement.
-	public struct UnsafePrivateKey: Sendable, Hashable {
+	public struct PrivateKey: Sendable, Hashable {
 		typealias Impl = K1._PrivateKeyImplementation
 		public typealias PublicKey = K1.KeyAgreement.PublicKey
 
@@ -310,7 +310,7 @@ extension K1.Schnorr {
 	// MARK: Schnorr + PrivateKey
 	/// A `secp256k1` private key used to create cryptographic signatures,
 	/// more specifically Schnorr signatures.
-	public struct UnsafePrivateKey: Sendable, Hashable {
+	public struct PrivateKey: Sendable, Hashable {
 		typealias Impl = K1._PrivateKeyImplementation
 		public typealias PublicKey = K1.Schnorr.PublicKey
 
@@ -615,7 +615,7 @@ extension K1.ECDSA {
 	// MARK: ECDSA + PrivateKey
 	/// A `secp256k1` private key used to create cryptographic signatures,
 	/// more specifically ECDSA signatures, that do not offer recovery of the public key.
-	public struct UnsafePrivateKey: Sendable, Hashable {
+	public struct PrivateKey: Sendable, Hashable {
 		typealias Impl = K1._PrivateKeyImplementation
 		public typealias PublicKey = K1.ECDSA.PublicKey
 
@@ -920,7 +920,7 @@ extension K1.ECDSAWithKeyRecovery {
 	// MARK: ECDSAWithKeyRecovery + PrivateKey
 	/// A `secp256k1` private key used to create cryptographic signatures,
 	/// more specifically ECDSA signatures that offers recovery of the public key.
-	public struct UnsafePrivateKey: Sendable, Hashable {
+	public struct PrivateKey: Sendable, Hashable {
 		typealias Impl = K1._PrivateKeyImplementation
 		public typealias PublicKey = K1.ECDSAWithKeyRecovery.PublicKey
 
@@ -1221,26 +1221,26 @@ extension K1.ECDSAWithKeyRecovery {
 	}
 }
 
-// MARK: - K1.KeyAgreement.UnsafePrivateKey + _K1PrivateKeyProtocol
-extension K1.KeyAgreement.UnsafePrivateKey: _K1PrivateKeyProtocol {}
+// MARK: - K1.KeyAgreement.PrivateKey + _K1PrivateKeyProtocol
+extension K1.KeyAgreement.PrivateKey: _K1PrivateKeyProtocol {}
 
 // MARK: - K1.KeyAgreement.PublicKey + _K1PublicKeyProtocol
 extension K1.KeyAgreement.PublicKey: _K1PublicKeyProtocol {}
 
-// MARK: - K1.Schnorr.UnsafePrivateKey + _K1PrivateKeyProtocol
-extension K1.Schnorr.UnsafePrivateKey: _K1PrivateKeyProtocol {}
+// MARK: - K1.Schnorr.PrivateKey + _K1PrivateKeyProtocol
+extension K1.Schnorr.PrivateKey: _K1PrivateKeyProtocol {}
 
 // MARK: - K1.Schnorr.PublicKey + _K1PublicKeyProtocol
 extension K1.Schnorr.PublicKey: _K1PublicKeyProtocol {}
 
-// MARK: - K1.ECDSA.UnsafePrivateKey + _K1PrivateKeyProtocol
-extension K1.ECDSA.UnsafePrivateKey: _K1PrivateKeyProtocol {}
+// MARK: - K1.ECDSA.PrivateKey + _K1PrivateKeyProtocol
+extension K1.ECDSA.PrivateKey: _K1PrivateKeyProtocol {}
 
 // MARK: - K1.ECDSA.PublicKey + _K1PublicKeyProtocol
 extension K1.ECDSA.PublicKey: _K1PublicKeyProtocol {}
 
-// MARK: - K1.ECDSAWithKeyRecovery.UnsafePrivateKey + _K1PrivateKeyProtocol
-extension K1.ECDSAWithKeyRecovery.UnsafePrivateKey: _K1PrivateKeyProtocol {}
+// MARK: - K1.ECDSAWithKeyRecovery.PrivateKey + _K1PrivateKeyProtocol
+extension K1.ECDSAWithKeyRecovery.PrivateKey: _K1PrivateKeyProtocol {}
 
 // MARK: - K1.ECDSAWithKeyRecovery.PublicKey + _K1PublicKeyProtocol
 extension K1.ECDSAWithKeyRecovery.PublicKey: _K1PublicKeyProtocol {}
