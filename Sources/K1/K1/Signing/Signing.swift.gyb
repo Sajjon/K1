@@ -7,6 +7,19 @@ import struct CryptoKit.SHA256
 import protocol CryptoKit.Digest
 
 %{
+	SAFETY_VARIANTS = [
+		{
+			"safetyVariantName": "Unsafe",
+			"isSafe": False
+		},
+		{
+			"safetyVariantName": "Safe",
+			"isSafe": True
+		}
+	]
+}%
+
+%{
 	VARIANTS_OF_FEATURE = [
 		{
 			"scheme": "ECDSA",
@@ -39,8 +52,14 @@ import protocol CryptoKit.Digest
 	DOC_SIGN_PARAM_OPTIONS = VARIANT_OF_FEATURE["docSignParameterOptions"]
 	DOC_SIGN_RETURN_EXTRA = VARIANT_OF_FEATURE["docSignReturnExtra"]
 }%
+% for SAFETY_VARIANT in SAFETY_VARIANTS:
+%{
+		SAFETY_VARIANT_NAME = SAFETY_VARIANT["safetyVariantName"]
+		IS_SAFE = SAFETY_VARIANT["isSafe"]
+		IS_UNSAFE = not IS_SAFE
+}%
 // MARK: Sign + ${FEATURE}
-extension K1.${FEATURE}.PrivateKey {
+extension K1.${FEATURE}.${SAFETY_VARIANT_NAME}PrivateKey {
 	/// Generates ${VARIANT} signature of _hashed_ data you provide over the `secp256k1` elliptic curve.
 	/// - Parameters:
 	///   - hashed: The _hashed_ data to sign.
@@ -90,5 +109,6 @@ extension K1.${FEATURE}.PrivateKey {
 	}
 }
 
+% end
 % end
 % end

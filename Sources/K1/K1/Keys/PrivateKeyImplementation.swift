@@ -36,7 +36,7 @@ extension K1 {
 
 		internal init(wrapped: Wrapped) {
 			self.wrapped = wrapped
-			self.publicKey = PublicKey(wrapped: wrapped.publicKey)
+			self.publicKey = _PublicKeyImplementation(wrapped: wrapped.publicKey)
 		}
 	}
 }

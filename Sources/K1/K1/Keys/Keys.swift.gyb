@@ -5,6 +5,19 @@
 import Foundation
 
 %{
+	SAFETY_VARIANTS = [
+		{
+			"safetyVariantName": "Unsafe",
+			"isSafe": False
+		},
+		{
+			"safetyVariantName": "Safe",
+			"isSafe": True
+		}
+	]
+}%
+
+%{
 	LIST_KEY_FOR_FEATURE_WITH_DOCS = [
 		{
 			"feature": "KeyAgreement",
@@ -36,6 +49,9 @@ import Foundation
 		},
 	]
 }%
+
+
+
 % for KEY_FOR_FEATURE_WITH_DOCS in LIST_KEY_FOR_FEATURE_WITH_DOCS:
 %{
 	FEATURE = KEY_FOR_FEATURE_WITH_DOCS["feature"]
@@ -45,9 +61,17 @@ import Foundation
 	PUBLICKEY_TYPE_DOC = KEY_FOR_FEATURE_WITH_DOCS["docPK"]
 }%
 extension K1.${FEATURE} {
+% for SAFETY_VARIANT in SAFETY_VARIANTS:
+%{
+		SAFETY_VARIANT_NAME = SAFETY_VARIANT["safetyVariantName"]
+		IS_SAFE = SAFETY_VARIANT["isSafe"]
+		IS_UNSAFE = not IS_SAFE
+		PRIVATEKEY_ANNOTATION = "" if IS_UNSAFE else "\n@_moveOnly\n"
+		PRIVATEKEY_CONFORMANCE_AS_STRING_WITH_LEADING_COMMA = ", Hashable" if IS_UNSAFE else ""
+}%
 	// MARK: ${FEATURE} + PrivateKey
 	${PRIVATEKEY_TYPE_DOC}
-	public struct PrivateKey: Sendable, Hashable {
+	${PRIVATEKEY_ANNOTATION}public struct ${SAFETY_VARIANT_NAME}PrivateKey: Sendable${PRIVATEKEY_CONFORMANCE_AS_STRING_WITH_LEADING_COMMA} {
 		
 		typealias Impl = K1._PrivateKeyImplementation
 		public typealias PublicKey = K1.${FEATURE}.PublicKey
@@ -148,6 +172,7 @@ extension K1.${FEATURE} {
 		}
 	
 	}
+	% end
 
 	// MARK: ${FEATURE} + PublicKey
 	${PUBLICKEY_TYPE_DOC}
@@ -251,7 +276,7 @@ extension K1.${FEATURE} {
 %{
 	FEATURE = KEY_FOR_FEATURE_WITH_DOCS["feature"]
 }%
-extension K1.${FEATURE}.PrivateKey: _K1PrivateKeyProtocol {}
+extension K1.${FEATURE}.UnsafePrivateKey: _K1PrivateKeyProtocol {}
 extension K1.${FEATURE}.PublicKey: _K1PublicKeyProtocol {}
 % end
 

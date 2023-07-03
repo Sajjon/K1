@@ -2,6 +2,27 @@ import Foundation
 @testable import K1
 import XCTest
 
+// MARK: - K1.ECDSA.PrivateKey
+extension K1.ECDSA {
+	typealias PrivateKey = UnsafePrivateKey
+}
+
+// MARK: - K1.ECDSAWithKeyRecovery.PrivateKey
+extension K1.ECDSAWithKeyRecovery {
+	typealias PrivateKey = UnsafePrivateKey
+}
+
+// MARK: - K1.Schnorr.PrivateKey
+extension K1.Schnorr {
+	typealias PrivateKey = UnsafePrivateKey
+}
+
+// MARK: - K1.KeyAgreement.PrivateKey
+extension K1.KeyAgreement {
+	typealias PrivateKey = UnsafePrivateKey
+}
+
+// MARK: - PrivateKeyImportTests
 final class PrivateKeyImportTests: XCTestCase {
 	func testAssertImportingPrivateKeyWithTooFewBytesThrowsError() throws {
 		let raw = try Data(hex: "deadbeef")

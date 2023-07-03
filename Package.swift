@@ -3,7 +3,7 @@
 
 import PackageDescription
 
-let development = false
+let development = true
 
 let cSettings: [CSetting] = [
 	// Basic config values that are universal and require no dependencies.
@@ -73,6 +73,7 @@ let package = Package(
 				"secp256k1",
 			],
 			exclude: [
+				"K1/ECDH/KeyAgreement.swift.gyb",
 				"K1/Keys/Keys.swift.gyb",
 				"K1/Signing/Signing.swift.gyb",
 				"K1/Validation/Validation.swift.gyb",
@@ -103,7 +104,7 @@ if development {
 			.unsafeFlags([
 				"-Xfrontend", "-warn-concurrency",
 				"-Xfrontend", "-enable-actor-data-race-checks",
-				"-enable-library-evolution",
+				"-Xfrontend", "-enable-experimental-move-only",
 			])
 		)
 	}
