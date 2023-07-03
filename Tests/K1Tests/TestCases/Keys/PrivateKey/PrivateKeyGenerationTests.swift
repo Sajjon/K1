@@ -2,7 +2,7 @@ import Foundation
 import K1
 import XCTest
 
-final class UnsafePrivateKeyGenerationTests: XCTestCase {
+final class PrivateKeyGenerationTests: XCTestCase {
 	func testGenerationWorks() throws {
 		XCTAssertNoThrow(K1.ECDSA.PrivateKey())
 	}

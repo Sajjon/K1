@@ -2,8 +2,8 @@ import Foundation
 @testable import K1
 import XCTest
 
-// MARK: - UnsafePrivateKeyEncodingTests
-final class UnsafePrivateKeyEncodingTests: XCTestCase {
+// MARK: - PrivateKeyEncodingTests
+final class PrivateKeyEncodingTests: XCTestCase {
 	func testRawRoundtrip() throws {
 		try doTest(
 			serialize: \.rawRepresentation,
@@ -33,7 +33,7 @@ final class UnsafePrivateKeyEncodingTests: XCTestCase {
 	}
 }
 
-private extension UnsafePrivateKeyEncodingTests {
+private extension PrivateKeyEncodingTests {
 	func doTest<Enc: Equatable>(
 		serialize: KeyPath<K1.ECDSA.PrivateKey, Enc>,
 		deserialize: (Enc) throws -> K1.ECDSA.PrivateKey

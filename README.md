@@ -19,7 +19,7 @@ Just like that K1 vendors these key pairs:
 - `K1.ECDSAWithKeyRecovery.PrivateKey` / `K1.ECDSAWithKeyRecovery.PublicKey` for sign / verify methods using ECDSA (producing/validating signature where public key is recoverable)
 - `K1.ECDSA.PrivateKey` / `K1.ECDSA.PublicKey` for sign / verify methods using ECDSA (producing/validating signature where public key is **not** recoverable)
 
-Just like you can convert between e.g. `Curve25519.KeyAgreement.PrivateKey` and  `Curve25519.Signing.PrivateKey` back and forth using any of the initializers and serializer, you can convert between all UnsafePrivateKeys and all PublicKeys of all features in K1.
+Just like you can convert between e.g. `Curve25519.KeyAgreement.PrivateKey` and  `Curve25519.Signing.PrivateKey` back and forth using any of the initializers and serializer, you can convert between all PrivateKeys and all PublicKeys of all features in K1.
 
 All keys can be serialized using these computed properties:
 
@@ -43,7 +43,7 @@ All keys can be deserialize using these initializer:
 }
 ```
 
-Furthermore, all UnsafePrivateKey's have these additional APIs:
+Furthermore, all PrivateKey's have these additional APIs:
 
 ```swift
 {

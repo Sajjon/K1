@@ -2,8 +2,8 @@ import Foundation
 @testable import K1
 import XCTest
 
-// MARK: - UnsafePrivateKeyImportTests
-final class UnsafePrivateKeyImportTests: XCTestCase {
+// MARK: - PrivateKeyImportTests
+final class PrivateKeyImportTests: XCTestCase {
 	func testAssertImportingUnsafePrivateKeyWithTooFewBytesThrowsError() throws {
 		let raw = try Data(hex: "deadbeef")
 		try assert(

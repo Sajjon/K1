@@ -89,6 +89,7 @@ let package = Package(
 			],
 			exclude: [
 				"TestCases/Keys/PublicKey/PublicKeyEncodingTests.swift.gyb",
+				"TestCases/ECDH/ECDHTests.swift.gyb",
 			],
 			resources: [
 				.process("TestVectors/"),
