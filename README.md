@@ -8,16 +8,18 @@ _K1_ is Swift wrapper around [libsecp256k1 (bitcoin-core/secp256k1)][lib], offer
 # Documentation
 Read full documentation [here on SwiftPackageIndex][doc].
 
+All private key types in K1 are divided into `UnsafePrivateKey` and `SafePrivateKey` where the former are standard copyable types and the latter are Noncopyable types ("move only").
+
 ## Quick overview
-The API of K1 maps almost 1:1 with Apple's [CryptoKit][ck], vendoring a set of keypairs, one per feature. E.g. in CryptoKit you have `Curve25519.KeyAgreement.PrivateKey` and `Curve25519.KeyAgreement.PublicKey` which are seperate for `Curve25519.Signing.PrivateKey` and `Curve25519.Signing.PublicKey`. 
+The API of K1 maps almost 1:1 with Apple's [CryptoKit][ck], vendoring a set of keypairs, one per feature. E.g. in CryptoKit you have `Curve25519.KeyAgreement.UnsafePrivateKey` and `Curve25519.KeyAgreement.PublicKey` which are seperate for `Curve25519.Signing.UnsafePrivateKey` and `Curve25519.Signing.PublicKey`. 
 
 Just like that K1 vendors these key pairs:
-- `K1.KeyAgreement.PrivateKey` / `K1.KeyAgreement.PublicKey` for key agreement (ECDH)
-- `K1.Schnorr.PrivateKey` / `K1.Schnorr.PublicKey` for sign / verify methods using Schnorr signature scheme
-- `K1.ECDSAWithKeyRecovery.PrivateKey` / `K1.ECDSAWithKeyRecovery.PublicKey` for sign / verify methods using ECDSA (producing/validating signature where public key is recoverable)
-- `K1.ECDSA.PrivateKey` / `K1.ECDSA.PublicKey` for sign / verify methods using ECDSA (producing/validating signature where public key is **not** recoverable)
+- `K1.KeyAgreement.UnsafePrivateKey` / `K1.KeyAgreement.PublicKey` for key agreement (ECDH)
+- `K1.Schnorr.UnsafePrivateKey` / `K1.Schnorr.PublicKey` for sign / verify methods using Schnorr signature scheme
+- `K1.ECDSAWithKeyRecovery.UnsafePrivateKey` / `K1.ECDSAWithKeyRecovery.PublicKey` for sign / verify methods using ECDSA (producing/validating signature where public key is recoverable)
+- `K1.ECDSA.UnsafePrivateKey` / `K1.ECDSA.PublicKey` for sign / verify methods using ECDSA (producing/validating signature where public key is **not** recoverable)
 
-Just like you can convert between e.g. `Curve25519.KeyAgreement.PrivateKey` and  `Curve25519.Signing.PrivateKey` back and forth using any of the initializers and serializer, you can convert between all PrivateKeys and all PublicKeys of all features in K1.
+Just like you can convert between e.g. `Curve25519.KeyAgreement.UnsafePrivateKey` and  `Curve25519.Signing.UnsafePrivateKey` back and forth using any of the initializers and serializer, you can convert between all UnsafePrivateKeys and all PublicKeys of all features in K1.
 
 All keys can be serialized using these computed properties:
 
@@ -41,7 +43,7 @@ All keys can be deserialize using these initializer:
 }
 ```
 
-Furthermore, all PrivateKey's have these additional APIs:
+Furthermore, all UnsafePrivateKey's have these additional APIs:
 
 ```swift
 {
@@ -64,8 +66,8 @@ Furthermore, all PublicKeys's have these additional APIs:
 ## ECDSA (Elliptic Curve Digital Signature Algorithm)
 
 There exists two set of ECDSA key pairs:
-- A key pair for signatures from which you can recover the public key, specifically: `K1.ECDSAWithKeyRecovery.PrivateKey` and `K1.ECDSAWithKeyRecovery.PublicKey`
-- A key pair for signatures from which you can **not** recover the public key, specifically: `K1.ECDSA.PrivateKey` and `K1.ECDSA.PublicKey`
+- A key pair for signatures from which you can recover the public key, specifically: `K1.ECDSAWithKeyRecovery.UnsafePrivateKey` and `K1.ECDSAWithKeyRecovery.PublicKey`
+- A key pair for signatures from which you can **not** recover the public key, specifically: `K1.ECDSA.UnsafePrivateKey` and `K1.ECDSA.PublicKey`
 
 For each private key there exists two different `signature:for:options` (one taking hashed data and taking `Digest` as argument) methods and one `signature:forUnhashed:options`.
 
@@ -76,7 +78,7 @@ The `option` is a `K1.ECDSA.SigningOptions` struct, which by default specifies [
 #### Sign
 
 ```swift
-let alice = K1.ECDSA.PrivateKey()
+let alice = K1.ECDSA.UnsafePrivateKey()
 ```
 
 ##### Hashed (Data)
@@ -146,7 +148,7 @@ assert(
 All signing and validation APIs are identical to the `NonRecoverable` namespace.
 
 ```swift
-let alice = K1.ECDSA.PrivateKey()
+let alice = K1.ECDSA.UnsafePrivateKey()
 let message: Data = // from somewhere
 let digest = SHA256.hash(data: message)
 let signature: K1.ECDSAWithKeyRecovery.Signature = try alice.signature(for: digest)
@@ -162,7 +164,7 @@ assert(
 ### Sign
 
 ```swift
-let alice = K1.Schnorr.PrivateKey()
+let alice = K1.Schnorr.UnsafePrivateKey()
 let signature = try alice.signature(forUnhashed: message)
 ```
 
@@ -192,8 +194,8 @@ This library vendors three different EC Diffie-Hellman (ECDH) key exchange funct
 3. Custom - No hash, return point uncompressed - `ecdhPoint -> Data`
 
 ```swift
-let alice = try K1.KeyAgreement.PrivateKey()
-let bob = try K1.KeyAgreement.PrivateKey()
+let alice = try K1.KeyAgreement.UnsafePrivateKey()
+let bob = try K1.KeyAgreement.UnsafePrivateKey()
 ```
 
 ### `ASN1 x9.63` ECDH

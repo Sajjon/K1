@@ -85,7 +85,7 @@ final class SchnorrSignatureBitcoinCoreTests: XCTestCase {
 
 private extension SchnorrSignatureBitcoinCoreTests {
 	func doTestSchnorrSign(vector: SchnorrTestSignVector) throws {
-		let privateKey = try K1.Schnorr.PrivateKey(
+		let privateKey = try K1.Schnorr.UnsafePrivateKey(
 			rawRepresentation: Data(hex: vector.privateKeyHex)
 		)
 

@@ -5,7 +5,7 @@ import XCTest
 
 final class APITest: XCTestCase {
 	func testECDSA() throws {
-		let privateKey: K1.ECDSA.PrivateKey = .init()
+		let privateKey: K1.ECDSA.UnsafePrivateKey = .init()
 		let publicKey: K1.ECDSA.PublicKey = privateKey.publicKey
 		let hashed = Data(SHA256.hash(data: Data("Hey Bob!".utf8)))
 		let signature = try privateKey.signature(for: hashed)
@@ -32,7 +32,7 @@ final class APITest: XCTestCase {
 	}
 
 	func testECDSAWithRecovery() throws {
-		let privateKey: K1.ECDSAWithKeyRecovery.PrivateKey = .init()
+		let privateKey: K1.ECDSAWithKeyRecovery.UnsafePrivateKey = .init()
 		let publicKey: K1.ECDSAWithKeyRecovery.PublicKey = privateKey.publicKey
 		let hashed = Data(SHA256.hash(data: Data("Hey Bob!".utf8)))
 		let signature = try privateKey.signature(for: hashed)
@@ -65,7 +65,7 @@ final class APITest: XCTestCase {
 	}
 
 	func testSchnorr() throws {
-		let privateKey: K1.Schnorr.PrivateKey = .init()
+		let privateKey: K1.Schnorr.UnsafePrivateKey = .init()
 		let publicKey: K1.Schnorr.PublicKey = privateKey.publicKey
 		let hashed = Data(SHA256.hash(data: Data("Hey Bob!".utf8)))
 		let signature = try privateKey.signature(for: hashed)
@@ -92,8 +92,8 @@ final class APITest: XCTestCase {
 	}
 
 	func testECDH() throws {
-		let alice = K1.KeyAgreement.PrivateKey()
-		let bob = K1.KeyAgreement.PrivateKey()
+		let alice = K1.KeyAgreement.UnsafePrivateKey()
+		let bob = K1.KeyAgreement.UnsafePrivateKey()
 		let ab = try alice.sharedSecretFromKeyAgreement(with: bob.publicKey)
 		let ba = try bob.sharedSecretFromKeyAgreement(with: alice.publicKey)
 		XCTAssertEqual(ab, ba)

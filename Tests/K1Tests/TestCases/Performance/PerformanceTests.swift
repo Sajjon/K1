@@ -8,8 +8,8 @@ final class PerformanceTests: XCTestCase {
 		measure {
 			do {
 				for _ in 0 ..< 10 {
-					let schnorrPrivateKey = K1.Schnorr.PrivateKey()
-					let schnorrPublicKey = schnorrPrivateKey.publicKey
+					let schnorrUnsafePrivateKey = K1.Schnorr.UnsafePrivateKey()
+					let schnorrPublicKey = schnorrUnsafePrivateKey.publicKey
 
 					try XCTAssertEqual(
 						K1.Schnorr.PublicKey(compressedRepresentation: schnorrPublicKey.compressedRepresentation),
@@ -20,8 +20,8 @@ final class PerformanceTests: XCTestCase {
 						schnorrPublicKey
 					)
 
-					let ecdsaPrivateKey = K1.ECDSAWithKeyRecovery.PrivateKey()
-					let ecdsaPublicKey = ecdsaPrivateKey.publicKey
+					let ecdsaUnsafePrivateKey = K1.ECDSAWithKeyRecovery.UnsafePrivateKey()
+					let ecdsaPublicKey = ecdsaUnsafePrivateKey.publicKey
 
 					try XCTAssertEqual(
 						K1.ECDSAWithKeyRecovery.PublicKey(compressedRepresentation: ecdsaPublicKey.compressedRepresentation),
@@ -32,7 +32,7 @@ final class PerformanceTests: XCTestCase {
 						ecdsaPublicKey
 					)
 
-					let ecdsa = try ecdsaPrivateKey.signature(for: message)
+					let ecdsa = try ecdsaUnsafePrivateKey.signature(for: message)
 					XCTAssertTrue(
 						ecdsaPublicKey.isValidSignature(
 							ecdsa,
@@ -52,7 +52,7 @@ final class PerformanceTests: XCTestCase {
 						ecdsa.nonRecoverable()
 					)
 
-					let schnorr = try schnorrPrivateKey.signature(for: message)
+					let schnorr = try schnorrUnsafePrivateKey.signature(for: message)
 					XCTAssertTrue(
 						schnorrPublicKey.isValidSignature(
 							schnorr,
@@ -64,16 +64,16 @@ final class PerformanceTests: XCTestCase {
 						schnorr
 					)
 
-					let alicePrivateKey = try K1.KeyAgreement.PrivateKey(x963Representation: ecdsaPrivateKey.x963Representation)
-					let alicePublicKey = alicePrivateKey.publicKey
-					let bobPrivateKey = K1.KeyAgreement.PrivateKey()
-					let bobPublicKey = bobPrivateKey.publicKey
+					let aliceUnsafePrivateKey = try K1.KeyAgreement.UnsafePrivateKey(x963Representation: ecdsaUnsafePrivateKey.x963Representation)
+					let alicePublicKey = aliceUnsafePrivateKey.publicKey
+					let bobUnsafePrivateKey = K1.KeyAgreement.UnsafePrivateKey()
+					let bobPublicKey = bobUnsafePrivateKey.publicKey
 
-					var ab = try alicePrivateKey.sharedSecretFromKeyAgreement(with: bobPublicKey)
-					var ba = try bobPrivateKey.sharedSecretFromKeyAgreement(with: alicePublicKey)
+					var ab = try aliceUnsafePrivateKey.sharedSecretFromKeyAgreement(with: bobPublicKey)
+					var ba = try bobUnsafePrivateKey.sharedSecretFromKeyAgreement(with: alicePublicKey)
 					XCTAssertEqual(ab, ba)
-					ab = try alicePrivateKey.ecdh(with: bobPublicKey)
-					ba = try bobPrivateKey.ecdh(with: alicePublicKey)
+					ab = try aliceUnsafePrivateKey.ecdh(with: bobPublicKey)
+					ba = try bobUnsafePrivateKey.ecdh(with: alicePublicKey)
 					XCTAssertEqual(ab, ba)
 				}
 			} catch {

@@ -2,71 +2,51 @@ import Foundation
 @testable import K1
 import XCTest
 
-// MARK: - K1.ECDSA.PrivateKey
-extension K1.ECDSA {
-	typealias PrivateKey = UnsafePrivateKey
-}
-
-// MARK: - K1.ECDSAWithKeyRecovery.PrivateKey
-extension K1.ECDSAWithKeyRecovery {
-	typealias PrivateKey = UnsafePrivateKey
-}
-
-// MARK: - K1.Schnorr.PrivateKey
-extension K1.Schnorr {
-	typealias PrivateKey = UnsafePrivateKey
-}
-
-// MARK: - K1.KeyAgreement.PrivateKey
-extension K1.KeyAgreement {
-	typealias PrivateKey = UnsafePrivateKey
-}
-
-// MARK: - PrivateKeyImportTests
-final class PrivateKeyImportTests: XCTestCase {
-	func testAssertImportingPrivateKeyWithTooFewBytesThrowsError() throws {
+// MARK: - UnsafePrivateKeyImportTests
+final class UnsafePrivateKeyImportTests: XCTestCase {
+	func testAssertImportingUnsafePrivateKeyWithTooFewBytesThrowsError() throws {
 		let raw = try Data(hex: "deadbeef")
 		try assert(
-			K1.ECDSA.PrivateKey(rawRepresentation: raw),
+			K1.ECDSA.UnsafePrivateKey(rawRepresentation: raw),
 			throws: K1.Error.incorrectKeySize
 		)
 	}
 
-	func testAssertImportingPrivateKeyWithTooManyBytesThrowsError() throws {
+	func testAssertImportingUnsafePrivateKeyWithTooManyBytesThrowsError() throws {
 		let raw = Data(repeating: 0xBA, count: 33)
 		try assert(
-			K1.ECDSA.PrivateKey(rawRepresentation: raw),
+			K1.ECDSA.UnsafePrivateKey(rawRepresentation: raw),
 			throws: K1.Error.incorrectKeySize
 		)
 	}
 
-	func testAssertImportingPrivateKeyZeroThrowsError() throws {
+	func testAssertImportingUnsafePrivateKeyZeroThrowsError() throws {
 		let raw = Data(repeating: 0x00, count: 32)
 		try assert(
-			K1.ECDSA.PrivateKey(rawRepresentation: raw),
+			K1.ECDSA.UnsafePrivateKey(rawRepresentation: raw),
 			throws: K1.Error.invalidKey
 		)
 	}
 
-	func testAssertImportingPrivateKeyCurveOrderThrowsError() throws {
+	func testAssertImportingUnsafePrivateKeyCurveOrderThrowsError() throws {
 		let raw = try Data(hex: "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141")
 		try assert(
-			K1.ECDSA.PrivateKey(rawRepresentation: raw),
+			K1.ECDSA.UnsafePrivateKey(rawRepresentation: raw),
 			throws: K1.Error.underlyingLibsecp256k1Error(.publicKeyCreate)
 		)
 	}
 
-	func testAssertImportingPrivateKeyLargerThanCurveOrderThrowsError() throws {
+	func testAssertImportingUnsafePrivateKeyLargerThanCurveOrderThrowsError() throws {
 		let raw = Data(repeating: 0xFF, count: 32)
 		try assert(
-			K1.ECDSA.PrivateKey(rawRepresentation: raw),
+			K1.ECDSA.UnsafePrivateKey(rawRepresentation: raw),
 			throws: K1.Error.underlyingLibsecp256k1Error(.publicKeyCreate)
 		)
 	}
 
-	func testAssertPublicKeyOfImportedPrivateKey1() throws {
+	func testAssertPublicKeyOfImportedUnsafePrivateKey1() throws {
 		let privateKeyRaw = try Data(hex: "0000000000000000000000000000000000000000000000000000000000000001")
-		let privateKey = try K1.ECDSA.PrivateKey(rawRepresentation: privateKeyRaw)
+		let privateKey = try K1.ECDSA.UnsafePrivateKey(rawRepresentation: privateKeyRaw)
 		// Easily verified by: https://bitaddress.org/
 		// Pretty well known key pair
 		let expectedPublicKey = try K1.ECDSA.PublicKey(x963Representation: Data(hex: "0479be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"))

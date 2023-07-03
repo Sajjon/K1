@@ -16,8 +16,8 @@ private struct ECDHX963Suite: Decodable {
 
 // MARK: - Vector
 private struct Vector: Decodable {
-	let alicePrivateKey: String
-	let bobPrivateKey: String
+	let aliceUnsafePrivateKey: String
+	let bobUnsafePrivateKey: String
 	let alicePublicKeyUncompressed: String
 	let bobPublicKeyUncompressed: String
 	let outcomes: [Outcome]
@@ -66,8 +66,8 @@ extension TwoVariantsOfECDHWithKDFTests {
 		let outputByteCount = 32
 		let hash = SHA256.self
 
-		let alice = try K1.KeyAgreement.PrivateKey(hex: vector.alicePrivateKey)
-		let bob = try K1.KeyAgreement.PrivateKey(hex: vector.bobPrivateKey)
+		let alice = try K1.KeyAgreement.UnsafePrivateKey(hex: vector.aliceUnsafePrivateKey)
+		let bob = try K1.KeyAgreement.UnsafePrivateKey(hex: vector.bobUnsafePrivateKey)
 		XCTAssertEqual(alice.publicKey.x963Representation.hex, vector.alicePublicKeyUncompressed)
 		XCTAssertEqual(bob.publicKey.x963Representation.hex, vector.bobPublicKeyUncompressed)
 
