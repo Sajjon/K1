@@ -1,11 +1,13 @@
 import CryptoKit
 import Foundation
 @testable import K1
-import XCTest
+import Testing
 
 // MARK: - ECDSA_Wycheproof_IEEE_P1364_RS_EncodedSignaturesTests
-final class ECDSA_Wycheproof_IEEE_P1364_RS_EncodedSignaturesTests: XCTestCase {
-	func testWycheProofSecp256k1_P1364_RS() throws {
+@Suite("ECDSA Wycheproof IEEE P1364 RS EncodedSignatures")
+struct ECDSA_Wycheproof_IEEE_P1364_RS_EncodedSignaturesTests {
+	@Test
+	func wycheProofSecp256k1_P1364_RS() throws {
 		let _: TestResult =
 			try testSuite(
 				/* https://github.com/google/wycheproof/blob/master/testvectors/ecdsa_secp256k1_sha256_test.json */
@@ -44,7 +46,7 @@ private struct SignatureWycheproofP1364TestVector: WycheproofTestVector {
 		let raw = try Data(hex: sig)
 		let signature = try Signature(rawRepresentation: raw)
 		if self.result == "valid" {
-			XCTAssertEqual(sig, signature.rawRepresentation.hex)
+			#expect(sig == signature.rawRepresentation.hex)
 		}
 		return signature
 	}
