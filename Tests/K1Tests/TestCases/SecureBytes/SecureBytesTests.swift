@@ -14,58 +14,66 @@
 
 // Modifications: Removed all `#if` and converted error type `CryptoKitError` -> `K1.Error`
 
+import Foundation
 @testable import K1
-import XCTest
+import Testing
 
-final class SecureBytesTests: XCTestCase {
-	func testBasicSoundness() {
+@Suite("SecureBytes")
+struct SecureBytesTests {
+	@Test
+	func basicSoundness() {
 		var first = SecureBytes()
 		var second = SecureBytes()
 
 		first.append(Data("hello".utf8))
 		second.append(Data("hello".utf8))
 
-		XCTAssertEqual(first, second)
+		#expect(first == second)
 
 		first.append(Data("world".utf8))
 		second.append(Data("wrold".utf8))
-		XCTAssertNotEqual(first, second)
+		#expect(first != second)
 	}
 
-	func testSimpleCollection() {
+	@Test
+	func simpleCollection() {
 		let base = SecureBytes(0 ..< 100)
-		XCTAssertEqual(base.count, 100)
-		XCTAssertEqual(Array(base), Array(0 ..< 100))
-		XCTAssertEqual(base.first, 0)
-		XCTAssertEqual(base.last, 99)
-		XCTAssertEqual(base.reduce(Int(0)) { Int($0) + Int($1) }, 4950)
+		#expect(base.count == 100)
+		#expect(Array(base) == Array(0 ..< 100))
+		#expect(base.first == 0)
+		#expect(base.last == 99)
+		#expect(base.reduce(Int(0)) { Int($0) + Int($1) } == 4950)
 	}
 
-	func testSimpleBidirectionalCollection() {
+	@Test
+	func simpleBidirectionalCollection() {
 		let base = SecureBytes(0 ..< 100)
 		let reversed = base.reversed()
-		XCTAssertEqual(Array(reversed), Array(stride(from: 99, through: 0, by: -1)))
+		#expect(Array(reversed) == Array(stride(from: 99, through: 0, by: -1)))
 	}
 
-	func testSimpleRandomAccessCollection() {
+	@Test
+	func simpleRandomAccessCollection() {
 		// Not easy to test this, just try to move the indices around a bit.
 		let base = SecureBytes(0 ..< 100)
 		let aMiddleIndex = base.index(base.startIndex, offsetBy: 48)
 		let aDifferentMiddleIndex = base.index(aMiddleIndex, offsetBy: 5)
-		XCTAssertEqual(base.distance(from: aMiddleIndex, to: aDifferentMiddleIndex), 5)
+		#expect(base.distance(from: aMiddleIndex, to: aDifferentMiddleIndex) == 5)
 
-		XCTAssertEqual(base[aMiddleIndex], 48)
-		XCTAssertEqual(base[aDifferentMiddleIndex], 48 + 5)
+		#expect(base[aMiddleIndex] == 48)
+		#expect(base[aDifferentMiddleIndex] == 48 + 5)
 	}
 
-	func testSimpleMutableCollection() {
+	@Test
+	func simpleMutableCollection() {
 		var base = SecureBytes(repeating: 0, count: 5)
 		let offset = base.index(base.startIndex, offsetBy: 2)
 		base[offset] = 5
-		XCTAssertEqual(Array(base), [0, 0, 5, 0, 0])
+		#expect(Array(base) == [0, 0, 5, 0, 0])
 	}
 
-	func testSimpleRangeReplaceableCollection() {
+	@Test
+	func simpleRangeReplaceableCollection() {
 		// This test validates RangeReplaceableCollection and the value semantics all at once.
 		let base = SecureBytes(repeating: 0, count: 10)
 		let baseBytes = Array(repeating: UInt8(0), count: 10)
@@ -73,119 +81,119 @@ final class SecureBytesTests: XCTestCase {
 		// There are a few ways we can "replace" a subrange. The first is to extend at the front by appending.
 		var copy = base
 		copy.insert(contentsOf: [1, 2, 3, 4], at: copy.startIndex)
-		XCTAssertEqual(Array(copy), [1, 2, 3, 4] + baseBytes)
-		XCTAssertEqual(Array(base), baseBytes)
-		XCTAssertNotEqual(copy, base)
+		#expect(Array(copy) == [1, 2, 3, 4] + baseBytes)
+		#expect(Array(base) == baseBytes)
+		#expect(copy != base)
 
 		// The second is to extend at the back.
 		copy = base
 		copy.append(contentsOf: [1, 2, 3, 4])
-		XCTAssertEqual(Array(copy), baseBytes + [1, 2, 3, 4])
-		XCTAssertEqual(Array(base), baseBytes)
-		XCTAssertNotEqual(copy, base)
+		#expect(Array(copy) == baseBytes + [1, 2, 3, 4])
+		#expect(Array(base) == baseBytes)
+		#expect(copy != base)
 
 		// The third is to "shrink" by replacing a subrange in the middle.
 		copy = base
 		var aMiddleIndex = copy.index(copy.startIndex, offsetBy: 2)
 		var aDifferentMiddleIndex = copy.index(aMiddleIndex, offsetBy: 5)
 		copy.removeSubrange(aMiddleIndex ..< aDifferentMiddleIndex)
-		XCTAssertEqual(copy.count, 5)
-		XCTAssertEqual(Array(copy), [0, 0, 0, 0, 0])
-		XCTAssertEqual(Array(base), baseBytes)
-		XCTAssertNotEqual(copy, base)
+		#expect(copy.count == 5)
+		#expect(Array(copy) == [0, 0, 0, 0, 0])
+		#expect(Array(base) == baseBytes)
+		#expect(copy != base)
 
 		// The fourth is to replace a fixed size subrange with a different subrange of the same size.
 		copy = base
 		aMiddleIndex = copy.index(copy.startIndex, offsetBy: 2)
 		aDifferentMiddleIndex = copy.index(aMiddleIndex, offsetBy: 5)
 		copy.replaceSubrange(aMiddleIndex ..< aDifferentMiddleIndex, with: [1, 2, 3, 4, 5])
-		XCTAssertEqual(copy.count, 10)
-		XCTAssertEqual(Array(copy), [0, 0, 1, 2, 3, 4, 5, 0, 0, 0])
-		XCTAssertEqual(Array(base), baseBytes)
-		XCTAssertNotEqual(copy, base)
+		#expect(copy.count == 10)
+		#expect(Array(copy) == [0, 0, 1, 2, 3, 4, 5, 0, 0, 0])
+		#expect(Array(base) == baseBytes)
+		#expect(copy != base)
 
 		// The fifth is to make the storage bigger.
 		copy = base
 		aMiddleIndex = copy.index(copy.startIndex, offsetBy: 2)
 		aDifferentMiddleIndex = copy.index(aMiddleIndex, offsetBy: 5)
 		copy.replaceSubrange(aMiddleIndex ..< aDifferentMiddleIndex, with: [1, 2, 3, 4, 5, 6, 7])
-		XCTAssertEqual(copy.count, 12)
-		XCTAssertEqual(Array(copy), [0, 0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0])
-		XCTAssertEqual(Array(base), baseBytes)
-		XCTAssertNotEqual(copy, base)
+		#expect(copy.count == 12)
+		#expect(Array(copy) == [0, 0, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0])
+		#expect(Array(base) == baseBytes)
+		#expect(copy != base)
 	}
 
 	func testResizingByMakingLarger() {
 		var base = SecureBytes(count: 12)
-		XCTAssertGreaterThanOrEqual(base.backing.capacity, 16)
-		XCTAssertEqual(base.count, 12)
+		#expect(base.backing.capacity >= 16)
+		#expect(base.count == 12)
 
 		base.append(contentsOf: 0 ..< 16)
-		XCTAssertGreaterThanOrEqual(base.backing.capacity, 32)
-		XCTAssertEqual(base.count, 28)
+		#expect(base.backing.capacity >= 32)
+		#expect(base.count == 28)
 
 		base.append(contentsOf: 0 ..< 4)
-		XCTAssertGreaterThanOrEqual(base.backing.capacity, 32)
-		XCTAssertEqual(base.count, 32)
+		#expect(base.backing.capacity >= 32)
+		#expect(base.count == 32)
 	}
 
 	func testCountInitializerGeneratesSomewhatRandomData() {
 		let base = SecureBytes(count: 16)
-		XCTAssertGreaterThanOrEqual(base.backing.capacity, 16)
-		XCTAssertEqual(base.count, 16)
-		XCTAssertNotEqual(Array(repeating: UInt8(0), count: 16), Array(base))
+		#expect(base.backing.capacity >= 16)
+		#expect(base.count == 16)
+		#expect(Array(repeating: UInt8(0), count: 16) != Array(base))
 	}
 
 	func testBackingBytesAreAppropriatelySized() {
 		var base = SecureBytes(repeating: 0, count: 10)
-		XCTAssertGreaterThanOrEqual(base.backing.capacity, 16)
+		#expect(base.backing.capacity >= 16)
 
-		base.withUnsafeBytes { XCTAssertEqual($0.count, 10) }
-		base.withUnsafeMutableBytes { XCTAssertEqual($0.count, 10) }
-		base.backing._withVeryUnsafeMutableBytes { XCTAssertGreaterThanOrEqual($0.count, 16) }
+		base.withUnsafeBytes { #expect($0.count == 10) }
+		base.withUnsafeMutableBytes { #expect($0.count == 10) }
+		base.backing._withVeryUnsafeMutableBytes { #expect($0.count >= 16) }
 	}
 
 	func testTheresOnlyOneRegion() {
 		var base = SecureBytes()
 		base.append(Data("hello".utf8))
 		base.append(Data("world".utf8))
-		XCTAssertEqual(base.regions.count, 1)
+		#expect(base.regions.count == 1)
 	}
 
-	func testScaryInitializer() {
+	@Test
+	func scaryInitializer() {
 		let base = SecureBytes(unsafeUninitializedCapacity: 5) { scaryPointer, initializedCapacity in
-			XCTAssertEqual(scaryPointer.count, 5)
+			#expect(scaryPointer.count == 5)
 			scaryPointer.storeBytes(of: UInt32(0x0102_0304).bigEndian, as: UInt32.self)
 			initializedCapacity = 4
 		}
 
-		XCTAssertGreaterThanOrEqual(base.backing.capacity, 8)
-		XCTAssertEqual(Array(base), [1, 2, 3, 4])
+		#expect(base.backing.capacity >= 8)
+		#expect(Array(base) == [1, 2, 3, 4])
 
 		func testThrowingInitialization() throws {
 			_ = try SecureBytes(unsafeUninitializedCapacity: 5) { _, _ in
 				throw K1.Error.incorrectKeySize
 			}
 		}
-		XCTAssertThrowsError(try testThrowingInitialization()) { error in
-			guard case .some(.incorrectKeySize) = error as? K1.Error else {
-				XCTFail("unexpected error: \(error)")
-				return
-			}
+		#expect(throws: K1.Error.incorrectKeySize) {
+			try testThrowingInitialization()
 		}
 	}
 
-	func testAppendingDataPerformsACoW() {
+	@Test
+	func appendingDataPerformsACoW() {
 		var base = SecureBytes(repeating: 0, count: 10)
 		let copy = base
 
 		base.append("Hello, world".utf8)
 
-		XCTAssertEqual(base.count, 22)
-		XCTAssertEqual(copy.count, 10)
+		#expect(base.count == 22)
+		#expect(copy.count == 10)
 	}
 
-	func testRequestingAMutablePointerPerformsACoW() {
+	@Test
+	func requestingAMutablePointerPerformsACoW() {
 		var base = SecureBytes(repeating: 0, count: 10)
 		let copy = base
 
@@ -193,29 +201,31 @@ final class SecureBytesTests: XCTestCase {
 			$0.storeBytes(of: UInt32(0x0102_0304).bigEndian, toByteOffset: 4, as: UInt32.self)
 		}
 
-		XCTAssertEqual(Array(base), [0, 0, 0, 0, 1, 2, 3, 4, 0, 0])
-		XCTAssertEqual(Array(copy), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+		#expect(Array(base) == [0, 0, 0, 0, 1, 2, 3, 4, 0, 0])
+		#expect(Array(copy) == [0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 	}
 
-	func testDataCausesCoWs() {
+	@Test
+	func dataCausesCoWs() {
 		var base = SecureBytes(repeating: 0, count: 10)
 		let copy = Data(base)
-		XCTAssertEqual(base.count, copy.count)
+		#expect(base.count == copy.count)
 
 		base.append("Hello, world".utf8)
 
-		XCTAssertEqual(base.count, 22)
-		XCTAssertEqual(copy.count, 10)
+		#expect(base.count == 22)
+		#expect(copy.count == 10)
 	}
 
-	func testDataFromSlice() {
+	@Test
+	func dataFromSlice() {
 		var base = SecureBytes(0 ..< 10)
 		let copy = Data(base.prefix(5))
-		XCTAssertEqual(Array(copy), [0, 1, 2, 3, 4])
+		#expect(Array(copy) == [0, 1, 2, 3, 4])
 
 		base.append("Hello, world".utf8)
 
-		XCTAssertEqual(base.count, 22)
-		XCTAssertEqual(Array(copy), [0, 1, 2, 3, 4])
+		#expect(base.count == 22)
+		#expect(Array(copy) == [0, 1, 2, 3, 4])
 	}
 }
