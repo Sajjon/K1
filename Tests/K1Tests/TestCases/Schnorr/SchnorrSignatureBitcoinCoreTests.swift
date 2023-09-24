@@ -1,6 +1,6 @@
 import Foundation
 @testable import K1
-import XCTest
+import Testing
 
 // MARK: - SchnorrTestGroup
 struct SchnorrTestGroup<V: SchnorrTestVector>: Codable {
@@ -49,13 +49,10 @@ struct SchnorrTestSignVector: SchnorrTestVector {
 }
 
 // MARK: - SchnorrSignatureBitcoinCoreTests
-final class SchnorrSignatureBitcoinCoreTests: XCTestCase {
-	override func setUp() {
-		super.setUp()
-		continueAfterFailure = false
-	}
-
-	func testSchnorrSignBitcoinVectors() throws {
+@Suite("Schnorr Signature BitcoinCore")
+struct SchnorrSignatureBitcoinCoreTests {
+	@Test
+	func schnorrSignBitcoinVectors() throws {
 		let _: TestResult = try testSuite(
 			/* https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv */
 			jsonName: "bip340_schnorr_sign",
@@ -68,7 +65,8 @@ final class SchnorrSignatureBitcoinCoreTests: XCTestCase {
 		)
 	}
 
-	func testSchnorrVerifyBitcoinVectors() throws {
+	@Test
+	func schnorrVerifyBitcoinVectors() throws {
 		let _: TestResult =
 			try testSuite(
 				/* https://github.com/bitcoin/bips/blob/master/bip-0340/test-vectors.csv */
@@ -91,11 +89,11 @@ private extension SchnorrSignatureBitcoinCoreTests {
 
 		let publicKey = privateKey.publicKey
 		let expectedPublicKey = try K1.Schnorr.PublicKey(compressedRepresentation: Data(hex: vector.publicKeyHex))
-		XCTAssertEqual(publicKey, expectedPublicKey)
+		#expect(publicKey == expectedPublicKey)
 
-		XCTAssertEqual(
-			publicKey.compressedRepresentation,
-			expectedPublicKey.compressedRepresentation
+		#expect(
+			publicKey.compressedRepresentation ==
+				expectedPublicKey.compressedRepresentation
 		)
 
 		let message = try Data(hex: vector.messageHex)
@@ -106,11 +104,11 @@ private extension SchnorrSignatureBitcoinCoreTests {
 
 		let expectedSig = try K1.Schnorr.Signature(rawRepresentation: Data(hex: vector.signatureCompact))
 
-		XCTAssertEqual(signature.rawRepresentation.hex, vector.signatureCompact)
+		#expect(signature.rawRepresentation.hex == vector.signatureCompact)
 
-		XCTAssertEqual(
-			publicKey.isValidSignature(expectedSig, hashed: message),
-			vector.isValid
+		#expect(
+			publicKey.isValidSignature(expectedSig, hashed: message) ==
+				vector.isValid
 		)
 	}
 
@@ -119,12 +117,8 @@ private extension SchnorrSignatureBitcoinCoreTests {
 			try .init(compressedRepresentation: Data(hex: vector.publicKeyHex))
 		}
 		guard !vector.invalidPublicKey else {
-			XCTAssertThrowsError(try parsePublicKey(), "") { anyError in
-				if let error = anyError as? K1.Error {
-					XCTAssertEqual(error, K1.Error.underlyingLibsecp256k1Error(.publicKeyParse))
-				} else {
-					XCTFail("Failed to cast error")
-				}
+			#expect(throws: K1.Error.underlyingLibsecp256k1Error(.publicKeyParse)) {
+				_ = try parsePublicKey()
 			}
 			return
 		}
@@ -136,7 +130,7 @@ private extension SchnorrSignatureBitcoinCoreTests {
 			signature, hashed: Data(hex: vector.messageHex)
 		)
 
-		XCTAssertEqual(validSignature, vector.isValid)
+		#expect(validSignature == vector.isValid)
 	}
 }
 
