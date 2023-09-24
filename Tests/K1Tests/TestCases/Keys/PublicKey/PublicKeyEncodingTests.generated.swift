@@ -4,20 +4,18 @@
 
 import Foundation
 @testable import K1
-import XCTest
+import Testing
 
-private extension XCTestCase {
-	func doTest<PubKey: _K1PublicKeyProtocol & Equatable, Encoding: Equatable>(
-		original makeOriginal: @autoclosure () -> PubKey,
-		serialize: KeyPath<PubKey, Encoding>,
-		deserialize: (Encoding) throws -> PubKey
-	) throws {
-		try doTestSerializationRoundtrip(
-			original: makeOriginal(),
-			serialize: serialize,
-			deserialize: deserialize
-		)
-	}
+private func doTest<PubKey: _K1PublicKeyProtocol & Equatable, Encoding: Equatable>(
+	original makeOriginal: @autoclosure () -> PubKey,
+	serialize: KeyPath<PubKey, Encoding>,
+	deserialize: (Encoding) throws -> PubKey
+) throws {
+	try doTestSerializationRoundtrip(
+		original: makeOriginal(),
+		serialize: serialize,
+		deserialize: deserialize
+	)
 }
 
 public func doTestSerializationRoundtrip<T, Enc>(
@@ -32,11 +30,11 @@ public func doTestSerializationRoundtrip<T, Enc>(
 		unique.insert(original)
 		let serialized = original[keyPath: serialize]
 		let deserialized = try deserialize(serialized)
-		XCTAssertEqual(deserialized, original)
+		#expect(deserialized == original)
 		let reserialized = deserialized[keyPath: serialize]
-		XCTAssertEqual(reserialized, serialized)
+		#expect(reserialized == serialized)
 	}
-	XCTAssertEqual(unique.count, count)
+	#expect(unique.count == count)
 }
 
 extension K1.Schnorr.PublicKey {
@@ -47,15 +45,17 @@ extension K1.Schnorr.PublicKey {
 }
 
 // MARK: - SchnorrPublicKeyEncodingDecodingRoundtripTests
-final class SchnorrPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
-	func test_pubkey_raw_is_x963_minus_prefix() throws {
+@Suite("K1.Schnorr.PublicKey")
+struct SchnorrPublicKeyEncodingDecodingRoundtripTests {
+	@Test
+	func pubkey_raw_is_x963_minus_prefix() throws {
 		let privateKey = K1.Schnorr.PrivateKey()
 		let publicKey = privateKey.publicKey
-
-		XCTAssertEqual(publicKey.rawRepresentation.hex, Data(publicKey.x963Representation.dropFirst()).hex)
+		#expect(publicKey.rawRepresentation.hex == Data(publicKey.x963Representation.dropFirst()).hex)
 	}
 
-	func testRawRoundtrip() throws {
+	@Test
+	func rawRoundtrip() throws {
 		try doTest(
 			original: K1.Schnorr.PublicKey(),
 			serialize: \.rawRepresentation,
@@ -63,7 +63,8 @@ final class SchnorrPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 		)
 	}
 
-	func testCompressedRoundtrip() throws {
+	@Test
+	func compressedRoundtrip() throws {
 		try doTest(
 			original: K1.Schnorr.PublicKey(),
 			serialize: \.compressedRepresentation,
@@ -71,7 +72,8 @@ final class SchnorrPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 		)
 	}
 
-	func testx963Roundtrip() throws {
+	@Test
+	func x963Roundtrip() throws {
 		try doTest(
 			original: K1.Schnorr.PublicKey(),
 			serialize: \.x963Representation,
@@ -79,7 +81,8 @@ final class SchnorrPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 		)
 	}
 
-	func testDERRoundtrip() throws {
+	@Test
+	func derRoundtrip() throws {
 		try doTest(
 			original: K1.Schnorr.PublicKey(),
 			serialize: \.derRepresentation,
@@ -87,7 +90,8 @@ final class SchnorrPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 		)
 	}
 
-	func testPEMRoundtrip() throws {
+	@Test
+	func pemRoundtrip() throws {
 		try doTest(
 			original: K1.Schnorr.PublicKey(),
 			serialize: \.pemRepresentation,
@@ -104,15 +108,17 @@ extension K1.ECDSA.PublicKey {
 }
 
 // MARK: - ECDSAPublicKeyEncodingDecodingRoundtripTests
-final class ECDSAPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
-	func test_pubkey_raw_is_x963_minus_prefix() throws {
+@Suite("K1.ECDSA.PublicKey")
+struct ECDSAPublicKeyEncodingDecodingRoundtripTests {
+	@Test
+	func pubkey_raw_is_x963_minus_prefix() throws {
 		let privateKey = K1.ECDSA.PrivateKey()
 		let publicKey = privateKey.publicKey
-
-		XCTAssertEqual(publicKey.rawRepresentation.hex, Data(publicKey.x963Representation.dropFirst()).hex)
+		#expect(publicKey.rawRepresentation.hex == Data(publicKey.x963Representation.dropFirst()).hex)
 	}
 
-	func testRawRoundtrip() throws {
+	@Test
+	func rawRoundtrip() throws {
 		try doTest(
 			original: K1.ECDSA.PublicKey(),
 			serialize: \.rawRepresentation,
@@ -120,7 +126,8 @@ final class ECDSAPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 		)
 	}
 
-	func testCompressedRoundtrip() throws {
+	@Test
+	func compressedRoundtrip() throws {
 		try doTest(
 			original: K1.ECDSA.PublicKey(),
 			serialize: \.compressedRepresentation,
@@ -128,7 +135,8 @@ final class ECDSAPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 		)
 	}
 
-	func testx963Roundtrip() throws {
+	@Test
+	func x963Roundtrip() throws {
 		try doTest(
 			original: K1.ECDSA.PublicKey(),
 			serialize: \.x963Representation,
@@ -136,7 +144,8 @@ final class ECDSAPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 		)
 	}
 
-	func testDERRoundtrip() throws {
+	@Test
+	func derRoundtrip() throws {
 		try doTest(
 			original: K1.ECDSA.PublicKey(),
 			serialize: \.derRepresentation,
@@ -144,7 +153,8 @@ final class ECDSAPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 		)
 	}
 
-	func testPEMRoundtrip() throws {
+	@Test
+	func pemRoundtrip() throws {
 		try doTest(
 			original: K1.ECDSA.PublicKey(),
 			serialize: \.pemRepresentation,
@@ -161,15 +171,17 @@ extension K1.ECDSAWithKeyRecovery.PublicKey {
 }
 
 // MARK: - ECDSAWithKeyRecoveryPublicKeyEncodingDecodingRoundtripTests
-final class ECDSAWithKeyRecoveryPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
-	func test_pubkey_raw_is_x963_minus_prefix() throws {
+@Suite("K1.ECDSAWithKeyRecovery.PublicKey")
+struct ECDSAWithKeyRecoveryPublicKeyEncodingDecodingRoundtripTests {
+	@Test
+	func pubkey_raw_is_x963_minus_prefix() throws {
 		let privateKey = K1.ECDSAWithKeyRecovery.PrivateKey()
 		let publicKey = privateKey.publicKey
-
-		XCTAssertEqual(publicKey.rawRepresentation.hex, Data(publicKey.x963Representation.dropFirst()).hex)
+		#expect(publicKey.rawRepresentation.hex == Data(publicKey.x963Representation.dropFirst()).hex)
 	}
 
-	func testRawRoundtrip() throws {
+	@Test
+	func rawRoundtrip() throws {
 		try doTest(
 			original: K1.ECDSAWithKeyRecovery.PublicKey(),
 			serialize: \.rawRepresentation,
@@ -177,7 +189,8 @@ final class ECDSAWithKeyRecoveryPublicKeyEncodingDecodingRoundtripTests: XCTestC
 		)
 	}
 
-	func testCompressedRoundtrip() throws {
+	@Test
+	func compressedRoundtrip() throws {
 		try doTest(
 			original: K1.ECDSAWithKeyRecovery.PublicKey(),
 			serialize: \.compressedRepresentation,
@@ -185,7 +198,8 @@ final class ECDSAWithKeyRecoveryPublicKeyEncodingDecodingRoundtripTests: XCTestC
 		)
 	}
 
-	func testx963Roundtrip() throws {
+	@Test
+	func x963Roundtrip() throws {
 		try doTest(
 			original: K1.ECDSAWithKeyRecovery.PublicKey(),
 			serialize: \.x963Representation,
@@ -193,7 +207,8 @@ final class ECDSAWithKeyRecoveryPublicKeyEncodingDecodingRoundtripTests: XCTestC
 		)
 	}
 
-	func testDERRoundtrip() throws {
+	@Test
+	func derRoundtrip() throws {
 		try doTest(
 			original: K1.ECDSAWithKeyRecovery.PublicKey(),
 			serialize: \.derRepresentation,
@@ -201,7 +216,8 @@ final class ECDSAWithKeyRecoveryPublicKeyEncodingDecodingRoundtripTests: XCTestC
 		)
 	}
 
-	func testPEMRoundtrip() throws {
+	@Test
+	func pemRoundtrip() throws {
 		try doTest(
 			original: K1.ECDSAWithKeyRecovery.PublicKey(),
 			serialize: \.pemRepresentation,
@@ -218,15 +234,17 @@ extension K1.KeyAgreement.PublicKey {
 }
 
 // MARK: - KeyAgreementPublicKeyEncodingDecodingRoundtripTests
-final class KeyAgreementPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
-	func test_pubkey_raw_is_x963_minus_prefix() throws {
+@Suite("K1.KeyAgreement.PublicKey")
+struct KeyAgreementPublicKeyEncodingDecodingRoundtripTests {
+	@Test
+	func pubkey_raw_is_x963_minus_prefix() throws {
 		let privateKey = K1.KeyAgreement.PrivateKey()
 		let publicKey = privateKey.publicKey
-
-		XCTAssertEqual(publicKey.rawRepresentation.hex, Data(publicKey.x963Representation.dropFirst()).hex)
+		#expect(publicKey.rawRepresentation.hex == Data(publicKey.x963Representation.dropFirst()).hex)
 	}
 
-	func testRawRoundtrip() throws {
+	@Test
+	func rawRoundtrip() throws {
 		try doTest(
 			original: K1.KeyAgreement.PublicKey(),
 			serialize: \.rawRepresentation,
@@ -234,7 +252,8 @@ final class KeyAgreementPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 		)
 	}
 
-	func testCompressedRoundtrip() throws {
+	@Test
+	func compressedRoundtrip() throws {
 		try doTest(
 			original: K1.KeyAgreement.PublicKey(),
 			serialize: \.compressedRepresentation,
@@ -242,7 +261,8 @@ final class KeyAgreementPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 		)
 	}
 
-	func testx963Roundtrip() throws {
+	@Test
+	func x963Roundtrip() throws {
 		try doTest(
 			original: K1.KeyAgreement.PublicKey(),
 			serialize: \.x963Representation,
@@ -250,7 +270,8 @@ final class KeyAgreementPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 		)
 	}
 
-	func testDERRoundtrip() throws {
+	@Test
+	func derRoundtrip() throws {
 		try doTest(
 			original: K1.KeyAgreement.PublicKey(),
 			serialize: \.derRepresentation,
@@ -258,7 +279,8 @@ final class KeyAgreementPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 		)
 	}
 
-	func testPEMRoundtrip() throws {
+	@Test
+	func pemRoundtrip() throws {
 		try doTest(
 			original: K1.KeyAgreement.PublicKey(),
 			serialize: \.pemRepresentation,

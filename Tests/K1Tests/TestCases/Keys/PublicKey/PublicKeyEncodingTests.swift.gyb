@@ -4,20 +4,18 @@
 
 import Foundation
 @testable import K1
-import XCTest
+import Testing
 
-private extension XCTestCase {
-	func doTest<PubKey: _K1PublicKeyProtocol & Equatable, Encoding: Equatable>(
-		original makeOriginal: @autoclosure () -> PubKey,
-		serialize: KeyPath<PubKey, Encoding>,
-		deserialize: (Encoding) throws -> PubKey
-	) throws {
-		try doTestSerializationRoundtrip(
-			original: makeOriginal(),
-			serialize: serialize,
-			deserialize: deserialize
-		)
-	}
+private func doTest<PubKey: _K1PublicKeyProtocol & Equatable, Encoding: Equatable>(
+	original makeOriginal: @autoclosure () -> PubKey,
+	serialize: KeyPath<PubKey, Encoding>,
+	deserialize: (Encoding) throws -> PubKey
+) throws {
+	try doTestSerializationRoundtrip(
+		original: makeOriginal(),
+		serialize: serialize,
+		deserialize: deserialize
+	)
 }
 
 public func doTestSerializationRoundtrip<T, Enc>(
@@ -32,11 +30,11 @@ public func doTestSerializationRoundtrip<T, Enc>(
 		unique.insert(original)
 		let serialized = original[keyPath: serialize]
 		let deserialized = try deserialize(serialized)
-		XCTAssertEqual(deserialized, original)
+		#expect(deserialized == original)
 		let reserialized = deserialized[keyPath: serialize]
-		XCTAssertEqual(reserialized, serialized)
+		#expect(reserialized == serialized)
 	}
-	XCTAssertEqual(unique.count, count)
+	#expect(unique.count == count)
 }
 
 
@@ -59,17 +57,20 @@ extension ${PUBLIC_KEY_TYPE} {
 }
 
 // MARK: ${PUBLIC_KEY_TYPE} Tests
-final class ${FEATURE.replace('.','')+"PublicKey"}EncodingDecodingRoundtripTests: XCTestCase {
+
+@Suite("${PUBLIC_KEY_TYPE}")
+struct ${FEATURE.replace('.','')+"PublicKey"}EncodingDecodingRoundtripTests {
 	
-	func test_pubkey_raw_is_x963_minus_prefix() throws {
+	@Test
+	func pubkey_raw_is_x963_minus_prefix() throws {
 		
 		let privateKey = ${MODULE}.PrivateKey()
 		let publicKey = privateKey.publicKey
-
-		XCTAssertEqual(publicKey.rawRepresentation.hex, Data(publicKey.x963Representation.dropFirst()).hex)
+		#expect(publicKey.rawRepresentation.hex == Data(publicKey.x963Representation.dropFirst()).hex)
 	}
 
-	func testRawRoundtrip() throws {
+	@Test
+	func rawRoundtrip() throws {
 		try doTest(
 			original: ${PUBLIC_KEY_TYPE}(),
 			serialize: \.rawRepresentation,
@@ -77,7 +78,8 @@ final class ${FEATURE.replace('.','')+"PublicKey"}EncodingDecodingRoundtripTests
 		)
 	}
 
-	func testCompressedRoundtrip() throws {
+	@Test
+	func compressedRoundtrip() throws {
 		try doTest(
 			original: ${PUBLIC_KEY_TYPE}(),
 			serialize: \.compressedRepresentation,
@@ -85,7 +87,8 @@ final class ${FEATURE.replace('.','')+"PublicKey"}EncodingDecodingRoundtripTests
 		)
 	}
 
-	func testx963Roundtrip() throws {
+	@Test
+	func x963Roundtrip() throws {
 		try doTest(
 			original: ${PUBLIC_KEY_TYPE}(),
 			serialize: \.x963Representation,
@@ -93,7 +96,8 @@ final class ${FEATURE.replace('.','')+"PublicKey"}EncodingDecodingRoundtripTests
 		)
 	}
 
-	func testDERRoundtrip() throws {
+	@Test
+	func derRoundtrip() throws {
 		try doTest(
 			original: ${PUBLIC_KEY_TYPE}(),
 			serialize: \.derRepresentation,
@@ -101,7 +105,8 @@ final class ${FEATURE.replace('.','')+"PublicKey"}EncodingDecodingRoundtripTests
 		)
 	}
 
-	func testPEMRoundtrip() throws {
+	@Test
+	func pemRoundtrip() throws {
 		try doTest(
 			original: ${PUBLIC_KEY_TYPE}(),
 			serialize: \.pemRepresentation,
