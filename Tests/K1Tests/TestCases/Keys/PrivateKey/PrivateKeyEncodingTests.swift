@@ -1,31 +1,36 @@
 import Foundation
 @testable import K1
-import XCTest
+import Testing
 
 // MARK: - PrivateKeyEncodingTests
-final class PrivateKeyEncodingTests: XCTestCase {
-	func testRawRoundtrip() throws {
+@Suite("PrivateKeyEncodingTests")
+struct PrivateKeyEncodingTests {
+	@Test
+	func rawRoundtrip() throws {
 		try doTest(
 			serialize: \.rawRepresentation,
 			deserialize: K1.ECDSA.PrivateKey.init(rawRepresentation:)
 		)
 	}
 
-	func testx963Roundtrip() throws {
+	@Test
+	func x963Roundtrip() throws {
 		try doTest(
 			serialize: \.x963Representation,
 			deserialize: K1.ECDSA.PrivateKey.init(x963Representation:)
 		)
 	}
 
-	func testDERRoundtrip() throws {
+	@Test
+	func derRoundtrip() throws {
 		try doTest(
 			serialize: \.derRepresentation,
 			deserialize: K1.ECDSA.PrivateKey.init(derRepresentation:)
 		)
 	}
 
-	func testPEMRoundtrip() throws {
+	@Test
+	func pemRoundtrip() throws {
 		try doTest(
 			serialize: \.pemRepresentation,
 			deserialize: K1.ECDSA.PrivateKey.init(pemRepresentation:)

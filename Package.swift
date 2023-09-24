@@ -1,4 +1,4 @@
-// swift-tools-version:5.5
+// swift-tools-version:5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -22,10 +22,7 @@ let cSettings: [CSetting] = [
 let package = Package(
 	name: "K1",
 	platforms: [
-		.iOS(.v13),
-		.macOS(.v11),
-		.tvOS(.v13),
-		.watchOS(.v6),
+		.macOS("13.0"), .iOS("16.0"), .watchOS("9.0"), .tvOS("16.0"),
 	],
 	products: [
 		.library(
@@ -35,7 +32,9 @@ let package = Package(
 			]
 		),
 	],
-	dependencies: [],
+	dependencies: [
+		.package(url: "https://github.com/apple/swift-testing.git", branch: "main"),
+	],
 	targets: [
 		// Target `libsecp256k1` https://github.com/bitcoin-core/secp256k1
 		.target(
@@ -85,6 +84,7 @@ let package = Package(
 			name: "K1Tests",
 			dependencies: [
 				"K1",
+				.product(name: "Testing", package: "swift-testing"),
 			],
 			exclude: [
 				"TestCases/Keys/PublicKey/PublicKeyEncodingTests.swift.gyb",
