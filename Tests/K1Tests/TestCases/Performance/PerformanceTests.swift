@@ -2,6 +2,9 @@ import Foundation
 import K1
 @testable @_spi(ExperimentalTestRunning) @_spi(ExperimentalEventHandling) @_spi(ExperimentalParameterizedTesting) import Testing
 
+// swiftformat:disable all
+// Disable unwanted change from "#expect(try" -> "#expecttry ("
+
 // MARK: - PerformanceTests
 @Suite("Performance")
 struct PerformanceTests {
@@ -60,14 +63,14 @@ private func doTest() throws {
 			ecdsa
 	)
 
-	#expecttry (
-		K1.ECDSA.Signature(rawRepresentation: ecdsa.nonRecoverable().rawRepresentation) ==
-			ecdsa.nonRecoverable()
+	#expect(
+		try K1.ECDSA.Signature(rawRepresentation: ecdsa.nonRecoverable().rawRepresentation)
+			== ecdsa.nonRecoverable()
 	)
 
-	#expecttry (
-		K1.ECDSA.Signature(derRepresentation: ecdsa.nonRecoverable().derRepresentation) ==
-			ecdsa.nonRecoverable()
+	#expect(
+		try K1.ECDSA.Signature(derRepresentation: ecdsa.nonRecoverable().derRepresentation)
+			== ecdsa.nonRecoverable()
 	)
 
 	let schnorr = try schnorrPrivateKey.signature(for: message)
