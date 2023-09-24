@@ -1,18 +1,21 @@
 import CryptoKit
 import Foundation
 import K1
-import XCTest
+import Testing
 
-final class SchnorrSignatureTests: XCTestCase {
-	func testSchnorr() throws {
+@Suite("Schnorr signature")
+struct SchnorrSignatureTests {
+	@Test
+	func schnorr() throws {
 		let alice = K1.Schnorr.PrivateKey()
 		let message = "Send Bob 3 BTC".data(using: .utf8)!
 		let signature = try alice.signature(forUnhashed: message)
 		let isSignatureValid = alice.publicKey.isValidSignature(signature, unhashed: message)
-		XCTAssertTrue(isSignatureValid, "Signature should be valid.")
+		#expect(isSignatureValid, "Signature should be valid.")
 	}
 
-	func testSchnorrAssertRandomAuxIsUsedByDefault() throws {
+	@Test
+	func schnorrAssertRandomAuxIsUsedByDefault() throws {
 		func doTest(aux: K1.Schnorr.SigningOptions.AuxiliaryRandomData, expectUnique: Bool) throws {
 			let count = 100
 			var signatures = Set<K1.Schnorr.Signature>()
@@ -21,13 +24,13 @@ final class SchnorrSignatureTests: XCTestCase {
 			let hashed = SHA256.hash(data: message)
 			for _ in 0 ..< count {
 				let signature = try alice.signature(for: hashed, options: .init(auxiliaryRandomData: aux))
-				XCTAssertTrue(alice.publicKey.isValidSignature(signature, digest: hashed))
+				#expect(alice.publicKey.isValidSignature(signature, digest: hashed))
 				signatures.insert(signature)
 			}
 			if expectUnique {
-				XCTAssertEqual(signatures.count, count)
+				#expect(signatures.count == count)
 			} else {
-				XCTAssertEqual(signatures.count, 1)
+				#expect(signatures.count == 1)
 			}
 		}
 
