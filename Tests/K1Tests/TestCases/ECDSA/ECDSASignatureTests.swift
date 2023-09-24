@@ -1,20 +1,22 @@
 import CryptoKit
 import Foundation
 @testable import K1
-import XCTest
+import Testing
 
-final class ECDSASignatureTests: XCTestCase {
-	func testECDSADeterministic() throws {
+@Suite("ECDSASignatureTests")
+struct ECDSASignatureTests {
+	@Test
+	func ecdasDeterministic() throws {
 		let alice = K1.ECDSA.PrivateKey()
 		let message = "Send Bob 3 BTC".data(using: .utf8)!
 
 		let signature = try alice.signature(forUnhashed: message)
 		let isSignatureValid = alice.publicKey.isValidSignature(signature, unhashed: message)
-		XCTAssertTrue(isSignatureValid, "Signature should be valid.")
+		#expect(isSignatureValid, "Signature should be valid.")
 	}
 
-	func testECDSARandom() throws {
-		continueAfterFailure = false
+	@Test
+	func ecdsaRandom() throws {
 		let alice = K1.ECDSA.PrivateKey()
 		let message = "Send Bob 3 BTC".data(using: .utf8)!
 
@@ -30,8 +32,8 @@ final class ECDSASignatureTests: XCTestCase {
 				signature,
 				unhashed: message
 			)
-			XCTAssertTrue(isSignatureValid, "Signature should be valid.")
-			XCTAssertEqual(signatures.count, i)
+			#expect(isSignatureValid, "Signature should be valid.")
+			#expect(signatures.count == i)
 			signatures.insert(signature)
 		}
 	}
