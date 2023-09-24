@@ -12,10 +12,10 @@
     {
       "identity" : "swift-testing",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/sajjon/swift-testing.git",
+      "location" : "https://github.com/apple/swift-testing.git",
       "state" : {
-        "branch" : "cli_test_output",
-        "revision" : "6fe124e84f2bcafcbd05afc7fb0acb483f758def"
+        "branch" : "main",
+        "revision" : "bf42de1b50ad2517da2a1b43a7c43a8862450d7f"
       }
     }
   ],

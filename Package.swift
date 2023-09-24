@@ -33,7 +33,7 @@ let package = Package(
 		),
 	],
 	dependencies: [
-		.package(url: "https://github.com/sajjon/swift-testing.git", branch: "cli_test_output"),
+		.package(url: "https://github.com/apple/swift-testing.git", branch: "main"),
 	],
 	targets: [
 		// Target `libsecp256k1` https://github.com/bitcoin-core/secp256k1

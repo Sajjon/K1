@@ -11,8 +11,8 @@ struct APITest {
 		let publicKey: K1.ECDSA.PublicKey = privateKey.publicKey
 		let hashed = Data(SHA256.hash(data: Data("Hey Bob!".utf8)))
 		let signature = try privateKey.signature(for: hashed)
-		let isValid = publicKey.isValidSignature(signature, hashed: hashed)
-		#expect(isValid)
+
+		#expect(publicKey.isValidSignature(signature, hashed: hashed))
 
 		// Wrong public key
 		#expect(
