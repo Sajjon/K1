@@ -21,12 +21,14 @@
 
 import Foundation
 @testable import K1
-import XCTest
+import Testing
 
 // MARK: - ECDHWycheproofTests
-final class ECDHWycheproofTests: XCTestCase {
-	func testECDHWycheproof() throws {
-		let _ = try testSuite(
+@Suite("ECDHWycheproofTests")
+struct ECDHWycheproofTests {
+	@Test
+	func ecdhWycheproof() throws {
+		_ = try testSuite(
 			jsonName: "wycheproof_ecdh_ASN1x963",
 			testFunction: { (group: ECDHTestGroup) in
 				testGroup(group: group)
@@ -88,10 +90,10 @@ private extension ECDHWycheproofTests {
 				let got = sharedPublicKeyPoint.withUnsafeBytes {
 					Data($0)
 				}
-				XCTAssertEqual(got.hex, testVector.shared, file: file, line: line)
+				#expect(got.hex == testVector.shared) // , file: file, line: line)
 			} catch {
 				if testVector.result != "invalid" {
-					XCTFail("Failed with error: \(String(describing: error)), test vector: \(String(describing: testVector))")
+					Issue.record("Failed with error: \(String(describing: error)), test vector: \(String(describing: testVector))")
 				}
 			}
 		}

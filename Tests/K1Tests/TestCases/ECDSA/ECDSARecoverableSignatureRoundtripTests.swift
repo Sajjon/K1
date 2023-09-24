@@ -1,13 +1,15 @@
 import Foundation
 import K1
-import XCTest
+import Testing
 
-final class ECDSARecoverableSignatureRoundtripTests: XCTestCase {
-	func testECDSARecoverable() throws {
+@Suite("ECDSARecoverableSignatureRoundtripTests")
+struct ECDSARecoverableSignatureRoundtripTests {
+	@Test
+	func ecdsaRecoverable() throws {
 		let alice = K1.ECDSAWithKeyRecovery.PrivateKey()
 		let message = "Send Bob 3 BTC".data(using: .utf8)!
 		let signature = try alice.signature(forUnhashed: message)
 		let isSignatureValid = alice.publicKey.isValidSignature(signature, unhashed: message)
-		XCTAssertTrue(isSignatureValid, "Signature should be valid.")
+		#expect(isSignatureValid, "Signature should be valid.")
 	}
 }
