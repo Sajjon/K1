@@ -1,6 +1,7 @@
 import CryptoKit
+import Foundation
 @testable import K1
-import XCTest
+import Testing
 
 // MARK: - ECDSASignatureTrezorsTests
 /// Test vectors from [trezor][trezor], signature data from [oleganza][oleganza]
@@ -11,8 +12,11 @@ import XCTest
 /// [oleganza]: https://github.com/oleganza/CoreBitcoin/blob/master/CoreBitcoinTestsOSX/BTCKeyTests.swift
 /// [bitcointalk1]: https://bitcointalk.org/index.php?topic=285142.msg3300992#msg3300992
 /// [bitcointalk2]: https://bitcointalk.org/index.php?topic=285142.msg3299061#msg3299061
-final class ECDSASignatureTrezorsTests: XCTestCase {
-	func testTrezorSecp256k1() throws {
+
+@Suite("ECDSASignatureTrezorsTests")
+struct ECDSASignatureTrezorsTests {
+	@Test
+	func trezorSecp256k1() throws {
 		let _: TestResult = try testSuite(
 			jsonName: "trezor_ecdsa_sign_rfc6979",
 			testFunction: { group in
@@ -24,51 +28,49 @@ final class ECDSASignatureTrezorsTests: XCTestCase {
 	}
 }
 
-private extension XCTestCase {
-	func doTestGroup(
-		group: ECDSATestGroup<SignatureTrezorTestVector>,
-		file: StaticString = #file,
-		line: UInt = #line
-	) throws -> ResultOfTestGroup {
-		var numberOfTestsRun = 0
-		for vector in group.tests {
-			let privateKey = try K1.ECDSA.PrivateKey(rawRepresentation: Data(hex: vector.privateKey))
-			let publicKey: K1.ECDSA.PublicKey = privateKey.publicKey
+private func doTestGroup(
+	group: ECDSATestGroup<SignatureTrezorTestVector>,
+	file: StaticString = #file,
+	line: UInt = #line
+) throws -> ResultOfTestGroup {
+	var numberOfTestsRun = 0
+	for vector in group.tests {
+		let privateKey = try K1.ECDSA.PrivateKey(rawRepresentation: Data(hex: vector.privateKey))
+		let publicKey: K1.ECDSA.PublicKey = privateKey.publicKey
 
-			let expectedSignature = try vector.expectedSignature()
-			let messageDigest = try vector.messageDigest()
-			XCTAssertTrue(publicKey.isValidSignature(expectedSignature, digest: messageDigest))
+		let expectedSignature = try vector.expectedSignature()
+		let messageDigest = try vector.messageDigest()
+		#expect(publicKey.isValidSignature(expectedSignature, digest: messageDigest))
 
-			let signatureFromMessage = try privateKey.signature(for: messageDigest)
-			XCTAssertEqual(signatureFromMessage, expectedSignature)
+		let signatureFromMessage = try privateKey.signature(for: messageDigest)
+		#expect(signatureFromMessage == expectedSignature)
 
-			let signatureRandom = try privateKey.signature(
-				for: messageDigest,
-				options: .init(nonceFunction: .random)
-			)
+		let signatureRandom = try privateKey.signature(
+			for: messageDigest,
+			options: .init(nonceFunction: .random)
+		)
 
-			XCTAssertNotEqual(signatureRandom, expectedSignature)
-			XCTAssertTrue(publicKey.isValidSignature(signatureRandom, digest: messageDigest))
+		#expect(signatureRandom != expectedSignature)
+		#expect(publicKey.isValidSignature(signatureRandom, digest: messageDigest))
 
-			let privateKeyRecoverable = try K1.ECDSAWithKeyRecovery.PrivateKey(rawRepresentation: privateKey.rawRepresentation)
-			let signatureRecoverableFromMessage = try privateKeyRecoverable.signature(for: messageDigest)
-			try XCTAssertEqual(signatureRecoverableFromMessage.nonRecoverable(), expectedSignature)
-			let recid = try signatureRecoverableFromMessage.compact().recoveryID
+		let privateKeyRecoverable = try K1.ECDSAWithKeyRecovery.PrivateKey(rawRepresentation: privateKey.rawRepresentation)
+		let signatureRecoverableFromMessage = try privateKeyRecoverable.signature(for: messageDigest)
+		try #expect(signatureRecoverableFromMessage.nonRecoverable() == expectedSignature)
+		let recid = try signatureRecoverableFromMessage.compact().recoveryID
 
-			XCTAssertEqual(
-				signatureRecoverableFromMessage.internalRepresentation.hex,
+		#expect(
+			signatureRecoverableFromMessage.internalRepresentation.hex ==
 				expectedSignature.internalRepresentation.hex + "\(Data([UInt8(recid.rawValue)]).hex)"
-			)
+		)
 
-			try XCTAssertEqual(
-				signatureRecoverableFromMessage.compact().serialize(format: .rsv).hex,
-				expectedSignature.rawRepresentation.hex + "\(Data([UInt8(recid.rawValue)]).hex)"
-			)
+		let expectedSignatureWithRecid = expectedSignature.rawRepresentation.hex + "\(Data([UInt8(recid.rawValue)]).hex)"
+		try #expect(
+			signatureRecoverableFromMessage.compact().serialize(format: .rsv).hex == expectedSignatureWithRecid
+		)
 
-			numberOfTestsRun += 1
-		}
-		return .init(numberOfTestsRun: numberOfTestsRun, idsOmittedTests: [])
+		numberOfTestsRun += 1
 	}
+	return .init(numberOfTestsRun: numberOfTestsRun, idsOmittedTests: [])
 }
 
 // MARK: - SignatureTrezorTestVector
@@ -96,19 +98,18 @@ private struct SignatureTrezorTestVector: SignatureTestVector {
 	func expectedSignature() throws -> Signature {
 		let derData = try Data(hex: expected.der)
 		let signature = try K1.ECDSA.Signature(derRepresentation: derData)
-		XCTAssertEqual(signature.derRepresentation.hex, expected.der)
-		XCTAssertEqual(
-			signature.rawRepresentation.hex,
-			[
-				expected.r,
-				expected.s,
-			].joined(separator: "")
+		#expect(signature.derRepresentation.hex == expected.der)
+		#expect(
+			signature.rawRepresentation.hex ==
+				[
+					expected.r,
+					expected.s,
+				].joined(separator: "")
 		)
 
-		try XCTAssertEqual(
-			K1.ECDSA.Signature(rawRepresentation: Data(hex: expected.r + expected.s)),
-			signature
-		)
+		let expectedSignature = try K1.ECDSA.Signature(rawRepresentation: Data(hex: expected.r + expected.s))
+
+		#expect(signature == expectedSignature)
 
 		return signature
 	}
