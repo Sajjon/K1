@@ -1,53 +1,56 @@
 import CryptoKit
 import Foundation
 import K1 // not `@testable import`!!
-import XCTest
+import Testing
 
-final class APITest: XCTestCase {
-	func testECDSA() throws {
+@Suite("API")
+struct APITest {
+	@Test
+	func ecdsa() throws {
 		let privateKey: K1.ECDSA.PrivateKey = .init()
 		let publicKey: K1.ECDSA.PublicKey = privateKey.publicKey
 		let hashed = Data(SHA256.hash(data: Data("Hey Bob!".utf8)))
 		let signature = try privateKey.signature(for: hashed)
 		let isValid = publicKey.isValidSignature(signature, hashed: hashed)
-		XCTAssertTrue(isValid)
+		#expect(isValid)
 
 		// Wrong public key
-		XCTAssertFalse(
-			type(of: privateKey).init().publicKey.isValidSignature(signature, hashed: hashed),
+		#expect(
+			!type(of: privateKey).init().publicKey.isValidSignature(signature, hashed: hashed),
 			"When wrong public key is used to validate signature, validation should fail."
 		)
 
 		// Modify message
-		XCTAssertFalse(
-			publicKey.isValidSignature(signature, hashed: Data(hashed.reversed())),
+		#expect(
+			!publicKey.isValidSignature(signature, hashed: Data(hashed.reversed())),
 			"When the wrong message is used during validation of signature, validation should fail."
 		)
 
 		// Modify signature
-		try XCTAssertFalse(
-			publicKey.isValidSignature(.init(rawRepresentation: signature.rawRepresentation.reversed()), hashed: hashed),
+		try #expect(
+			!publicKey.isValidSignature(.init(rawRepresentation: signature.rawRepresentation.reversed()), hashed: hashed),
 			"Tampered signatures should fail validation."
 		)
 	}
 
-	func testECDSAWithRecovery() throws {
+	@Test
+	func ecdsaWithRecovery() throws {
 		let privateKey: K1.ECDSAWithKeyRecovery.PrivateKey = .init()
 		let publicKey: K1.ECDSAWithKeyRecovery.PublicKey = privateKey.publicKey
 		let hashed = Data(SHA256.hash(data: Data("Hey Bob!".utf8)))
 		let signature = try privateKey.signature(for: hashed)
 		let isValid = publicKey.isValidSignature(signature, hashed: hashed)
-		XCTAssertTrue(isValid)
+		#expect(isValid)
 
 		// Wrong public key
-		XCTAssertFalse(
-			type(of: privateKey).init().publicKey.isValidSignature(signature, hashed: hashed),
+		#expect(
+			!type(of: privateKey).init().publicKey.isValidSignature(signature, hashed: hashed),
 			"When wrong public key is used to validate signature, validation should fail."
 		)
 
 		// Modify message
-		XCTAssertFalse(
-			publicKey.isValidSignature(signature, hashed: Data(hashed.reversed())),
+		#expect(
+			!publicKey.isValidSignature(signature, hashed: Data(hashed.reversed())),
 			"When the wrong message is used during validation of signature, validation should fail."
 		)
 
@@ -58,44 +61,47 @@ final class APITest: XCTestCase {
 			let v = compact.recoveryID
 			return try K1.ECDSAWithKeyRecovery.Signature(compact: .init(compact: .init(rs.reversed()), recoveryID: v))
 		}()
-		XCTAssertFalse(
-			publicKey.isValidSignature(modifiedSignature, hashed: hashed),
+
+		#expect(
+			!publicKey.isValidSignature(modifiedSignature, hashed: hashed),
 			"Tampered signatures should fail validation."
 		)
 	}
 
-	func testSchnorr() throws {
+	@Test
+	func schnorr() throws {
 		let privateKey: K1.Schnorr.PrivateKey = .init()
 		let publicKey: K1.Schnorr.PublicKey = privateKey.publicKey
 		let hashed = Data(SHA256.hash(data: Data("Hey Bob!".utf8)))
 		let signature = try privateKey.signature(for: hashed)
 		let isValid = publicKey.isValidSignature(signature, hashed: hashed)
-		XCTAssertTrue(isValid)
+		#expect(isValid)
 
 		// Wrong public key
-		XCTAssertFalse(
-			type(of: privateKey).init().publicKey.isValidSignature(signature, hashed: hashed),
+		#expect(
+			!type(of: privateKey).init().publicKey.isValidSignature(signature, hashed: hashed),
 			"When wrong public key is used to validate signature, validation should fail."
 		)
 
 		// Modify message
-		XCTAssertFalse(
-			publicKey.isValidSignature(signature, hashed: Data(hashed.reversed())),
+		#expect(
+			!publicKey.isValidSignature(signature, hashed: Data(hashed.reversed())),
 			"When the wrong message is used during validation of signature, validation should fail."
 		)
 
 		// Modify signature
-		try XCTAssertFalse(
-			publicKey.isValidSignature(.init(rawRepresentation: signature.rawRepresentation.reversed()), hashed: hashed),
+		try #expect(
+			!publicKey.isValidSignature(.init(rawRepresentation: signature.rawRepresentation.reversed()), hashed: hashed),
 			"Tampered signatures should fail validation."
 		)
 	}
 
-	func testECDH() throws {
+	@Test
+	func eCDH() throws {
 		let alice = K1.KeyAgreement.PrivateKey()
 		let bob = K1.KeyAgreement.PrivateKey()
 		let ab = try alice.sharedSecretFromKeyAgreement(with: bob.publicKey)
 		let ba = try bob.sharedSecretFromKeyAgreement(with: alice.publicKey)
-		XCTAssertEqual(ab, ba)
+		#expect(ab == ba)
 	}
 }
