@@ -22,11 +22,13 @@
 import CryptoKit
 import Foundation
 @testable import K1
-import XCTest
+import Testing
 
 // MARK: - ECDSA_Wycheproof_ASN_DER_EncodedSignaturesTests
-final class ECDSA_Wycheproof_ASN_DER_EncodedSignaturesTests: XCTestCase {
-	func testWycheProofSecp256k1_DER() throws {
+@Suite("ECDSA Wycheproof ASN DER EncodedSignatures")
+struct ECDSA_Wycheproof_ASN_DER_EncodedSignaturesTests {
+	@Test
+	func wycheProofSecp256k1_DER() throws {
 		let _: TestResult = try testSuite(
 			/* https://github.com/google/wycheproof/blob/master/testvectors/ecdsa_secp256k1_sha256_test.json */
 			jsonName: "wycheproof_ecdsa_verify_der",
@@ -64,7 +66,7 @@ private struct SignatureWycheproofDERTestVector: WycheproofTestVector {
 		let derData = try Data(hex: sig)
 		let signature = try K1.ECDSA.Signature(derRepresentation: derData)
 		if self.result == "valid" {
-			XCTAssertEqual(sig, signature.derRepresentation.hex)
+			#expect(sig == signature.derRepresentation.hex)
 		}
 		return signature
 	}
