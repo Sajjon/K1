@@ -30,7 +30,7 @@ extension FFI.ECDH {
 		///
 		case noHashWholePoint
 
-		func hashfp() -> (Optional< @convention(c) (UnsafeMutablePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafeMutableRawPointer?) -> Int32>) {
+		func hashfp() -> ((@convention(c) (UnsafeMutablePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafeMutableRawPointer?) -> Int32)?) {
 			switch self {
 			case .libsecp256kDefault: return secp256k1_ecdh_hash_function_default
 			case .ansiX963: return ecdh_asn1_x963
@@ -59,7 +59,7 @@ extension FFI.ECDH {
 			repeating: 0,
 			count: hashFp.outputByteCount
 		)
-		var arbitraryData: [UInt8]? = {
+		let arbitraryData: [UInt8]? = {
 			switch hashFp {
 			case let .libsecp256kDefault(arbitraryData?): return [UInt8](arbitraryData)
 			case .libsecp256kDefault(.none): return nil
@@ -70,14 +70,27 @@ extension FFI.ECDH {
 		try FFI.call(
 			ifFailThrow: .ecdh
 		) { context in
-			secp256k1_ecdh(
-				context,
-				&sharedPublicPointBytes, // output
-				&publicKeyRaw, // pubkey
-				privateKey.secureBytes.backing.bytes, // seckey
-				hashFp.hashfp(), // hashfp
-				&arbitraryData // arbitrary data pointer that is passed through to hashfp
-			)
+			if var arbitraryData {
+				arbitraryData.withUnsafeMutableBytes { ptr in
+					secp256k1_ecdh(
+						context,
+						&sharedPublicPointBytes, // output
+						&publicKeyRaw, // pubkey
+						privateKey.secureBytes.backing.bytes, // seckey
+						hashFp.hashfp(), // hashfp
+						ptr.baseAddress // properly formed pointer
+					)
+				}
+			} else {
+				secp256k1_ecdh(
+					context,
+					&sharedPublicPointBytes,
+					&publicKeyRaw,
+					privateKey.secureBytes.backing.bytes,
+					hashFp.hashfp(),
+					nil // No arbitrary data
+				)
+			}
 		}
 
 		return Data(sharedPublicPointBytes)
