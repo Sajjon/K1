@@ -5,6 +5,9 @@
 
 _K1_ is Swift wrapper around [libsecp256k1 (bitcoin-core/secp256k1)][lib], offering ECDSA, Schnorr ([BIP340][bip340]) and ECDH features.
 
+> [!NOTE]
+> Current `libsecp256k1` version is [0.6.0 (0cdc758a56360bf58a851fe91085a327ec97685a)](https://github.com/bitcoin-core/secp256k1/commit/0cdc758a56360bf58a851fe91085a327ec97685a)
+
 # Documentation
 Read full documentation [here on SwiftPackageIndex][doc].
 
@@ -246,14 +249,11 @@ assert(ab.count == 65) // pass
 
 # Development
 
-Stand in root and run
+Stand in root and run to setup submodules
 
 ```sh
-./scripts/bootstrap.sh
+make submodules
 ```
-
-To clone the dependency [libsecp256k1][lib], using commit [427bc3cdcfbc74778070494daab1ae5108c71368](https://github.com/bitcoin-core/secp256k1/commit/427bc3cdcfbc74778070494daab1ae5108c71368) (semver 0.3.0)
-
 
 ## `gyb`
 
