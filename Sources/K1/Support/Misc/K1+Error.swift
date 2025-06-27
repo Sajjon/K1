@@ -92,6 +92,9 @@ extension FFI {
 
 		/// `secp256k1_ec_pubkey_create`
 		case publicKeyCreate
+
+		/// Group operation (point addition, subtraction, etc.) failed
+		case groupOperation
 	}
 }
 
@@ -156,6 +159,8 @@ extension K1.Error: CustomDebugStringConvertible {
 					return "Schnorr sign"
 				case .publicKeyCreate:
 					return "PublicKey create"
+				case .groupOperation:
+					return "Group operation"
 				}
 			}()
 			return "libsecp256k \(call) failed."
