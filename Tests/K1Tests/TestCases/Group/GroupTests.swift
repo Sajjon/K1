@@ -4,13 +4,13 @@ import XCTest
 final class GroupTests: XCTestCase {
 	
 	func testPointCreation() throws {
-		// Test creating a point from coordinates
-		let x = Data(repeating: 1, count: 32)
-		let y = Data(repeating: 2, count: 32)
-		let point = try K1.Group.Point(x: x, y: y)
+		// Create a valid point from a public key
+		let privateKey = K1.KeyAgreement.PrivateKey()
+		let publicKey = privateKey.publicKey
+		let point = try K1.Group.Point(publicKey: publicKey)
 		
-		XCTAssertEqual(point.x, x)
-		XCTAssertEqual(point.y, y)
+		XCTAssertEqual(point.x.count, 32)
+		XCTAssertEqual(point.y.count, 32)
 		XCTAssertFalse(point.isInfinity)
 	}
 	
@@ -30,10 +30,10 @@ final class GroupTests: XCTestCase {
 	}
 	
 	func testPointNegation() throws {
-		// Create a point
-		let x = Data(repeating: 1, count: 32)
-		let y = Data(repeating: 2, count: 32)
-		let point = try K1.Group.Point(x: x, y: y)
+		// Create a valid point from a public key
+		let privateKey = K1.KeyAgreement.PrivateKey()
+		let publicKey = privateKey.publicKey
+		let point = try K1.Group.Point(publicKey: publicKey)
 		
 		// Negate the point
 		let negatedPoint = try K1.Group.negate(point)
@@ -58,24 +58,82 @@ final class GroupTests: XCTestCase {
 	}
 	
 	func testPointOperators() throws {
-		// Test the operator syntax
-		let x1 = Data(repeating: 1, count: 32)
-		let y1 = Data(repeating: 2, count: 32)
-		let point1 = try K1.Group.Point(x: x1, y: y1)
+		// Create valid points from public keys
+		let privateKey1 = K1.KeyAgreement.PrivateKey()
+		let publicKey1 = privateKey1.publicKey
+		let point1 = try K1.Group.Point(publicKey: publicKey1)
 		
-		let x2 = Data(repeating: 3, count: 32)
-		let y2 = Data(repeating: 4, count: 32)
-		let point2 = try K1.Group.Point(x: x2, y: y2)
+		let privateKey2 = K1.KeyAgreement.PrivateKey()
+		let publicKey2 = privateKey2.publicKey
+		let point2 = try K1.Group.Point(publicKey: publicKey2)
 		
 		// Test negation operator
 		let negated = try -point1
 		XCTAssertEqual(negated.x, point1.x)
 		XCTAssertNotEqual(negated.y, point1.y)
 		
-		// Note: Addition and subtraction will throw groupOperation error
-		// since the low-level implementation is not yet complete
-		XCTAssertThrowsError(try point1 + point2)
-		XCTAssertThrowsError(try point1 - point2)
+		// Test addition and subtraction
+		let sum = try point1 + point2
+		XCTAssertEqual(sum.x.count, 32)
+		XCTAssertEqual(sum.y.count, 32)
+		
+		let difference = try point1 - point2
+		XCTAssertEqual(difference.x.count, 32)
+		XCTAssertEqual(difference.y.count, 32)
+	}
+	
+	func testPointAddition() throws {
+		// Create two valid points
+		let privateKey1 = K1.KeyAgreement.PrivateKey()
+		let point1 = try K1.Group.Point(publicKey: privateKey1.publicKey)
+		
+		let privateKey2 = K1.KeyAgreement.PrivateKey()
+		let point2 = try K1.Group.Point(publicKey: privateKey2.publicKey)
+		
+		// Test addition
+		let sum = try K1.Group.add(point1, point2)
+		XCTAssertEqual(sum.x.count, 32)
+		XCTAssertEqual(sum.y.count, 32)
+		
+		// Test that addition is commutative
+		let sum2 = try K1.Group.add(point2, point1)
+		XCTAssertEqual(sum.x, sum2.x)
+		XCTAssertEqual(sum.y, sum2.y)
+	}
+	
+	func testPointSubtraction() throws {
+		// Create two valid points
+		let privateKey1 = K1.KeyAgreement.PrivateKey()
+		let point1 = try K1.Group.Point(publicKey: privateKey1.publicKey)
+		
+		let privateKey2 = K1.KeyAgreement.PrivateKey()
+		let point2 = try K1.Group.Point(publicKey: privateKey2.publicKey)
+		
+		// Test subtraction
+		let difference = try K1.Group.subtract(point1, point2)
+		XCTAssertEqual(difference.x.count, 32)
+		XCTAssertEqual(difference.y.count, 32)
+		
+		// Test that (a - b) + b = a
+		let reconstructed = try K1.Group.add(difference, point2)
+		XCTAssertEqual(reconstructed.x, point1.x)
+		XCTAssertEqual(reconstructed.y, point1.y)
+	}
+	
+	func testPointDoubling() throws {
+		// Create a valid point
+		let privateKey = K1.KeyAgreement.PrivateKey()
+		let point = try K1.Group.Point(publicKey: privateKey.publicKey)
+		
+		// Test doubling
+		let doubled = try K1.Group.double(point)
+		XCTAssertEqual(doubled.x.count, 32)
+		XCTAssertEqual(doubled.y.count, 32)
+		
+		// Test that doubling is the same as adding to itself
+		let selfSum = try K1.Group.add(point, point)
+		XCTAssertEqual(doubled.x, selfSum.x)
+		XCTAssertEqual(doubled.y, selfSum.y)
 	}
 	
 	func testInvalidPointCreation() {
