@@ -1,0 +1,31 @@
+import XCTest
+@testable import K1
+
+final class PublicKeyGroupOperationsTests: XCTestCase {
+	
+	func testGeneratorPointCoordinates() throws {
+		// Test that the generator point has the correct coordinates
+		// x: 79BE667E F9DCBBAC 55A06295 CE870B07 029BFCDB 2DCE28D9 59F2815B 16F81798
+		// y: 483ADA77 26A3C465 5DA4FBFC 0E1108A8 FD17B448 A6855419 9C47D08F FB10D4B8
+		
+		let generatorPoint: [UInt8] = [
+			// X coordinate (32 bytes)
+			0x79, 0xBE, 0x66, 0x7E, 0xF9, 0xDC, 0xBB, 0xAC,
+			0x55, 0xA0, 0x62, 0x95, 0xCE, 0x87, 0x0B, 0x07,
+			0x02, 0x9B, 0xFC, 0xDB, 0x2D, 0xCE, 0x28, 0xD9,
+			0x59, 0xF2, 0x81, 0x5B, 0x16, 0xF8, 0x17, 0x98,
+			
+			// Y coordinate (32 bytes)
+			0x48, 0x3A, 0xDA, 0x77, 0x26, 0xA3, 0xC4, 0x65,
+			0x5D, 0xA4, 0xFB, 0xFC, 0x0E, 0x11, 0x08, 0xA8,
+			0xFD, 0x17, 0xB4, 0x48, 0xA6, 0x85, 0x54, 0x19,
+			0x9C, 0x47, 0xD0, 0x8F, 0xFB, 0x10, 0xD4, 0xB8
+		]
+		
+		let expectedGenerator = try K1.Schnorr.PublicKey(rawRepresentation: generatorPoint)
+		let actualGeneratorRaw = try FFI.PublicKey.serialize(FFI.PublicKey.Wrapped.g, format: .uncompressed)
+		let actualGenerator = try K1.Schnorr.PublicKey(rawRepresentation: actualGeneratorRaw.dropFirst()) // Drop the 0x04 prefix
+		
+		XCTAssertEqual(expectedGenerator.rawRepresentation, actualGenerator.rawRepresentation)
+	}
+} 

@@ -199,6 +199,29 @@ extension K1.KeyAgreement {
 		public var compressedRepresentation: Data {
 			impl.compressedRepresentation
 		}
+
+		// MARK: Group Operations
+		
+		/// Adds two public keys (points) on the secp256k1 curve
+		public static func + (lhs: Self, rhs: Self) throws -> Self {
+			try Self(impl: lhs.impl + rhs.impl)
+		}
+		
+		/// Subtracts two public keys (points) on the secp256k1 curve
+		public static func - (lhs: Self, rhs: Self) throws -> Self {
+			try Self(impl: lhs.impl - rhs.impl)
+		}
+		
+		/// Negates a public key (point) on the secp256k1 curve
+		public func negate() throws -> Self {
+			try Self(impl: impl.negate())
+		}
+		
+		/// Combines multiple public keys (points) on the secp256k1 curve
+		public static func sum(keys: [Self]) throws -> Self {
+			let impls = keys.map { $0.impl }
+			return try Self(impl: K1._PublicKeyImplementation.sum(keys: impls))
+		}
 	}
 }
 
@@ -398,6 +421,29 @@ extension K1.Schnorr {
 		///
 		public var compressedRepresentation: Data {
 			impl.compressedRepresentation
+		}
+
+		// MARK: Group Operations
+
+		/// Adds two public keys (points) on the secp256k1 curve
+		public static func + (lhs: Self, rhs: Self) throws -> Self {
+			try Self(impl: lhs.impl + rhs.impl)
+		}
+
+		/// Subtracts two public keys (points) on the secp256k1 curve
+		public static func - (lhs: Self, rhs: Self) throws -> Self {
+			try Self(impl: lhs.impl - rhs.impl)
+		}
+
+		/// Negates a public key (point) on the secp256k1 curve
+		public func negate() throws -> Self {
+			try Self(impl: impl.negate())
+		}
+
+		/// Combines multiple public keys (points) on the secp256k1 curve
+		public static func sum(keys: [Self]) throws -> Self {
+			let impls = keys.map { $0.impl }
+			return try Self(impl: K1._PublicKeyImplementation.sum(keys: impls))
 		}
 	}
 }
@@ -599,6 +645,29 @@ extension K1.ECDSA {
 		public var compressedRepresentation: Data {
 			impl.compressedRepresentation
 		}
+
+		// MARK: Group Operations
+
+		/// Adds two public keys (points) on the secp256k1 curve
+		public static func + (lhs: Self, rhs: Self) throws -> Self {
+			try Self(impl: lhs.impl + rhs.impl)
+		}
+
+		/// Subtracts two public keys (points) on the secp256k1 curve
+		public static func - (lhs: Self, rhs: Self) throws -> Self {
+			try Self(impl: lhs.impl - rhs.impl)
+		}
+
+		/// Negates a public key (point) on the secp256k1 curve
+		public func negate() throws -> Self {
+			try Self(impl: impl.negate())
+		}
+
+		/// Combines multiple public keys (points) on the secp256k1 curve
+		public static func sum(keys: [Self]) throws -> Self {
+			let impls = keys.map { $0.impl }
+			return try Self(impl: K1._PublicKeyImplementation.sum(keys: impls))
+		}
 	}
 }
 
@@ -798,6 +867,29 @@ extension K1.ECDSAWithKeyRecovery {
 		///
 		public var compressedRepresentation: Data {
 			impl.compressedRepresentation
+		}
+
+		// MARK: Group Operations
+
+		/// Adds two public keys (points) on the secp256k1 curve
+		public static func + (lhs: Self, rhs: Self) throws -> Self {
+			try Self(impl: lhs.impl + rhs.impl)
+		}
+
+		/// Subtracts two public keys (points) on the secp256k1 curve
+		public static func - (lhs: Self, rhs: Self) throws -> Self {
+			try Self(impl: lhs.impl - rhs.impl)
+		}
+
+		/// Negates a public key (point) on the secp256k1 curve
+		public func negate() throws -> Self {
+			try Self(impl: impl.negate())
+		}
+
+		/// Combines multiple public keys (points) on the secp256k1 curve
+		public static func sum(keys: [Self]) throws -> Self {
+			let impls = keys.map { $0.impl }
+			return try Self(impl: K1._PublicKeyImplementation.sum(keys: impls))
 		}
 	}
 }

@@ -82,3 +82,26 @@ extension FFI.PrivateKey {
 		try Wrapped(bytes: rawRepresentation.bytes)
 	}
 }
+
+#if DEBUG
+// MARK: Debug Extensions
+extension FFI.PrivateKey.Wrapped {
+	init(scalar: UInt) throws {
+		// Convert to big-endian bytes
+		let valueBytes = withUnsafeBytes(of: scalar.bigEndian, Array.init)
+		
+		// Pad with leading zeros to get exactly 32 bytes
+		let paddingCount = 32 - valueBytes.count
+		let paddedBytes = Array(repeating: UInt8(0), count: paddingCount) + valueBytes
+		
+		try self.init(bytes: paddedBytes)
+	}
+	
+	internal static let one = try! Self(scalar: 1)
+	internal static let two = try! Self(scalar: 2)
+	internal static let three = try! Self(scalar: 3)
+	internal static let four = try! Self(scalar: 4)
+	internal static let five = try! Self(scalar: 5)
+	internal static let six = try! Self(scalar: 6)
+}
+#endif
