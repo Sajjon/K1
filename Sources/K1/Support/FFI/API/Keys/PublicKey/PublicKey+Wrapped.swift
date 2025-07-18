@@ -65,16 +65,26 @@ extension FFI.PublicKey.Wrapped {
 	
     /// Combines multiple public keys (points) on the secp256k1 curve
     public static func sum(keys: [Self]) throws -> Self {
-        var result = secp256k1_pubkey()
-        
-        let keyPointers: [UnsafePointer<secp256k1_pubkey>?] = keys.map { key in
-            withUnsafePointer(to: key.raw) { UnsafePointer($0) }
+        guard !keys.isEmpty else {
+            throw K1.Error.invalidParameter
         }
         
-        _ = try keyPointers.withUnsafeBufferPointer { pointerBuffer in
-            try FFI.toC { ffi in
-                ffi.callWithResultCode { context in
-                    secp256k1_ec_pubkey_combine(context, &result, pointerBuffer.baseAddress!, keys.count)
+        var result = secp256k1_pubkey()
+        var mutableKeys = keys.map { $0.raw }
+        
+        try mutableKeys.withUnsafeMutableBufferPointer { keysBuffer in
+            var keyPointers = [UnsafePointer<secp256k1_pubkey>?]()
+            keyPointers.reserveCapacity(keys.count)
+            
+            for i in 0..<keys.count {
+                keyPointers.append(keysBuffer.baseAddress!.advanced(by: i))
+            }
+            
+            try keyPointers.withUnsafeBufferPointer { pointers in
+                try FFI.toC { ffi in
+                    try ffi.call(ifFailThrow: .groupOperation) { context in
+                        secp256k1_ec_pubkey_combine(context, &result, pointers.baseAddress!, keys.count)
+                    }
                 }
             }
         }
