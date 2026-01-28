@@ -99,18 +99,7 @@ extension Program {
 		if let originalError {
 			print("Cleaning up due to error: \(originalError)")
 		}
-		if dryRun {
-			// Reset submodule change if dry run
-			do {
-				try await runCommand(
-					"git",
-					arguments: ["submodule", "update", "--", dependencyPath],
-					workingDirectory: projectRoot
-				)
-			} catch {
-				print("❌ Error while resetting submodule changes: \(error)")
-			}
-		} else {
+		if !dryRun {
 			// Switch back to working branch
 			do {
 				try await runCommand(
@@ -121,6 +110,17 @@ extension Program {
 			} catch {
 				print("❌ Error while switching back to branch '\(currentBranch)': \(error)")
 			}
+		}
+
+		// Reset submodule change if dry run
+		do {
+			try await runCommand(
+				"git",
+				arguments: ["submodule", "update", "--", dependencyPath],
+				workingDirectory: projectRoot
+			)
+		} catch {
+			print("❌ Error while resetting submodule changes: \(error)")
 		}
 	}
 }
