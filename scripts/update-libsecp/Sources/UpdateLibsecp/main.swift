@@ -8,6 +8,24 @@ enum UpdateLibsecpTool {
 	static func main() async throws {
 		print("\n\n✨ Updating submodule libsecp256k1...")
 		let cli = try CLI.parse()
+		let program = try await Program.from(cli: cli)
+		try await program.run()
+	}
+}
+
+// MARK: - Program
+struct Program {
+	let dryRun: Bool
+	let projectRoot: FilePath
+	let dependencyPath: String
+}
+
+extension Program {
+	var dependencyFullPath: FilePath {
+		projectRoot.appending(dependencyPath)
+	}
+
+	fileprivate static func from(cli: CLI) async throws -> Self {
 		let projectRoot = try await cli.resolveRoot()
 		let dryRun = cli.dryRun
 		if dryRun {
@@ -17,10 +35,12 @@ enum UpdateLibsecpTool {
 		}
 
 		let dependencyPath = try readDependencyPath(in: projectRoot)
-		let dependencyFullPath = projectRoot.appending(dependencyPath)
-
 		print("📦 Found libsecp256k1 submodule at \(dependencyPath)")
+		return Self(dryRun: dryRun, projectRoot: projectRoot, dependencyPath: dependencyPath)
+	}
 
+	func run() async throws {
+		print("🏃‍♂️📦 running with args: \(self)")
 		let currentStatus = try await runCommand(
 			"git",
 			arguments: ["submodule", "status", "--", dependencyPath],
@@ -39,7 +59,7 @@ enum UpdateLibsecpTool {
 		print("🛜 Fetching latest tags in submodule…")
 		try await runCommand(
 			"git",
-			arguments: ["fetch"],
+			arguments: ["fetch", "--tags", "origin"],
 			workingDirectory: dependencyFullPath
 		)
 
@@ -57,31 +77,62 @@ enum UpdateLibsecpTool {
 			workingDirectory: dependencyFullPath
 		)
 
-		defer {
-			// Reset submodule change if dry run
-			if dryRun {
-				do {
-					try await runCommand(
-						"git",
-						arguments: ["submodule", "update", "--", dependencyPath],
-						workingDirectory: dependencyFullPath
-					)
-				} catch {
-					print("❌ Error while resetting submodule changes: \(error)")
-				}
-			}
-			// Switch back to working branch
+		do {
+			try await proceed(
+				latestTag: latestTag,
+				currentBranch: currentBranch,
+				old: old
+			)
+
+			await cleanUp(
+				currentBranch: currentBranch,
+			)
+		} catch {
+			await cleanUp(
+				currentBranch: currentBranch,
+				error: error
+			)
+		}
+
+		print("✅ Done!")
+	}
+
+	func cleanUp(
+		currentBranch: String,
+		error originalError: Swift.Error? = nil
+	) async {
+		if let originalError {
+			print("Cleaning up due to error: \(originalError)")
+		}
+		// Reset submodule change if dry run
+		if dryRun {
 			do {
 				try await runCommand(
 					"git",
-					arguments: ["switch", currentBranch],
+					arguments: ["submodule", "update", "--", dependencyPath],
 					workingDirectory: dependencyFullPath
 				)
 			} catch {
-				print("❌ Error while switching back to branch '\(currentBranch)': \(error)")
+				print("❌ Error while resetting submodule changes: \(error)")
 			}
 		}
+		// Switch back to working branch
+		do {
+			try await runCommand(
+				"git",
+				arguments: ["switch", currentBranch],
+				workingDirectory: dependencyFullPath
+			)
+		} catch {
+			print("❌ Error while switching back to branch '\(currentBranch)': \(error)")
+		}
+	}
 
+	func proceed(
+		latestTag: String,
+		currentBranch: String,
+		old: (tag: String, commit: String),
+	) async throws {
 		let newCommit = try await runCommand(
 			"git",
 			arguments: ["rev-list", "-n", "1", latestTag],
@@ -152,8 +203,6 @@ enum UpdateLibsecpTool {
 			dryRun: dryRun,
 			workingDirectory: projectRoot
 		)
-
-		print("✅ Done!")
 	}
 }
 
@@ -280,7 +329,7 @@ private func updateReadme(
 
 	let matches = regex.matches(in: content, options: [], range: range)
 	guard let match = matches.first else {
-		throw ToolError("Could not find README version line to replace.")
+		throw ToolError("Could not find README version line to replace, searched for line:\n\(oldLinePattern)")
 	}
 
 	if dryRun {
@@ -303,6 +352,7 @@ private func firstLineOf(
 	dryRun: Bool = false,
 	workingDirectory: FilePath
 ) async throws -> String {
+	print("rawArgs", rawArgs)
 	let (stdout, stderr) = try await runCommand(
 		executable,
 		arguments: rawArgs,
@@ -310,7 +360,7 @@ private func firstLineOf(
 		workingDirectory: workingDirectory
 	)
 	guard let firstLine = stdout.split(separator: "\n").first else {
-		throw ToolError("No first line returned from command. Output was: \(stdout), stderr: \(stderr)")
+		throw ToolError("No first line returned from command. Output was: '\(stdout)', stderr: '\(stderr)'")
 	}
 	return String(firstLine)
 }
@@ -334,7 +384,6 @@ private func runCommand(
 		output: .string(limit: 1_000_000),
 		error: .string(limit: 1_000_000)
 	)
-	print("DEBUG: args \(arguments)")
 
 	guard
 		case let .exited(code) = result.terminationStatus,
@@ -361,8 +410,6 @@ private func runCommand(
 			"""
 		)
 	}
-
-	print("DEBUG: std out \(result.standardOutput)")
 
 	return (result.standardOutput ?? "", result.standardError ?? "")
 }
