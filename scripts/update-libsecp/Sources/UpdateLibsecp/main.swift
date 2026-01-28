@@ -50,7 +50,6 @@ extension Program {
 
 		do {
 			try await proceed(
-				branchAtStart: currentBranch,
 				latestVersion: latestVersion,
 				oldVersion: oldVersion
 			)
@@ -69,7 +68,6 @@ extension Program {
 	}
 
 	func proceed(
-		branchAtStart: String,
 		latestVersion newVersion: Version,
 		oldVersion: Version
 	) async throws {
@@ -112,7 +110,6 @@ extension Program {
 			}
 		}
 
-		// Reset submodule change if dry run
 		do {
 			try await runCommand(
 				"git",
@@ -250,7 +247,7 @@ extension Program {
 
 	func doCommitChanges(newVersion: Version) async throws {
 		let commitMessage =
-			"Update libsecp256k1 dependency to \(newVersion) [all unit tests passed]"
+			"Update libsecp256k1 dependency to \(newVersion.tag) (\(newVersion.commit)) [all unit tests passed]"
 		try await runCommand(
 			"git",
 			arguments: ["commit", "-m", commitMessage],
