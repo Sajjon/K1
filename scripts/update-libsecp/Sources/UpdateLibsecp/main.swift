@@ -30,10 +30,7 @@ extension Program {
 		let dryRun = cli.dryRun
 		if dryRun {
 			print("🌵🏃‍♂️ Running in dry-run mode — we won't perform any changes.")
-		} else {
-			fatalError("only dry run supported for now")
 		}
-
 		let dependencyPath = try readDependencyPath(in: projectRoot)
 		print("📦 Found libsecp256k1 submodule at \(dependencyPath)")
 		return Self(dryRun: dryRun, projectRoot: projectRoot, dependencyPath: dependencyPath)
