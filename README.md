@@ -6,7 +6,7 @@
 _K1_ is Swift wrapper around [libsecp256k1 (bitcoin-core/secp256k1)][lib], offering ECDSA, Schnorr ([BIP340][bip340]) and ECDH features.
 
 > [!NOTE]
-> Current `libsecp256k1` version is [0.6.0 (0cdc758a56360bf58a851fe91085a327ec97685a)](https://github.com/bitcoin-core/secp256k1/commit/0cdc758a56360bf58a851fe91085a327ec97685a)
+> Current `libsecp256k1` version is [v0.6.0 (0cdc758a56360bf58a851fe91085a327ec97685a)](https://github.com/bitcoin-core/secp256k1/releases/tag/v0.6.0)
 
 # Documentation
 Read full documentation [here on SwiftPackageIndex][doc].
@@ -74,7 +74,7 @@ For each private key there exists two different `signature:for:options` (one tak
 
 The `option` is a `K1.ECDSA.SigningOptions` struct, which by default specifies [`RFC6979`][rfc6979] deterministic signing, as per Bitcoin standard, however, you can change to use secure random nonce instead.
 
-### NonRecoverable 
+### NonRecoverable
 
 #### Sign
 
@@ -89,7 +89,7 @@ let hashedMessage: Data = // from somewhere
 let signature = try alice.signature(for: hashedMessage)
 ```
 
-##### Digest 
+##### Digest
 
 ```swift
 let message: Data = // from somewhere
@@ -249,10 +249,21 @@ assert(ab.count == 65) // pass
 
 # Development
 
-Stand in root and run to setup submodules
+## Setup submodule
+Stand in root and run to setup submodule
 
 ```sh
 make submodules
+```
+
+## Update submodule
+```sh
+just bump-dep
+```
+
+Or to use dry run:
+```sh
+just bump-dep true
 ```
 
 ## `gyb`
