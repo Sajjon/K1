@@ -70,6 +70,11 @@ extension Program {
 		)
 		print("🏷️🆕 Latest tag discovered: \(latestTag)")
 
+		if oldVersion == latestTag {
+			print("Current version == latest tag — nothing to update. Exiting ✅.")
+			return
+		}
+
 		print("🏷️🔀 Checking out \(latestTag)…")
 		try await runCommand(
 			"git",
@@ -312,7 +317,7 @@ private func parseVersionLine(_ line: String) throws -> Version {
 }
 
 // MARK: - Version
-struct Version {
+struct Version: Equatable {
 	let tag: String
 	let commit: String
 }
