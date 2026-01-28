@@ -74,7 +74,7 @@ For each private key there exists two different `signature:for:options` (one tak
 
 The `option` is a `K1.ECDSA.SigningOptions` struct, which by default specifies [`RFC6979`][rfc6979] deterministic signing, as per Bitcoin standard, however, you can change to use secure random nonce instead.
 
-### NonRecoverable 
+### NonRecoverable
 
 #### Sign
 
@@ -89,7 +89,7 @@ let hashedMessage: Data = // from somewhere
 let signature = try alice.signature(for: hashedMessage)
 ```
 
-##### Digest 
+##### Digest
 
 ```swift
 let message: Data = // from somewhere
@@ -249,10 +249,21 @@ assert(ab.count == 65) // pass
 
 # Development
 
-Stand in root and run to setup submodules
+## Setup submodule
+Stand in root and run to setup submodule
 
 ```sh
 make submodules
+```
+
+## Update submodule
+```sh
+just bump-dep
+```
+
+Or to use dry run:
+```sh
+just bump-dep true
 ```
 
 ## `gyb`
