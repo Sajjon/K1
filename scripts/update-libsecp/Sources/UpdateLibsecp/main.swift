@@ -102,7 +102,18 @@ extension Program {
 		if let originalError {
 			print("Cleaning up due to error: \(originalError)")
 		}
-		if !dryRun {
+		if dryRun {
+			// Reset submodule change if dry run
+			do {
+				try await runCommand(
+					"git",
+					arguments: ["submodule", "update", "--", dependencyPath],
+					workingDirectory: projectRoot
+				)
+			} catch {
+				print("❌ Error while resetting submodule changes: \(error)")
+			}
+		} else {
 			// Switch back to working branch
 			do {
 				try await runCommand(
