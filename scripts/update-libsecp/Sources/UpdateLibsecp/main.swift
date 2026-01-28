@@ -53,8 +53,8 @@ extension Program {
 			workingDirectory: projectRoot
 		).trimmed()
 
-		let old = try parseVersionLine(currentStatus)
-		print("🏷️ Current libsecp256k1 version: tag \(old.tag), commit \(old.commit)")
+		let oldVersion = try parseVersionLine(currentStatus)
+		print("🏷️ Current libsecp256k1 version: \(oldVersion)")
 
 		print("🛜 Fetching latest tags in submodule…")
 		try await runCommand(
@@ -81,7 +81,7 @@ extension Program {
 			try await proceed(
 				latestTag: latestTag,
 				currentBranch: currentBranch,
-				old: old
+				oldVersion: oldVersion
 			)
 
 			await cleanUp(
@@ -131,7 +131,7 @@ extension Program {
 	func proceed(
 		latestTag: String,
 		currentBranch: String,
-		old: (tag: String, commit: String),
+		oldVersion: Version
 	) async throws {
 		let newCommit = try await runCommand(
 			"git",
@@ -140,12 +140,16 @@ extension Program {
 		).stdout.trimmed()
 		print("#️⃣🆕 New commit resolved from tag: \(newCommit)")
 
-		print("➕📦 Staging submodule changes…")
-		try await runCommand(
-			"git",
-			arguments: ["add", dependencyPath],
-			workingDirectory: projectRoot
-		)
+		if dryRun {
+			print("➕🌵 Skipping git add of submodole changes since dry run.")
+		} else {
+			print("➕📦 Staging submodule changes…")
+			try await runCommand(
+				"git",
+				arguments: ["add", dependencyPath],
+				workingDirectory: projectRoot
+			)
+		}
 
 		print("🧪 Running swift test…")
 		try await runCommand(
@@ -156,13 +160,10 @@ extension Program {
 		print("🧪 Tests passed🏅.")
 
 		print("📝 Updating README.md…")
+		let newVersion = Version(tag: latestTag, commit: newCommit)
 		try updateReadme(
-			root: projectRoot,
-			oldTag: old.tag,
-			oldCommit: old.commit,
-			newTag: latestTag,
-			newCommit: newCommit,
-			dryRun: dryRun
+			oldVersion: oldVersion,
+			newVersion: newVersion
 		)
 
 		try await runCommand(
@@ -291,57 +292,67 @@ private func readDependencyPath(in root: FilePath) throws -> String {
 	throw ToolError("Could not locate libsecp256k1 path inside .gitmodules")
 }
 
-private func parseVersionLine(_ line: String) throws -> (commit: String, tag: String) {
+private func parseVersionLine(_ line: String) throws -> Version {
 	let pattern = #"[-+ ]?([0-9a-f]{40})\s+[^\(]*\(([^)]+)\)"#
 	let regex = try NSRegularExpression(pattern: pattern, options: [])
 	let range = NSRange(line.startIndex ..< line.endIndex, in: line)
-	guard let match = regex.firstMatch(in: line, options: [], range: range),
-	      let commitRange = Range(match.range(at: 1), in: line),
-	      let tagRange = Range(match.range(at: 2), in: line)
+
+	guard
+		let match = regex.firstMatch(in: line, options: [], range: range),
+		let commitRange = Range(match.range(at: 1), in: line),
+		let tagRange = Range(match.range(at: 2), in: line)
 	else {
 		throw ToolError("Unable to parse submodule status line: \(line)")
 	}
 
-	return (String(line[commitRange]), String(line[tagRange]))
+	return Version(
+		tag: .init(line[tagRange]),
+		commit: .init(line[commitRange])
+	)
 }
 
-private func updateReadme(
-	root: FilePath,
-	oldTag: String,
-	oldCommit: String,
-	newTag: String,
-	newCommit: String,
-	dryRun: Bool
-) throws {
-	let readmeURL = URL(fileURLWithPath: root.appending("README.md").description)
-	let content = try String(contentsOf: readmeURL)
+// MARK: - Version
+struct Version {
+	let tag: String
+	let commit: String
+}
 
-	let escapedTag = NSRegularExpression.escapedPattern(for: oldTag)
-	let escapedCommit = NSRegularExpression.escapedPattern(for: oldCommit)
-	let oldLinePattern =
-		"> Current `libsecp256k1` version is \\[\(escapedTag) \\(\(escapedCommit)\\)\\]\\([^\\n]*\\)"
+extension Program {
+	private func updateReadme(
+		oldVersion: Version,
+		newVersion: Version
+	) throws {
+		let readmeURL = URL(fileURLWithPath: projectRoot.appending("README.md").description)
+		let content = try String(contentsOf: readmeURL)
 
-	let regex = try NSRegularExpression(pattern: oldLinePattern, options: [])
-	let range = NSRange(location: 0, length: (content as NSString).length)
+		let escapedTag = NSRegularExpression.escapedPattern(for: oldVersion.tag)
+		let escapedCommit = NSRegularExpression.escapedPattern(for: oldVersion.commit)
+		let newTag = newVersion.tag
+		let oldLinePattern =
+			"> Current `libsecp256k1` version is \\[\(escapedTag) \\(\(escapedCommit)\\)\\]\\([^\\n]*\\)"
 
-	let replacement =
-		"> Current `libsecp256k1` version is [\(newTag) (\(newCommit))](https://github.com/bitcoin-core/secp256k1/releases/tag/\(newTag))"
+		let regex = try NSRegularExpression(pattern: oldLinePattern, options: [])
+		let range = NSRange(location: 0, length: (content as NSString).length)
 
-	let matches = regex.matches(in: content, options: [], range: range)
-	guard let match = matches.first else {
-		throw ToolError("Could not find README version line to replace, searched for line:\n\(oldLinePattern)")
-	}
+		let replacement =
+			"> Current `libsecp256k1` version is [\(newTag) (\(newVersion.commit))](https://github.com/bitcoin-core/secp256k1/releases/tag/\(newTag))"
 
-	if dryRun {
-		print("Skipped README update since dryRun...(but we successfully found the line to replace.)")
-	} else {
-		let updated = regex.stringByReplacingMatches(
-			in: content,
-			options: [],
-			range: match.range,
-			withTemplate: replacement
-		)
-		try updated.write(to: readmeURL, atomically: true, encoding: String.Encoding.utf8)
+		let matches = regex.matches(in: content, options: [], range: range)
+		guard let match = matches.first else {
+			throw ToolError("Could not find README version line to replace, searched for line:\n\(oldLinePattern)")
+		}
+
+		if dryRun {
+			print("Skipped README update since dryRun...(but we successfully found the line to replace.)")
+		} else {
+			let updated = regex.stringByReplacingMatches(
+				in: content,
+				options: [],
+				range: match.range,
+				withTemplate: replacement
+			)
+			try updated.write(to: readmeURL, atomically: true, encoding: .utf8)
+		}
 	}
 }
 
@@ -399,7 +410,6 @@ private func runCommand(
 			statusDescription = "terminated for unknown reason"
 		}
 
-		let failureSeparator = ", "
 		let failure = "\(executable) \(arguments)"
 		throw ToolError(
 			"""
