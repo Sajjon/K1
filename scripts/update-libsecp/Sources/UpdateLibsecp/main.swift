@@ -5,6 +5,9 @@ import System
 // MARK: - UpdateLibsecpTool
 @main
 enum UpdateLibsecpTool {
+	// TODO: we can use `git submodule update -- Sources/secp256k1/libsecp256k1` to "reset"/"undo" the
+	// checking out of libsecp256k1 submodule to its newer commit. Figure out if we wanna do that
+	// if `dryRun` is set, since it should not change any state...
 	static func main() async throws {
 		print("\n\n✨ Updating submodule libsecp256k1...")
 		let cli = try CLI.parse()
@@ -86,16 +89,28 @@ enum UpdateLibsecpTool {
 		try await runCommand(
 			"git",
 			arguments: ["add", "README.md"],
+			dryRun: dryRun,
 			workingDirectory: projectRoot
 		)
 
-		let branchName = "bump/libsecp256k1_to_\(latestTag)"
-		print("🪾🆕 Creating branch \(branchName)…")
-		try await runCommand(
-			"git",
-			arguments: ["checkout", "-b", branchName],
-			workingDirectory: projectRoot
-		)
+		let branchName: String
+		if dryRun {
+			let currentBranch = try await firstLineOf(
+				command: "git",
+				arguments: ["branch", "--show-current"],
+				workingDirectory: projectRoot
+			).trimmed()
+			branchName = currentBranch
+		} else {
+			let newBranch = "bump/libsecp256k1_to_\(latestTag)"
+			print("🪾🆕 Creating branch \(newBranch)…")
+			try await runCommand(
+				"git",
+				arguments: ["checkout", "-b", newBranch],
+				workingDirectory: projectRoot
+			)
+			branchName = newBranch
+		}
 
 		let commitMessage =
 			"Update libsecp256k1 dependency to \(latestTag) (\(newCommit)) [all unit tests passed]"
@@ -288,13 +303,15 @@ private func runCommand(
 	if dryRun {
 		rawArgs.append("--dry-run")
 	}
+	let arguments = Arguments(rawArgs)
 	let result = try await run(
 		.name(executable),
-		arguments: Arguments(rawArgs),
+		arguments: arguments,
 		workingDirectory: workingDirectory,
 		output: .string(limit: 1_000_000),
 		error: .string(limit: 1_000_000)
 	)
+	print("DEBUG: args \(arguments)")
 
 	guard
 		case let .exited(code) = result.terminationStatus,
@@ -311,7 +328,7 @@ private func runCommand(
 		}
 
 		let failureSeparator = ", "
-		let failure = "\(executable) \(rawArgs.joined(separator: failureSeparator))"
+		let failure = "\(executable) \(arguments)"
 		throw ToolError(
 			"""
 			Command failed: \(failure)
@@ -321,6 +338,8 @@ private func runCommand(
 			"""
 		)
 	}
+
+	print("DEBUG: std out \(result.standardOutput)")
 
 	return (result.standardOutput ?? "", result.standardError ?? "")
 }
