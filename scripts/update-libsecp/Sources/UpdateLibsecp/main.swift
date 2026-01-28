@@ -39,53 +39,81 @@ extension Program {
 		return Self(dryRun: dryRun, projectRoot: projectRoot, dependencyPath: dependencyPath)
 	}
 
-	func run() async throws {
-		print("🏃‍♂️📦 running with args: \(self)")
-		let currentStatus = try await runCommand(
+	func submoduleStatus() async throws -> String {
+		try await runCommand(
 			"git",
 			arguments: ["submodule", "status", "--", dependencyPath],
 			workingDirectory: projectRoot
 		).stdout.trimmed()
+	}
 
-		let currentBranch = try await firstLineOf(
+	func currentBranch() async throws -> String {
+		try await firstLineOf(
 			command: "git",
 			arguments: ["branch", "--show-current"],
 			workingDirectory: projectRoot
 		).trimmed()
+	}
 
-		let oldVersion = try parseVersionLine(currentStatus)
-		print("🏷️ Current libsecp256k1 version: \(oldVersion)")
+	func currentVersion() async throws -> Version {
+		let currentStatus = try await submoduleStatus()
+		return try parseVersionLine(currentStatus)
+	}
 
-		print("🛜 Fetching latest tags in submodule…")
+	func fetchLatestTags() async throws {
 		try await runCommand(
 			"git",
 			arguments: ["fetch", "--tags", "origin"],
 			workingDirectory: dependencyFullPath
 		)
+	}
 
-		let latestTag = try await firstLineOf(
+	func getLatestTag() async throws -> String {
+		try await fetchLatestTags()
+		return try await firstLineOf(
 			command: "git",
 			arguments: ["tag", "--list", "v*", "--sort=-v:refname"],
 			workingDirectory: dependencyFullPath
 		)
+	}
+
+	func checkout(tag: String) async throws -> Version {
+		try await runCommand(
+			"git",
+			arguments: ["checkout", tag],
+			workingDirectory: dependencyFullPath
+		)
+		let commit = try await runCommand(
+			"git",
+			arguments: ["rev-list", "-n", "1", tag],
+			workingDirectory: dependencyFullPath
+		).stdout.trimmed()
+		print("#️⃣🆕 Commit resolved from tag: \(commit)")
+		return Version(tag: tag, commit: commit)
+	}
+
+	func run() async throws {
+		let currentBranch = try await currentBranch()
+
+		let oldVersion = try await currentVersion()
+		print("🏷️ Current libsecp256k1 version: \(oldVersion)")
+
+		print("🛜 Fetching latest tags in submodule…")
+		let latestTag = try await getLatestTag()
 		print("🏷️🆕 Latest tag discovered: \(latestTag)")
 
-		if oldVersion == latestTag {
+		if oldVersion.tag == latestTag {
 			print("Current version == latest tag — nothing to update. Exiting ✅.")
 			return
 		}
 
 		print("🏷️🔀 Checking out \(latestTag)…")
-		try await runCommand(
-			"git",
-			arguments: ["checkout", latestTag],
-			workingDirectory: dependencyFullPath
-		)
+		let latestVersion = try await checkout(tag: latestTag)
 
 		do {
 			try await proceed(
-				latestTag: latestTag,
-				currentBranch: currentBranch,
+				branchAtStart: currentBranch,
+				latestVersion: latestVersion,
 				oldVersion: oldVersion
 			)
 
@@ -134,19 +162,12 @@ extension Program {
 	}
 
 	func proceed(
-		latestTag: String,
-		currentBranch: String,
+		branchAtStart: String,
+		latestVersion newVersion: Version,
 		oldVersion: Version
 	) async throws {
-		let newCommit = try await runCommand(
-			"git",
-			arguments: ["rev-list", "-n", "1", latestTag],
-			workingDirectory: dependencyFullPath
-		).stdout.trimmed()
-		print("#️⃣🆕 New commit resolved from tag: \(newCommit)")
-
 		if dryRun {
-			print("➕🌵 Skipping git add of submodole changes since dry run.")
+			print("➕🌵 Skipping git add of submodule changes since dry run.")
 		} else {
 			print("➕📦 Staging submodule changes…")
 			try await runCommand(
@@ -165,7 +186,7 @@ extension Program {
 		print("🧪 Tests passed🏅.")
 
 		print("📝 Updating README.md…")
-		let newVersion = Version(tag: latestTag, commit: newCommit)
+
 		try updateReadme(
 			oldVersion: oldVersion,
 			newVersion: newVersion
@@ -180,9 +201,9 @@ extension Program {
 
 		let branchName: String
 		if dryRun {
-			branchName = currentBranch
+			branchName = branchAtStart
 		} else {
-			let newBranch = "bump/libsecp256k1_to_\(latestTag)"
+			let newBranch = "bump/libsecp256k1_to_\(newVersion.tag)"
 			print("🪾🆕 Creating branch \(newBranch)…")
 			try await runCommand(
 				"git",
@@ -193,7 +214,7 @@ extension Program {
 		}
 
 		let commitMessage =
-			"Update libsecp256k1 dependency to \(latestTag) (\(newCommit)) [all unit tests passed]"
+			"Update libsecp256k1 dependency to \(newVersion) [all unit tests passed]"
 		print("💾 Committing changes…")
 		try await runCommand(
 			"git",
@@ -368,7 +389,6 @@ private func firstLineOf(
 	dryRun: Bool = false,
 	workingDirectory: FilePath
 ) async throws -> String {
-	print("rawArgs", rawArgs)
 	let (stdout, stderr) = try await runCommand(
 		executable,
 		arguments: rawArgs,
