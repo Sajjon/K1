@@ -90,7 +90,7 @@ extension Program {
 		}
 
 		try await stageReadme()
-		let newBranch = try await checkoutNewBranch()
+		let newBranch = try await checkoutNewBranch(newVersion: newVersion)
 		try await commitChanges(newVersion: newVersion)
 		try await push(branch: newBranch)
 	}
@@ -156,9 +156,9 @@ extension Program {
 	}
 
 	func getCurrentVersion() async throws -> Version {
-		print("🏷️ Getting current libsecp256k1 version: \(oldVersion)")
+		print("🏷️ Getting current libsecp256k1 version…")
 		let oldVersion = try await doGetCurrentVersion()
-		print("🏷️ Got current libsecp256k1 version: \(oldVersion)")
+		print("🏷️ Got current libsecp256k1 version: \(oldVersion) ☑️.")
 		return oldVersion
 	}
 
@@ -192,9 +192,9 @@ extension Program {
 	}
 
 	func checkout(tag: String) async throws -> Version {
-		print("🏷️🔀 Checking out \(latestTag)…")
-		let latestVersion = try await doCheckout(tag: latestTag)
-		print("🏷️🔀 Checked out \(latestTag) ☑️.")
+		print("🏷️🔀 Checking out \(tag)…")
+		let latestVersion = try await doCheckout(tag: tag)
+		print("🏷️🔀 Checked out \(tag) ☑️.")
 		return latestVersion
 	}
 
@@ -209,13 +209,13 @@ extension Program {
 			arguments: ["rev-list", "-n", "1", tag],
 			workingDirectory: dependencyFullPath
 		).stdout.trimmed()
-		print("#️⃣🆕 Commit resolved from tag: \(commit)")
+		print("#️⃣ 🆕 Commit resolved from tag: \(commit)")
 		return Version(tag: tag, commit: commit)
 	}
 
 	func stageReadme() async throws {
 		print("➕📄 Staging README change…")
-		try await stageReadme()
+		try await doStageReadme()
 		print("➕📄 Staged README change ☑️.")
 	}
 
@@ -227,13 +227,14 @@ extension Program {
 		)
 	}
 
-	func checkoutNewBranch() async throws -> String {
+	func checkoutNewBranch(newVersion: Version) async throws -> String {
 		print("🪾🆕 Checked out new branch…")
-		let newBranch = try await doCheckoutNewBranch()
+		let newBranch = try await doCheckoutNewBranch(newVersion: newVersion)
 		print("🪾🆕 Checked out new branch \(newBranch) ☑️.")
+		return newBranch
 	}
 
-	func doCheckoutNewBranch() async throws -> String {
+	func doCheckoutNewBranch(newVersion: Version) async throws -> String {
 		let newBranch = "bump/libsecp256k1_to_\(newVersion.tag)"
 		try await runCommand(
 			"git",
@@ -261,7 +262,7 @@ extension Program {
 
 	func push(branch: String) async throws {
 		print("🛜🪾 Pushing branch to origin…")
-		try await doPush(branch: newBranch)
+		try await doPush(branch: branch)
 		print("🛜🪾 Pushed branch to origin ☑️.")
 	}
 
