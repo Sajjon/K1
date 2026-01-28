@@ -39,75 +39,16 @@ extension Program {
 		return Self(dryRun: dryRun, projectRoot: projectRoot, dependencyPath: dependencyPath)
 	}
 
-	func submoduleStatus() async throws -> String {
-		try await runCommand(
-			"git",
-			arguments: ["submodule", "status", "--", dependencyPath],
-			workingDirectory: projectRoot
-		).stdout.trimmed()
-	}
-
-	func currentBranch() async throws -> String {
-		try await firstLineOf(
-			command: "git",
-			arguments: ["branch", "--show-current"],
-			workingDirectory: projectRoot
-		).trimmed()
-	}
-
-	func currentVersion() async throws -> Version {
-		let currentStatus = try await submoduleStatus()
-		return try parseVersionLine(currentStatus)
-	}
-
-	func fetchLatestTags() async throws {
-		try await runCommand(
-			"git",
-			arguments: ["fetch", "--tags", "origin"],
-			workingDirectory: dependencyFullPath
-		)
-	}
-
-	func getLatestTag() async throws -> String {
-		try await fetchLatestTags()
-		return try await firstLineOf(
-			command: "git",
-			arguments: ["tag", "--list", "v*", "--sort=-v:refname"],
-			workingDirectory: dependencyFullPath
-		)
-	}
-
-	func checkout(tag: String) async throws -> Version {
-		try await runCommand(
-			"git",
-			arguments: ["checkout", tag],
-			workingDirectory: dependencyFullPath
-		)
-		let commit = try await runCommand(
-			"git",
-			arguments: ["rev-list", "-n", "1", tag],
-			workingDirectory: dependencyFullPath
-		).stdout.trimmed()
-		print("#️⃣🆕 Commit resolved from tag: \(commit)")
-		return Version(tag: tag, commit: commit)
-	}
-
 	func run() async throws {
 		let currentBranch = try await currentBranch()
-
-		let oldVersion = try await currentVersion()
-		print("🏷️ Current libsecp256k1 version: \(oldVersion)")
-
-		print("🛜 Fetching latest tags in submodule…")
+		let oldVersion = try await getCurrentVersion()
 		let latestTag = try await getLatestTag()
-		print("🏷️🆕 Latest tag discovered: \(latestTag)")
 
 		if oldVersion.tag == latestTag {
 			print("Current version == latest tag — nothing to update. Exiting ✅.")
 			return
 		}
 
-		print("🏷️🔀 Checking out \(latestTag)…")
 		let latestVersion = try await checkout(tag: latestTag)
 
 		do {
@@ -128,6 +69,30 @@ extension Program {
 		}
 
 		print("✅ Done!")
+	}
+
+	func proceed(
+		branchAtStart: String,
+		latestVersion newVersion: Version,
+		oldVersion: Version
+	) async throws {
+		try await stageSubmoduleChangesIfLive()
+		try await test()
+
+		try updateReadme(
+			oldVersion: oldVersion,
+			newVersion: newVersion
+		)
+
+		guard !dryRun else {
+			print("dryRun: skipping git commands: [add README, checkout branch, commit, push]")
+			return
+		}
+
+		try await stageReadme()
+		let newBranch = try await checkoutNewBranch()
+		try await commitChanges(newVersion: newVersion)
+		try await push(branch: newBranch)
 	}
 
 	func cleanUp(
@@ -160,74 +125,173 @@ extension Program {
 			print("❌ Error while switching back to branch '\(currentBranch)': \(error)")
 		}
 	}
+}
 
-	func proceed(
-		branchAtStart: String,
-		latestVersion newVersion: Version,
-		oldVersion: Version
-	) async throws {
-		if dryRun {
-			print("➕🌵 Skipping git add of submodule changes since dry run.")
-		} else {
-			print("➕📦 Staging submodule changes…")
-			try await runCommand(
-				"git",
-				arguments: ["add", dependencyPath],
-				workingDirectory: projectRoot
-			)
-		}
-
+// MARK: Helper Methods
+extension Program {
+	func test() async throws {
 		print("🧪 Running swift test…")
 		try await runCommand(
 			"swift",
 			arguments: ["test"],
 			workingDirectory: projectRoot
 		)
-		print("🧪 Tests passed🏅.")
+		print("🧪 Tests passed  ☑️.")
+	}
 
-		print("📝 Updating README.md…")
+	func submoduleStatus() async throws -> String {
+		try await runCommand(
+			"git",
+			arguments: ["submodule", "status", "--", dependencyPath],
+			workingDirectory: projectRoot
+		).stdout.trimmed()
+	}
 
-		try updateReadme(
-			oldVersion: oldVersion,
-			newVersion: newVersion
+	func currentBranch() async throws -> String {
+		try await firstLineOf(
+			command: "git",
+			arguments: ["branch", "--show-current"],
+			workingDirectory: projectRoot
+		).trimmed()
+	}
+
+	func getCurrentVersion() async throws -> Version {
+		print("🏷️ Getting current libsecp256k1 version: \(oldVersion)")
+		let oldVersion = try await doGetCurrentVersion()
+		print("🏷️ Got current libsecp256k1 version: \(oldVersion)")
+		return oldVersion
+	}
+
+	func doGetCurrentVersion() async throws -> Version {
+		let currentStatus = try await submoduleStatus()
+		return try parseVersionLine(currentStatus)
+	}
+
+	func fetchLatestTags() async throws {
+		try await runCommand(
+			"git",
+			arguments: ["fetch", "--tags", "origin"],
+			workingDirectory: dependencyFullPath
 		)
+	}
 
+	func getLatestTag() async throws -> String {
+		print("🛜 Fetching latest tags in submodule…")
+		let latestTag = try await doGetLatestTag()
+		print("🛜 Fetched latest tag in submodule: \(latestTag) ☑️.")
+		return latestTag
+	}
+
+	func doGetLatestTag() async throws -> String {
+		try await fetchLatestTags()
+		return try await firstLineOf(
+			command: "git",
+			arguments: ["tag", "--list", "v*", "--sort=-v:refname"],
+			workingDirectory: dependencyFullPath
+		)
+	}
+
+	func checkout(tag: String) async throws -> Version {
+		print("🏷️🔀 Checking out \(latestTag)…")
+		let latestVersion = try await doCheckout(tag: latestTag)
+		print("🏷️🔀 Checked out \(latestTag) ☑️.")
+		return latestVersion
+	}
+
+	func doCheckout(tag: String) async throws -> Version {
+		try await runCommand(
+			"git",
+			arguments: ["checkout", tag],
+			workingDirectory: dependencyFullPath
+		)
+		let commit = try await runCommand(
+			"git",
+			arguments: ["rev-list", "-n", "1", tag],
+			workingDirectory: dependencyFullPath
+		).stdout.trimmed()
+		print("#️⃣🆕 Commit resolved from tag: \(commit)")
+		return Version(tag: tag, commit: commit)
+	}
+
+	func stageReadme() async throws {
+		print("➕📄 Staging README change…")
+		try await stageReadme()
+		print("➕📄 Staged README change ☑️.")
+	}
+
+	func doStageReadme() async throws {
 		try await runCommand(
 			"git",
 			arguments: ["add", "README.md"],
-			dryRun: dryRun,
 			workingDirectory: projectRoot
 		)
+	}
 
-		let branchName: String
-		if dryRun {
-			branchName = branchAtStart
-		} else {
-			let newBranch = "bump/libsecp256k1_to_\(newVersion.tag)"
-			print("🪾🆕 Creating branch \(newBranch)…")
-			try await runCommand(
-				"git",
-				arguments: ["checkout", "-b", newBranch],
-				workingDirectory: projectRoot
-			)
-			branchName = newBranch
-		}
+	func checkoutNewBranch() async throws -> String {
+		print("🪾🆕 Checked out new branch…")
+		let newBranch = try await doCheckoutNewBranch()
+		print("🪾🆕 Checked out new branch \(newBranch) ☑️.")
+	}
 
+	func doCheckoutNewBranch() async throws -> String {
+		let newBranch = "bump/libsecp256k1_to_\(newVersion.tag)"
+		try await runCommand(
+			"git",
+			arguments: ["checkout", "-b", newBranch],
+			workingDirectory: projectRoot
+		)
+		return newBranch
+	}
+
+	func commitChanges(newVersion: Version) async throws {
+		print("💾 Committing changes…")
+		try await doCommitChanges(newVersion: newVersion)
+		print("💾 Commited changes ☑️.")
+	}
+
+	func doCommitChanges(newVersion: Version) async throws {
 		let commitMessage =
 			"Update libsecp256k1 dependency to \(newVersion) [all unit tests passed]"
-		print("💾 Committing changes…")
 		try await runCommand(
 			"git",
 			arguments: ["commit", "-m", commitMessage],
+			workingDirectory: projectRoot
+		)
+	}
+
+	func push(branch: String) async throws {
+		print("🛜🪾 Pushing branch to origin…")
+		try await doPush(branch: newBranch)
+		print("🛜🪾 Pushed branch to origin ☑️.")
+	}
+
+	func doPush(branch: String) async throws {
+		try await runCommand(
+			"git",
+			arguments: ["push", "--set-upstream", "origin", branch],
 			dryRun: dryRun,
 			workingDirectory: projectRoot
 		)
+	}
 
-		print("🛜🪾 Pushing branch to origin…")
+	func stageSubmoduleChangesIfLive() async throws {
+		if dryRun {
+			print("➕🌵 Skipping git add of submodule changes since dry run.")
+		} else {
+			try await stageSubmoduleChanges()
+		}
+	}
+
+	func stageSubmoduleChanges() async throws {
+		print("➕📦 Staging submodule changes…")
+		try await doStageSubmoduleChanges()
+		print("➕📦 Staged submodule changes ☑️.")
+	}
+
+	func doStageSubmoduleChanges() async throws {
 		try await runCommand(
 			"git",
-			arguments: ["push", "--set-upstream", "origin", branchName],
-			dryRun: dryRun,
+			arguments: ["add", dependencyPath],
 			workingDirectory: projectRoot
 		)
 	}
@@ -264,7 +328,8 @@ private struct CLI {
 						--root <path>   Override project root (defaults to repository root).
 						--dry-run       Print actions without mutating the working copy.
 						-h, --help      Show this help.
-					""")
+					"""
+				)
 				exit(0)
 			default:
 				throw ToolError("Unrecognized argument: \(arg)")
@@ -345,6 +410,18 @@ struct Version: Equatable {
 
 extension Program {
 	private func updateReadme(
+		oldVersion: Version,
+		newVersion: Version
+	) throws {
+		print("📝 Updating README.md…")
+		try doUpdateReadme(
+			oldVersion: oldVersion,
+			newVersion: newVersion
+		)
+		print("📝 Updated README.md ☑️.")
+	}
+
+	private func doUpdateReadme(
 		oldVersion: Version,
 		newVersion: Version
 	) throws {
