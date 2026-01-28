@@ -5,9 +5,6 @@ import System
 // MARK: - UpdateLibsecpTool
 @main
 enum UpdateLibsecpTool {
-	// TODO: we can use `git submodule update -- Sources/secp256k1/libsecp256k1` to "reset"/"undo" the
-	// checking out of libsecp256k1 submodule to its newer commit. Figure out if we wanna do that
-	// if `dryRun` is set, since it should not change any state...
 	static func main() async throws {
 		print("\n\n✨ Updating submodule libsecp256k1...")
 		let cli = try CLI.parse()
@@ -29,6 +26,12 @@ enum UpdateLibsecpTool {
 			arguments: ["submodule", "status", "--", dependencyPath],
 			workingDirectory: projectRoot
 		).stdout.trimmed()
+
+		let currentBranch = try await firstLineOf(
+			command: "git",
+			arguments: ["branch", "--show-current"],
+			workingDirectory: projectRoot
+		).trimmed()
 
 		let old = try parseVersionLine(currentStatus)
 		print("🏷️ Current libsecp256k1 version: tag \(old.tag), commit \(old.commit)")
@@ -53,6 +56,31 @@ enum UpdateLibsecpTool {
 			arguments: ["checkout", latestTag],
 			workingDirectory: dependencyFullPath
 		)
+
+		defer {
+			// Reset submodule change if dry run
+			if dryRun {
+				do {
+					try await runCommand(
+						"git",
+						arguments: ["submodule", "update", "--", dependencyPath],
+						workingDirectory: dependencyFullPath
+					)
+				} catch {
+					print("❌ Error while resetting submodule changes: \(error)")
+				}
+			}
+			// Switch back to working branch
+			do {
+				try await runCommand(
+					"git",
+					arguments: ["switch", currentBranch],
+					workingDirectory: dependencyFullPath
+				)
+			} catch {
+				print("❌ Error while switching back to branch '\(currentBranch)': \(error)")
+			}
+		}
 
 		let newCommit = try await runCommand(
 			"git",
@@ -95,11 +123,6 @@ enum UpdateLibsecpTool {
 
 		let branchName: String
 		if dryRun {
-			let currentBranch = try await firstLineOf(
-				command: "git",
-				arguments: ["branch", "--show-current"],
-				workingDirectory: projectRoot
-			).trimmed()
 			branchName = currentBranch
 		} else {
 			let newBranch = "bump/libsecp256k1_to_\(latestTag)"
