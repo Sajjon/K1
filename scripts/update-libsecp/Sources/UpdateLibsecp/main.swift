@@ -116,7 +116,7 @@ extension Program {
 				try await runCommand(
 					"git",
 					arguments: ["switch", currentBranch],
-					workingDirectory: dependencyFullPath
+					workingDirectory: projectRoot
 				)
 			} catch {
 				print("❌ Error while switching back to branch '\(currentBranch)': \(error)")
@@ -441,7 +441,8 @@ extension Program {
 
 		let matches = regex.matches(in: content, options: [], range: range)
 		guard let match = matches.first else {
-			throw ToolError("Could not find README version line to replace, searched for line:\n\(oldLinePattern)")
+			throw ToolError(
+				"Could not find README version line to replace, searched for line:\n\(oldLinePattern)")
 		}
 
 		if dryRun {
@@ -472,7 +473,8 @@ private func firstLineOf(
 		workingDirectory: workingDirectory
 	)
 	guard let firstLine = stdout.split(separator: "\n").first else {
-		throw ToolError("No first line returned from command. Output was: '\(stdout)', stderr: '\(stderr)'")
+		throw ToolError(
+			"No first line returned from command. Output was: '\(stdout)', stderr: '\(stderr)'")
 	}
 	return String(firstLine)
 }
