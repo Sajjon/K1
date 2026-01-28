@@ -37,11 +37,11 @@ enum UpdateLibsecpTool {
 			workingDirectory: dependencyFullPath
 		)
 
-		let latestTag = try await runCommand(
-			"git",
-			arguments: ["describe", "--tags", "--abbrev=0"],
+		let latestTag = try await firstLineOf(
+			command: "git",
+			arguments: ["tag", "--list", "v*", "--sort=-v:refname"],
 			workingDirectory: dependencyFullPath
-		).stdout.trimmed()
+		)
 		print("🏷️🆕 Latest tag discovered: \(latestTag)")
 
 		print("🏷️🔀 Checking out \(latestTag)…")
@@ -256,6 +256,25 @@ private func updateReadme(
 		)
 		try updated.write(to: readmeURL, atomically: true, encoding: String.Encoding.utf8)
 	}
+}
+
+@discardableResult
+private func firstLineOf(
+	command executable: String,
+	arguments rawArgs: [String],
+	dryRun: Bool = false,
+	workingDirectory: FilePath
+) async throws -> String {
+	let (stdout, stderr) = try await runCommand(
+		executable,
+		arguments: rawArgs,
+		dryRun: dryRun,
+		workingDirectory: workingDirectory
+	)
+	guard let firstLine = stdout.split(separator: "\n").first else {
+		throw ToolError("No first line returned from command. Output was: \(stdout), stderr: \(stderr)")
+	}
+	return String(firstLine)
 }
 
 @discardableResult

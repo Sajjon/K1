@@ -46,9 +46,9 @@ Git fetch
 git fetch
 ```
 
-Extract latest tag:
+Extract tag with highest semver number (somewhat incorrectly we call it "latest"):
 ```sh
-git describe --tags --abbrev=0
+git tag --list 'v*' --sort=-v:refname | head -n 1
 ```
 Call it `LATEST_TAG`
 
