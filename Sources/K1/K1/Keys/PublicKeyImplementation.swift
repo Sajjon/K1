@@ -1,6 +1,7 @@
 import Foundation
 
 // MARK: - _K1PublicKeyProtocol
+// swiftlint:disable:next type_name
 protocol _K1PublicKeyProtocol: _K1KeyPortable, Sendable, Hashable {
 	init(compressedRepresentation: some ContiguousBytes) throws
 	var compressedRepresentation: Data { get }
@@ -8,7 +9,9 @@ protocol _K1PublicKeyProtocol: _K1KeyPortable, Sendable, Hashable {
 
 // MARK: - K1._PublicKeyImplementation
 extension K1 {
+	// swiftlint:disable:next type_name
 	struct _PublicKeyImplementation: Sendable, Hashable, _K1PublicKeyProtocol {
+		// swiftlint:disable:next nesting
 		typealias Wrapped = FFI.PublicKey.Wrapped
 		let wrapped: Wrapped
 
@@ -80,11 +83,13 @@ extension K1._PublicKeyImplementation {
 
 	/// `04 || X || Y` (65 bytes)
 	var x963Representation: Data {
+		// swiftlint:disable:next force_try
 		try! FFI.PublicKey.serialize(wrapped, format: .uncompressed)
 	}
 
 	/// `02|03 || X` (33 bytes)
 	var compressedRepresentation: Data {
+		// swiftlint:disable:next force_try
 		try! FFI.PublicKey.serialize(wrapped, format: .compressed)
 	}
 
@@ -97,6 +102,7 @@ extension K1._PublicKeyImplementation {
 		var serializer = ASN1.Serializer()
 
 		// Serializing these keys can't throw
+		// swiftlint:disable:next force_try
 		try! serializer.serialize(spki)
 		return Data(serializer.serializedBytes)
 	}

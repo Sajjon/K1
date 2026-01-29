@@ -4,6 +4,8 @@
 
 import Foundation
 
+// swiftlint:disable all
+
 %{
 	LIST_KEY_FOR_FEATURE_WITH_DOCS = [
 		{
@@ -277,6 +279,8 @@ extension K1.${FEATURE} {
 extension K1.${FEATURE}.PrivateKey: _K1PrivateKeyProtocol {}
 extension K1.${FEATURE}.PublicKey: _K1PublicKeyProtocol {}
 % end
+
+// swiftlint:enable all
 
 % end
 

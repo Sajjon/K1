@@ -1,3 +1,5 @@
+// swiftlint:disable all
+
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the SwiftCrypto open source project
@@ -57,3 +59,5 @@ extension ASN1 {
 }
 
 #endif // Linux or !SwiftPM
+
+// swiftlint:enable all

@@ -1,0 +1,7 @@
+disabled_rules:
+  - trailing_comma
+
+excluded:
+  - .build
+  - scripts/update-libsecp/.build
+  - Tests/K1Tests/TestCases/

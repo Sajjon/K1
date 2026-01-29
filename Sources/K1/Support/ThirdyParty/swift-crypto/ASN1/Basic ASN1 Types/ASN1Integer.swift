@@ -1,3 +1,5 @@
+// swiftlint:disable all
+
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the SwiftCrypto open source project
@@ -270,3 +272,5 @@ extension UInt8 {
 }
 
 #endif // Linux or !SwiftPM
+
+// swiftlint:enable all

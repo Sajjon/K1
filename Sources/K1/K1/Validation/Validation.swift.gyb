@@ -6,6 +6,8 @@ import Foundation
 import struct CryptoKit.SHA256
 import protocol CryptoKit.Digest
 
+// swiftlint:disable all
+
 %{
 	VARIANTS_OF_FEATURE = [
 		{
@@ -102,4 +104,5 @@ extension K1.${FEATURE}.PublicKey {
 }
 
 % end
+// swiftlint:enable all
 % end

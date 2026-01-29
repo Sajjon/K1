@@ -30,6 +30,7 @@ extension FFI.ECDH {
 		///
 		case noHashWholePoint
 
+		// swiftlint:disable:next line_length
 		func hashfp() -> ((@convention(c) (UnsafeMutablePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafeMutableRawPointer?) -> Int32)?) {
 			switch self {
 			case .libsecp256kDefault: return secp256k1_ecdh_hash_function_default

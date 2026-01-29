@@ -13,6 +13,7 @@ extension FFI.ECDSAWithKeyRecovery {
 
 	/// Compact aka `IEEE P1363` aka `R||S`.
 	static func deserialize(
+		// swiftlint:disable:next identifier_name
 		compact rs: [UInt8],
 		recoveryID recid: Int32
 	) throws -> Wrapped {
@@ -36,6 +37,7 @@ extension FFI.ECDSAWithKeyRecovery {
 	static func serializeCompact(
 		_ wrapped: Wrapped
 	) throws -> (rs: [UInt8], recoveryID: Int32) {
+		// swiftlint:disable:next identifier_name
 		var rs = [UInt8](repeating: 0, count: FFI.ECDSA.byteCount)
 		var recoveryID: Int32 = 0
 		var rawSignature = wrapped.raw

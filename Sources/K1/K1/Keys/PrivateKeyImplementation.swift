@@ -2,6 +2,7 @@ import CryptoKit
 import Foundation
 
 // MARK: - _K1KeyExportable
+// swiftlint:disable:next type_name
 protocol _K1KeyExportable {
 	var rawRepresentation: Data { get }
 	var derRepresentation: Data { get }
@@ -10,6 +11,7 @@ protocol _K1KeyExportable {
 }
 
 // MARK: - _K1KeyImportable
+// swiftlint:disable:next type_name
 protocol _K1KeyImportable {
 	init(rawRepresentation: some ContiguousBytes) throws
 	init(derRepresentation: some RandomAccessCollection<UInt8>) throws
@@ -17,9 +19,11 @@ protocol _K1KeyImportable {
 	init(x963Representation: some ContiguousBytes) throws
 }
 
+// swiftlint:disable:next type_name
 typealias _K1KeyPortable = _K1KeyExportable & _K1KeyImportable
 
 // MARK: - _K1PrivateKeyProtocol
+// swiftlint:disable:next type_name
 protocol _K1PrivateKeyProtocol: _K1KeyPortable {
 	associatedtype PublicKey: _K1PublicKeyProtocol
 	var publicKey: PublicKey { get }
@@ -28,7 +32,9 @@ protocol _K1PrivateKeyProtocol: _K1KeyPortable {
 
 // MARK: - K1._PrivateKeyImplementation
 extension K1 {
+	// swiftlint:disable:next type_name
 	struct _PrivateKeyImplementation: Sendable, Hashable, _K1PrivateKeyProtocol {
+		// swiftlint:disable:next nesting
 		typealias Wrapped = FFI.PrivateKey.Wrapped
 		let wrapped: Wrapped
 
@@ -122,6 +128,7 @@ extension K1._PrivateKeyImplementation {
 		var serializer = ASN1.Serializer()
 
 		// Serializing these keys can't throw
+		// swiftlint:disable:next force_try
 		try! serializer.serialize(pkey)
 		return Data(serializer.serializedBytes)
 	}

@@ -1,3 +1,5 @@
+// swiftlint:disable all
+
 // from: https://github.com/apple/swift-crypto/blob/eefb07cc5924023468861187234f6e3ea717e9d2/Sources/Crypto/Util/BoringSSL/SafeCompare_boring.swift
 // commit: eefb07cc5924023468861187234f6e3ea717e9d2
 
@@ -37,3 +39,5 @@ func constantTimeCompare<LHS: Collection, RHS: Collection>(_ lhs: LHS, _ rhs: RH
 
     return zip(lhs, rhs).reduce(into: 0) { $0 |= $1.0 ^ $1.1 } == 0
 }
+
+// swiftlint:enable all

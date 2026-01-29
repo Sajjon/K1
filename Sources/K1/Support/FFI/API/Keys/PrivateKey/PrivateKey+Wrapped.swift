@@ -4,6 +4,7 @@ import secp256k1
 // MARK: - FFI.PrivateKey
 extension FFI {
 	enum PrivateKey {
+		// swiftlint:disable:next nesting
 		struct Wrapped: @unchecked Sendable {
 			let publicKey: FFI.PublicKey.Wrapped
 			let secureBytes: SecureBytes
@@ -51,7 +52,7 @@ extension FFI.PrivateKey.Wrapped {
 				defer { attempt += 1 }
 				do {
 					let secureBytes = SecureBytes(count: Curve.Field.byteCount)
-					let _ = try FFI.PrivateKey.Wrapped(secureBytes: secureBytes)
+					_ = try FFI.PrivateKey.Wrapped(secureBytes: secureBytes)
 					return secureBytes
 				} catch {
 					// Failure (due to unlikely scenario that the private key scalar > order of the curve) => retry
@@ -70,6 +71,7 @@ extension FFI.PrivateKey.Wrapped {
 				"""
 			)
 		}
+		// swiftlint:disable:next force_try
 		try! self.init(secureBytes: generateNew())
 	}
 }
@@ -82,6 +84,8 @@ extension FFI.PrivateKey {
 		try Wrapped(bytes: rawRepresentation.bytes)
 	}
 }
+
+// swiftlint:disable force_try
 
 #if DEBUG
 
@@ -105,4 +109,7 @@ extension FFI.PrivateKey.Wrapped {
 	static let five = try! Self(scalar: 5)
 	static let six = try! Self(scalar: 6)
 }
+
 #endif
+
+// swiftlint:enable force_try

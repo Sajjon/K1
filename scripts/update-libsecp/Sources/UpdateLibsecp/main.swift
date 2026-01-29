@@ -3,6 +3,8 @@ import Subprocess
 import System
 
 // MARK: - UpdateLibsecpTool
+// swiftlint:disable file_length
+
 @main
 enum UpdateLibsecpTool {
 	static func main() async throws {
@@ -433,8 +435,9 @@ extension Program {
 		let regex = try NSRegularExpression(pattern: oldLinePattern, options: [])
 		let range = NSRange(location: 0, length: (content as NSString).length)
 
+		let url = "https://github.com/bitcoin-core/secp256k1/releases/tag/\(newTag)"
 		let replacement =
-			"> Current `libsecp256k1` version is [\(newTag) (\(newVersion.commit))](https://github.com/bitcoin-core/secp256k1/releases/tag/\(newTag))"
+			"> Current `libsecp256k1` version is [\(newTag) (\(newVersion.commit))](\(url))"
 
 		let matches = regex.matches(in: content, options: [], range: range)
 		guard let match = matches.first else {
@@ -536,3 +539,5 @@ extension String {
 		trimmingCharacters(in: .whitespacesAndNewlines)
 	}
 }
+
+// swiftlint:enable file_length

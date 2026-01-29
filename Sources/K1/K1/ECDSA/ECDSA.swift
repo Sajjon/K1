@@ -1,6 +1,8 @@
 // MARK: - K1.ECDSA
 extension K1 {
-	/// A mechanism used to create or verify a cryptographic signature using the `secp256k1` elliptic curve digital signature algorithm (ECDSA), signatures that do not offer recovery of the public key.
+	/// A mechanism used to create or verify a cryptographic signature using
+	/// the `secp256k1` elliptic curve digital signature algorithm (ECDSA),
+	/// signatures that do not offer recovery of the public key.
 	public enum ECDSA {}
 }
 
@@ -23,6 +25,8 @@ extension K1.ECDSA.ValidationOptions {
 		malleabilityStrictness: .rejected
 	)
 
+	// swiftlint:disable line_length
+
 	/// Whether or not to consider malleable signatures valid.
 	///
 	/// [more]: https://github.com/bitcoin-core/secp256k1/blob/2e5e4b67dfb67950563c5f0ab2a62e25eb1f35c5/include/secp256k1.h#L510-L550
@@ -33,6 +37,8 @@ extension K1.ECDSA.ValidationOptions {
 		/// Accepts malleable signatures valid.
 		case accepted
 	}
+
+	// swiftlint:enable line_length
 }
 
 // MARK: - K1.ECDSA.SigningOptions

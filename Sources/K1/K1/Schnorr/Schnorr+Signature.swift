@@ -6,6 +6,7 @@ extension K1.Schnorr {
 	///
 	/// [scheme]: https://doi.org/10.1007%2F0-387-34805-0_22
 	public struct Signature: Sendable, Hashable {
+		// swiftlint:disable:next nesting
 		typealias Wrapped = FFI.Schnorr.Wrapped
 		let wrapped: Wrapped
 		init(wrapped: Wrapped) {

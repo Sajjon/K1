@@ -1,3 +1,5 @@
+// swiftlint:disable all
+
 // From: https://github.com/apple/swift-crypto/blob/22fd38919566816705c57d5f4dd5a97a4edcf25e/Sources/Crypto/Util/SecureBytes.swift
 // Commit: 22fd38919566816705c57d5f4dd5a97a4edcf25e
 
@@ -490,3 +492,5 @@ extension Data {
         }
     }
 }
+
+// swiftlint:enable all

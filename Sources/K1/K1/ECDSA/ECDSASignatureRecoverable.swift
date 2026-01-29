@@ -4,7 +4,9 @@ import Foundation
 
 // MARK: - K1.ECDSAWithKeyRecovery
 extension K1 {
-	/// A mechanism used to create or verify a cryptographic signature using the `secp256k1` elliptic curve digital signature algorithm (ECDSA), signatures that do offers recovery of the public key.
+	/// A mechanism used to create or verify a cryptographic signature using
+	/// the `secp256k1` elliptic curve digital signature algorithm (ECDSA),
+	/// signatures that do offers recovery of the public key.
 	public enum ECDSAWithKeyRecovery {
 		// Just a namespace
 	}
@@ -15,6 +17,7 @@ extension K1.ECDSAWithKeyRecovery {
 	/// A `secp256k1` elliptic curve digital signature algorithm (ECDSA) signature,
 	/// from which users **cannot** recover the public key, not without the `RecoveryID`.
 	public struct Signature: Sendable, Hashable, ContiguousBytes {
+		// swiftlint:disable:next nesting
 		typealias Wrapped = FFI.ECDSAWithKeyRecovery.Wrapped
 		let wrapped: Wrapped
 
@@ -60,6 +63,7 @@ extension K1.ECDSAWithKeyRecovery.Signature {
 
 	/// Compact aka `IEEE P1363` aka `R||S` and `V` (`RecoveryID`).
 	public func compact() throws -> Compact {
+		// swiftlint:disable:next identifier_name
 		let (rs, recid) = try FFI.ECDSAWithKeyRecovery.serializeCompact(
 			wrapped
 		)
@@ -138,10 +142,12 @@ extension K1.ECDSAWithKeyRecovery.Signature.Compact {
 		case vrs
 	}
 
+	// swiftlint:disable:next identifier_name
 	private var v: Data {
 		recoveryID.vData
 	}
 
+	// swiftlint:disable:next identifier_name
 	private var rs: Data {
 		compact
 	}

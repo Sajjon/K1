@@ -1,3 +1,5 @@
+// swiftlint:disable all
+
 // From: https://github.com/apple/swift-crypto/blob/main/Tests/CryptoTests/Utils/BytesUtil.swift
 // Commit: 22fd38919566816705c57d5f4dd5a97a4edcf25e
 // Editing: changed Array<UInt8>(hex:) init a bit (pun not intended)
@@ -104,3 +106,5 @@ extension Data {
     }
     
 }
+
+// swiftlint:enable all

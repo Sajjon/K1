@@ -51,7 +51,8 @@ extension K1.Schnorr.SigningOptions.AuxiliaryRandomData {
 	/// The default behavior of auxiliary random data.
 	public static let `default` = Self.random
 
-	/// 32 bytes of fresh randomness. While recommended to provide this, it is only supplemental to security and can be nil.
+	/// 32 bytes of fresh randomness. While recommended to provide this,
+	/// it is only supplemental to security and can be nil.
 	/// By default we generate secure random bytes.
 	public struct Aux32: Sendable, Hashable {
 		public let aux: [UInt8]

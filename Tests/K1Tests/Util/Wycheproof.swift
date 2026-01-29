@@ -1,4 +1,5 @@
 // swiftformat:disable strip
+// swiftlint:disable all
 
 //===----------------------------------------------------------------------===//
 //
@@ -74,6 +75,7 @@ struct ResultOfTestGroup {
 }
 
 extension XCTestCase {
+	// swiftlint:disable:next function_body_length cyclomatic_complexity
 	func doTestGroup<HF: HashFunction, TV: WycheproofTestVector>(
 		group: ECDSAWycheTestGroup<TV>,
 		signatureValidationMode: K1.ECDSA.ValidationOptions = .default,
@@ -132,11 +134,9 @@ extension XCTestCase {
 				continue
 			}
 
-			for comment in skipIfContainsComment {
-				if testVector.comment.contains(comment) {
-					idsOfOmittedTests.append(testVector.tcId)
-					continue outerloop
-				}
+			for comment in skipIfContainsComment where testVector.comment.contains(comment) {
+				idsOfOmittedTests.append(testVector.tcId)
+				continue outerloop
 			}
 
 			numberOfTestsRun += 1
@@ -156,7 +156,11 @@ extension XCTestCase {
 				if !expectedFailure {
 					print("❌ Test ID: \(testVector.tcId) is valid, but failed \(errorMessage).")
 				}
-				XCTAssert(expectedFailure, "Test ID: \(testVector.tcId) is valid, but failed \(errorMessage).", file: file, line: line)
+				XCTAssert(
+					expectedFailure,
+					"Test ID: \(testVector.tcId) is valid, but failed \(errorMessage).",
+					file: file, line: line
+				)
 				continue
 			}
 
@@ -167,12 +171,20 @@ extension XCTestCase {
 				}
 				XCTAssert(isValid, "Test vector is valid, but is rejected \(testVector.tcId)", file: file, line: line)
 			case "acceptable":
-				XCTAssert(isValid, "'acceptable' test vector, expected isValid to be `true`, but was not, tcID: \(testVector.tcId)", file: file, line: line)
+				XCTAssert(
+					isValid,
+					"'acceptable' test vector, expected isValid to be `true`, but was not, tcID: \(testVector.tcId)",
+					file: file, line: line
+				)
 			case "invalid":
 				if isValid {
 					print("❌ Test ID: \(testVector.tcId) is valid (we expected 'invalid'), but failed.")
 				}
-				XCTAssert(!isValid, "Test ID: \(testVector.tcId) is valid (we expected 'invalid'), but failed.", file: file, line: line)
+				XCTAssert(
+					!isValid,
+					"Test ID: \(testVector.tcId) is valid (we expected 'invalid'), but failed.",
+					file: file, line: line
+				)
 			default:
 				XCTFail("Unhandled test vector", file: file, line: line)
 			}
@@ -197,8 +209,10 @@ struct ECDSAWycheTestGroup<TV: WycheproofTestVector>: Codable {
 // MARK: - ECDSAKey
 struct ECDSAKey: Codable {
 	let uncompressed: String
+	// swiftlint:disable identifier_name
 	let wx: String
 	let wy: String
+	// swiftlint:enable identifier_name
 	let curve: String
 }
 
@@ -226,3 +240,5 @@ struct ECDSASignatureTestError: Swift.Error, CustomStringConvertible {
 
 // MARK: - BadKeyComponent
 struct BadKeyComponent: Swift.Error {}
+
+// swiftlint:enable all

@@ -6,6 +6,8 @@ import protocol CryptoKit.Digest
 import struct CryptoKit.SHA256
 import Foundation
 
+// swiftlint:disable all
+
 // MARK: Sign + ECDSA
 extension K1.ECDSA.PrivateKey {
 	/// Generates an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature of _hashed_ data you provide over the `secp256k1` elliptic curve.
@@ -158,3 +160,5 @@ extension K1.Schnorr.PrivateKey {
 		)
 	}
 }
+
+// swiftlint:enable all
