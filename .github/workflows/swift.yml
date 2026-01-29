@@ -30,7 +30,7 @@ jobs:
       - linting
     strategy:
       matrix:
-        xcode: ['14.1']
+        xcode: ['26.2']
     steps:
       - uses: actions/checkout@v3
       - name: "Select Xcode ${{ matrix.xcode }}"
