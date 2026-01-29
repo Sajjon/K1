@@ -32,7 +32,7 @@ extension K1.Format {
 		}
 	}
 
-	internal init(byteCount: Int) throws {
+	init(byteCount: Int) throws {
 		if byteCount == Self.uncompressed.length {
 			self = .uncompressed
 		} else if byteCount == Self.compressed.length {

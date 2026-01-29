@@ -5,7 +5,7 @@ extension FFI.Schnorr {
 	struct Wrapped: @unchecked Sendable, Hashable {
 		static let byteCount = 2 * Curve.Field.byteCount
 
-		internal let bytes: [UInt8]
+		let bytes: [UInt8]
 
 		init(bytes: [UInt8]) throws {
 			guard bytes.count == Self.byteCount else {

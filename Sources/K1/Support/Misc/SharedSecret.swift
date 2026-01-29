@@ -9,7 +9,7 @@ import struct CryptoKit.SharedSecret
 struct __SharedSecret {
 	var ss: SecureBytes
 
-	internal init(ss: SecureBytes) {
+	init(ss: SecureBytes) {
 		self.ss = ss
 	}
 }

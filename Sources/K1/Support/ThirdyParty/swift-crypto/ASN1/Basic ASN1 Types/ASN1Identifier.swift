@@ -19,7 +19,7 @@ import Foundation
 extension ASN1 {
     /// An `ASN1Identifier` is a representation of the abstract notion of an ASN.1 identifier. Identifiers have a number of properties that relate to both the specific
     /// tag number as well as the properties of the identifier in the stream.
-    internal struct ASN1Identifier {
+    struct ASN1Identifier {
         /// The base tag. In a general ASN.1 implementation we'd need an arbitrary precision integer here as the tag number can be arbitrarily large, but
         /// we don't need the full generality here.
         private(set) var baseTag: UInt8
@@ -112,27 +112,27 @@ extension ASN1 {
 }
 
 extension ASN1.ASN1Identifier {
-    internal static let objectIdentifier = try! ASN1.ASN1Identifier(rawIdentifier: 0x06)
-    internal static let primitiveBitString = try! ASN1.ASN1Identifier(rawIdentifier: 0x03)
-    internal static let primitiveOctetString = try! ASN1.ASN1Identifier(rawIdentifier: 0x04)
-    internal static let integer = try! ASN1.ASN1Identifier(rawIdentifier: 0x02)
-    internal static let sequence = try! ASN1.ASN1Identifier(rawIdentifier: 0x30)
-    internal static let set = try! ASN1.ASN1Identifier(rawIdentifier: 0x31)
-    internal static let null = try! ASN1.ASN1Identifier(rawIdentifier: 0x05)
-    internal static let boolean = try! ASN1.ASN1Identifier(rawIdentifier: 0x01)
-    internal static let enumerated = try! ASN1.ASN1Identifier(rawIdentifier: 0x0a)
-    internal static let primitiveUTF8String = try! ASN1.ASN1Identifier(rawIdentifier: 0x0c)
-    internal static let primitiveNumericString = try! ASN1.ASN1Identifier(rawIdentifier: 0x12)
-    internal static let primitivePrintableString = try! ASN1.ASN1Identifier(rawIdentifier: 0x13)
-    internal static let primitiveTeletexString = try! ASN1.ASN1Identifier(rawIdentifier: 0x14)
-    internal static let primitiveVideotexString = try! ASN1.ASN1Identifier(rawIdentifier: 0x15)
-    internal static let primitiveIA5String = try! ASN1.ASN1Identifier(rawIdentifier: 0x16)
-    internal static let primitiveGraphicString = try! ASN1.ASN1Identifier(rawIdentifier: 0x19)
-    internal static let primitiveVisibleString = try! ASN1.ASN1Identifier(rawIdentifier: 0x1a)
-    internal static let primitiveGeneralString = try! ASN1.ASN1Identifier(rawIdentifier: 0x1b)
-    internal static let primitiveUniversalString = try! ASN1.ASN1Identifier(rawIdentifier: 0x1c)
-    internal static let primitiveBMPString = try! ASN1.ASN1Identifier(rawIdentifier: 0x1e)
-    internal static let generalizedTime = try! ASN1.ASN1Identifier(rawIdentifier: 0x18)
+    static let objectIdentifier = try! ASN1.ASN1Identifier(rawIdentifier: 0x06)
+    static let primitiveBitString = try! ASN1.ASN1Identifier(rawIdentifier: 0x03)
+    static let primitiveOctetString = try! ASN1.ASN1Identifier(rawIdentifier: 0x04)
+    static let integer = try! ASN1.ASN1Identifier(rawIdentifier: 0x02)
+    static let sequence = try! ASN1.ASN1Identifier(rawIdentifier: 0x30)
+    static let set = try! ASN1.ASN1Identifier(rawIdentifier: 0x31)
+    static let null = try! ASN1.ASN1Identifier(rawIdentifier: 0x05)
+    static let boolean = try! ASN1.ASN1Identifier(rawIdentifier: 0x01)
+    static let enumerated = try! ASN1.ASN1Identifier(rawIdentifier: 0x0a)
+    static let primitiveUTF8String = try! ASN1.ASN1Identifier(rawIdentifier: 0x0c)
+    static let primitiveNumericString = try! ASN1.ASN1Identifier(rawIdentifier: 0x12)
+    static let primitivePrintableString = try! ASN1.ASN1Identifier(rawIdentifier: 0x13)
+    static let primitiveTeletexString = try! ASN1.ASN1Identifier(rawIdentifier: 0x14)
+    static let primitiveVideotexString = try! ASN1.ASN1Identifier(rawIdentifier: 0x15)
+    static let primitiveIA5String = try! ASN1.ASN1Identifier(rawIdentifier: 0x16)
+    static let primitiveGraphicString = try! ASN1.ASN1Identifier(rawIdentifier: 0x19)
+    static let primitiveVisibleString = try! ASN1.ASN1Identifier(rawIdentifier: 0x1a)
+    static let primitiveGeneralString = try! ASN1.ASN1Identifier(rawIdentifier: 0x1b)
+    static let primitiveUniversalString = try! ASN1.ASN1Identifier(rawIdentifier: 0x1c)
+    static let primitiveBMPString = try! ASN1.ASN1Identifier(rawIdentifier: 0x1e)
+    static let generalizedTime = try! ASN1.ASN1Identifier(rawIdentifier: 0x18)
 }
 
 extension ASN1.ASN1Identifier: Hashable { }

@@ -11,8 +11,8 @@ extension K1.KeyAgreement {
 		typealias Impl = K1._PrivateKeyImplementation
 		public typealias PublicKey = K1.KeyAgreement.PublicKey
 
-		internal let impl: Impl
-		internal let publicKeyImpl: K1._PublicKeyImplementation
+		let impl: Impl
+		let publicKeyImpl: K1._PublicKeyImplementation
 
 		/// The corresponding public key.
 		public var publicKey: PublicKey {
@@ -111,8 +111,8 @@ extension K1.KeyAgreement {
 	/// A `secp256k1` public key used for key agreement.
 	public struct PublicKey: Sendable, Hashable {
 		typealias Impl = K1._PublicKeyImplementation
-		internal let impl: Impl
-		internal init(impl: Impl) {
+		let impl: Impl
+		init(impl: Impl) {
 			self.impl = impl
 		}
 
@@ -233,8 +233,8 @@ extension K1.Schnorr {
 		typealias Impl = K1._PrivateKeyImplementation
 		public typealias PublicKey = K1.Schnorr.PublicKey
 
-		internal let impl: Impl
-		internal let publicKeyImpl: K1._PublicKeyImplementation
+		let impl: Impl
+		let publicKeyImpl: K1._PublicKeyImplementation
 
 		/// The corresponding public key.
 		public var publicKey: PublicKey {
@@ -334,8 +334,8 @@ extension K1.Schnorr {
 	/// more specifically Schnorr signatures
 	public struct PublicKey: Sendable, Hashable {
 		typealias Impl = K1._PublicKeyImplementation
-		internal let impl: Impl
-		internal init(impl: Impl) {
+		let impl: Impl
+		init(impl: Impl) {
 			self.impl = impl
 		}
 
@@ -456,8 +456,8 @@ extension K1.ECDSA {
 		typealias Impl = K1._PrivateKeyImplementation
 		public typealias PublicKey = K1.ECDSA.PublicKey
 
-		internal let impl: Impl
-		internal let publicKeyImpl: K1._PublicKeyImplementation
+		let impl: Impl
+		let publicKeyImpl: K1._PublicKeyImplementation
 
 		/// The corresponding public key.
 		public var publicKey: PublicKey {
@@ -557,8 +557,8 @@ extension K1.ECDSA {
 	/// more specifically ECDSA signatures, that do not offer recovery of the public key.
 	public struct PublicKey: Sendable, Hashable {
 		typealias Impl = K1._PublicKeyImplementation
-		internal let impl: Impl
-		internal init(impl: Impl) {
+		let impl: Impl
+		init(impl: Impl) {
 			self.impl = impl
 		}
 
@@ -679,8 +679,8 @@ extension K1.ECDSAWithKeyRecovery {
 		typealias Impl = K1._PrivateKeyImplementation
 		public typealias PublicKey = K1.ECDSAWithKeyRecovery.PublicKey
 
-		internal let impl: Impl
-		internal let publicKeyImpl: K1._PublicKeyImplementation
+		let impl: Impl
+		let publicKeyImpl: K1._PublicKeyImplementation
 
 		/// The corresponding public key.
 		public var publicKey: PublicKey {
@@ -780,8 +780,8 @@ extension K1.ECDSAWithKeyRecovery {
 	/// more specifically ECDSA signatures that offers recovery of the public key.
 	public struct PublicKey: Sendable, Hashable {
 		typealias Impl = K1._PublicKeyImplementation
-		internal let impl: Impl
-		internal init(impl: Impl) {
+		let impl: Impl
+		init(impl: Impl) {
 			self.impl = impl
 		}
 

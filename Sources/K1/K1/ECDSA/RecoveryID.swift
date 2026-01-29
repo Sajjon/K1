@@ -8,7 +8,7 @@ extension K1.ECDSAWithKeyRecovery.Signature {
 		case _2 = 2
 		case _3 = 3
 
-		internal var recid: Int32 {
+		var recid: Int32 {
 			Int32(rawValue)
 		}
 	}

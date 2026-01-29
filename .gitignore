@@ -7,4 +7,5 @@ DerivedData/
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 scripts/update-libsecp/Package.resolved
 scripts/update-libsecp/.build
+scripts/*.pyc
 scripts/update-libsecp/.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata

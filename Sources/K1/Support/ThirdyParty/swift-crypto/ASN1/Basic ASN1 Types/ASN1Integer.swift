@@ -16,7 +16,7 @@
 #else
 import Foundation
 
-/// A protocol that represents any internal object that can present itself as a INTEGER, or be parsed from
+/// A protocol that represents any object that can present itself as a INTEGER, or be parsed from
 /// a INTEGER.
 ///
 /// This is not a very good solution for a fully-fledged ASN.1 library: we'd rather have a better numerics
@@ -39,7 +39,7 @@ extension ASN1IntegerRepresentable {
         .integer
     }
 
-    internal init(asn1Encoded node: ASN1.ASN1Node, withIdentifier identifier: ASN1.ASN1Identifier) throws {
+    init(asn1Encoded node: ASN1.ASN1Node, withIdentifier identifier: ASN1.ASN1Identifier) throws {
         guard node.identifier == identifier else {
             throw CryptoKitASN1Error.unexpectedFieldType
         }
@@ -79,7 +79,7 @@ extension ASN1IntegerRepresentable {
         self = try Self(asn1IntegerBytes: dataBytes)
     }
 
-    internal func serialize(into coder: inout ASN1.Serializer, withIdentifier identifier: ASN1.ASN1Identifier) throws {
+    func serialize(into coder: inout ASN1.Serializer, withIdentifier identifier: ASN1.ASN1Identifier) throws {
         coder.appendPrimitiveNode(identifier: identifier) { bytes in
             self.withBigEndianIntegerBytes { integerBytes in
                 // If the number of bytes is 0, we're encoding a zero. That actually _does_ require one byte.

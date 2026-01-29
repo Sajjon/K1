@@ -28,7 +28,7 @@ protocol WrappedECDSASignature {
 
 // MARK: ECDSA Shared
 extension FFI {
-	internal static func _ecdsa<WrappedSignature>(
+	static func _ecdsa<WrappedSignature>(
 		message: [UInt8],
 		privateKey: FFI.PrivateKey.Wrapped,
 		options: K1.ECDSA.SigningOptions = .default
@@ -66,7 +66,7 @@ extension K1.ECDSA.SigningOptions {
 }
 
 extension K1.ECDSA.SigningOptions.NonceFunction {
-	fileprivate func function() -> Optional< @convention(c) (UnsafeMutablePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafeMutableRawPointer?, UInt32) -> Int32> {
+	fileprivate func function() -> (@convention(c) (UnsafeMutablePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafeMutableRawPointer?, UInt32) -> Int32)? {
 		switch self {
 		case .deterministic:
 			return secp256k1_nonce_function_rfc6979

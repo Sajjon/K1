@@ -16,9 +16,9 @@ extension K1.ECDSAWithKeyRecovery {
 	/// from which users **cannot** recover the public key, not without the `RecoveryID`.
 	public struct Signature: Sendable, Hashable, ContiguousBytes {
 		typealias Wrapped = FFI.ECDSAWithKeyRecovery.Wrapped
-		internal let wrapped: Wrapped
+		let wrapped: Wrapped
 
-		internal init(wrapped: Wrapped) {
+		init(wrapped: Wrapped) {
 			self.wrapped = wrapped
 		}
 	}
@@ -54,7 +54,7 @@ extension K1.ECDSAWithKeyRecovery.Signature {
 
 // MARK: Serialize
 extension K1.ECDSAWithKeyRecovery.Signature {
-	internal var internalRepresentation: Data {
+	var internalRepresentation: Data {
 		Data(wrapped.bytes)
 	}
 
@@ -127,11 +127,11 @@ extension K1.ECDSAWithKeyRecovery.Signature.Compact {
 	/// Controls the order of the three components `R`, `S` and `V` (`RecoveryID`), specifyin
 	/// either `R || S || V` called `.rsv` or `V || R || S` called `vrs`.
 	public enum SerializationFormat {
-		/// `R || S || V` - the format `libsecp256k1` v0.3.0 uses as internal representation
+		/// `R || S || V` - the format `libsecp256k1` v0.3.0 uses as representation
 		/// This is the default value of this library.
 		case rsv
 
-		/// We use `R || S || V` as default values since `libsecp256k1` v0.3.0 uses it as its internal representation.
+		/// We use `R || S || V` as default values since `libsecp256k1` v0.3.0 uses it as its representation.
 		public static let `default`: Self = .rsv
 
 		/// `V || R || S`.

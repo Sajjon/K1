@@ -7,8 +7,8 @@ extension K1.Schnorr {
 	/// [scheme]: https://doi.org/10.1007%2F0-387-34805-0_22
 	public struct Signature: Sendable, Hashable {
 		typealias Wrapped = FFI.Schnorr.Wrapped
-		internal let wrapped: Wrapped
-		internal init(wrapped: Wrapped) {
+		let wrapped: Wrapped
+		init(wrapped: Wrapped) {
 			self.wrapped = wrapped
 		}
 	}

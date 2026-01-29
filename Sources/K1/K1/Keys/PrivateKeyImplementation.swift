@@ -17,7 +17,7 @@ protocol _K1KeyImportable {
 	init(x963Representation: some ContiguousBytes) throws
 }
 
-typealias _K1KeyPortable = _K1KeyImportable & _K1KeyExportable
+typealias _K1KeyPortable = _K1KeyExportable & _K1KeyImportable
 
 // MARK: - _K1PrivateKeyProtocol
 protocol _K1PrivateKeyProtocol: _K1KeyPortable {
@@ -30,11 +30,11 @@ protocol _K1PrivateKeyProtocol: _K1KeyPortable {
 extension K1 {
 	struct _PrivateKeyImplementation: Sendable, Hashable, _K1PrivateKeyProtocol {
 		typealias Wrapped = FFI.PrivateKey.Wrapped
-		internal let wrapped: Wrapped
+		let wrapped: Wrapped
 
 		let publicKey: _PublicKeyImplementation
 
-		internal init(wrapped: Wrapped) {
+		init(wrapped: Wrapped) {
 			self.wrapped = wrapped
 			self.publicKey = PublicKey(wrapped: wrapped.publicKey)
 		}

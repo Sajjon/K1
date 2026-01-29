@@ -52,7 +52,7 @@ extension ASN1 {
             self.key = key
         }
         
-        internal init(algorithmIdentifier: RFC5480AlgorithmIdentifier, key: [UInt8]) {
+        init(algorithmIdentifier: RFC5480AlgorithmIdentifier, key: [UInt8]) {
             self.algorithmIdentifier = algorithmIdentifier
             self.key = ASN1BitString(bytes: key[...])
         }
