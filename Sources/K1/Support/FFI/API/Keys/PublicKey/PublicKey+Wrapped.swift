@@ -44,17 +44,17 @@ extension FFI.PublicKey.Wrapped {
 // MARK: Group Operations
 extension FFI.PublicKey.Wrapped {
 	/// Adds two public keys (points) on the secp256k1 curve
-	public static func + (lhs: Self, rhs: Self) throws -> Self {
+	static func + (lhs: Self, rhs: Self) throws -> Self {
 		try sum(keys: [lhs, rhs])
 	}
 
 	/// Subtracts two public keys (points) on the secp256k1 curve
-	public static func - (lhs: Self, rhs: Self) throws -> Self {
+	static func - (lhs: Self, rhs: Self) throws -> Self {
 		try lhs + rhs.negate()
 	}
 
 	/// Negates a public key (point) on the secp256k1 curve
-	public func negate() throws -> Self {
+	func negate() throws -> Self {
 		var result = self.raw
 		try FFI.toC { ffi in
 			try ffi.call(ifFailThrow: .publicKeyCreate) { context in
@@ -65,7 +65,7 @@ extension FFI.PublicKey.Wrapped {
 	}
 
 	/// Combines multiple public keys (points) on the secp256k1 curve
-	public static func sum(keys: [Self]) throws -> Self {
+	static func sum(keys: [Self]) throws -> Self {
 		guard !keys.isEmpty else {
 			throw K1.Error.invalidParameter
 		}

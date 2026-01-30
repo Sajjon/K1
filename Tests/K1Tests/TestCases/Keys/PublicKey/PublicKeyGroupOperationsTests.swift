@@ -151,7 +151,7 @@ final class PublicKeyGroupOperationsTests: XCTestCase {
 	
 	func testGroupNegationWithG2G3G4() throws {
 		// Test negation operations
-		
+
 		// Test: -g2 should be different from g2
 		let negG2 = try FFI.PublicKey.Wrapped.gx2.negate()
 		XCTAssertFalse(try negG2.compare(to: FFI.PublicKey.Wrapped.gx2))

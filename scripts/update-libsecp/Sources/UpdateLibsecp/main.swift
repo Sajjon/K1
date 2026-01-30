@@ -57,7 +57,7 @@ extension Program {
 			)
 
 			await cleanUp(
-				currentBranch: currentBranch,
+				currentBranch: currentBranch
 			)
 		} catch {
 			await cleanUp(
@@ -442,7 +442,8 @@ extension Program {
 		let matches = regex.matches(in: content, options: [], range: range)
 		guard let match = matches.first else {
 			throw ToolError(
-				"Could not find README version line to replace, searched for line:\n\(oldLinePattern)")
+				"Could not find README version line to replace, searched for line:\n\(oldLinePattern)"
+			)
 		}
 
 		if dryRun {
@@ -474,7 +475,8 @@ private func firstLineOf(
 	)
 	guard let firstLine = stdout.split(separator: "\n").first else {
 		throw ToolError(
-			"No first line returned from command. Output was: '\(stdout)', stderr: '\(stderr)'")
+			"No first line returned from command. Output was: '\(stdout)', stderr: '\(stderr)'"
+		)
 	}
 	return String(firstLine)
 }
@@ -530,8 +532,14 @@ private func runCommand(
 // MARK: - ToolError
 private struct ToolError: LocalizedError {
 	let message: String
-	init(_ message: String) { self.message = message }
-	var errorDescription: String? { message }
+
+	init(_ message: String) {
+		self.message = message
+	}
+
+	var errorDescription: String? {
+		message
+	}
 }
 
 extension String {

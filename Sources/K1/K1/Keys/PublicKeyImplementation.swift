@@ -108,7 +108,7 @@ extension K1._PublicKeyImplementation {
 	}
 
 	/// A Privacy-Enhanced Mail (PEM) representation of the public key.
-	public var pemRepresentation: String {
+	var pemRepresentation: String {
 		let pemDocument = ASN1.PEMDocument(type: Self.pemType, derBytes: self.derRepresentation)
 		return pemDocument.pemString
 	}
@@ -143,22 +143,22 @@ extension K1._PublicKeyImplementation {
 // MARK: Group Operations
 extension K1._PublicKeyImplementation {
 	/// Adds two public keys (points) on the secp256k1 curve
-	public static func + (lhs: Self, rhs: Self) throws -> Self {
+	static func + (lhs: Self, rhs: Self) throws -> Self {
 		try Self(wrapped: lhs.wrapped + rhs.wrapped)
 	}
 
 	/// Subtracts two public keys (points) on the secp256k1 curve
-	public static func - (lhs: Self, rhs: Self) throws -> Self {
+	static func - (lhs: Self, rhs: Self) throws -> Self {
 		try Self(wrapped: lhs.wrapped - rhs.wrapped)
 	}
 
 	/// Negates a public key (point) on the secp256k1 curve
-	public func negate() throws -> Self {
+	func negate() throws -> Self {
 		try Self(wrapped: wrapped.negate())
 	}
 
 	/// Combines multiple public keys (points) on the secp256k1 curve
-	public static func sum(keys: [Self]) throws -> Self {
+	static func sum(keys: [Self]) throws -> Self {
 		let wrappedKeys = keys.map(\.wrapped)
 		return try Self(wrapped: FFI.PublicKey.Wrapped.sum(keys: wrappedKeys))
 	}

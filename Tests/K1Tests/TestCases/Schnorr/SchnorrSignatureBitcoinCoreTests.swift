@@ -21,8 +21,13 @@ protocol SchnorrTestVector: Codable {
 }
 
 extension SchnorrTestVector {
-	var comment: String? { nil }
-	var flags: [String]? { nil }
+	var comment: String? { 
+		nil
+	}
+	
+	var flags: [String]? { 
+		nil
+	}
 }
 
 // MARK: - SchnorrTestVerifyVector

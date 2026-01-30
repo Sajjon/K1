@@ -23,13 +23,6 @@ extension FFI.Schnorr.Wrapped {
 	}
 }
 
-// MARK: Equatable
-extension FFI.Schnorr.Wrapped {
-	static func == (lhs: FFI.Schnorr.Wrapped, rhs: FFI.Schnorr.Wrapped) -> Bool {
-		lhs.bytes == rhs.bytes
-	}
-}
-
 // MARK: Hashable
 extension FFI.Schnorr.Wrapped {
 	func hash(into hasher: inout Hasher) {
