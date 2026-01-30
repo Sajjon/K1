@@ -39,9 +39,9 @@ private extension ECDHWycheproofTests {
 	func testGroup(
 		group: ECDHTestGroup,
 		skipIfContainsAnyFlag flagsForUnsupportedTestVectors: [String] = ["InvalidAsn", "CompressedPoint", "InvalidPublic", "UnnamedCurve"],
-		file: StaticString = #file, line: UInt = #line
+		file: StaticString = #filePath, line: UInt = #line
 	) -> ResultOfTestGroup {
-		func padKeyIfNecessary(vector: String, file: StaticString = #file, line: UInt = #line) throws -> [UInt8] {
+		func padKeyIfNecessary(vector: String, file: StaticString = #filePath, line: UInt = #line) throws -> [UInt8] {
 			// There are a few edge cases here.
 			//
 			// First, our raw bytes function requires the

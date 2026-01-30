@@ -130,7 +130,7 @@ extension K1.ECDSAWithKeyRecovery.Signature.Compact {
 	///
 	/// Controls the order of the three components `R`, `S` and `V` (`RecoveryID`), specifyin
 	/// either `R || S || V` called `.rsv` or `V || R || S` called `vrs`.
-	public enum SerializationFormat {
+	public enum SerializationFormat: Sendable {
 		/// `R || S || V` - the format `libsecp256k1` v0.3.0 uses as representation
 		/// This is the default value of this library.
 		case rsv

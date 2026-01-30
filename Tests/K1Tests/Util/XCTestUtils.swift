@@ -4,7 +4,8 @@ extension XCTestCase {
 	func assert<T, E: Swift.Error & Equatable>(
 		_ fn: @autoclosure () throws -> T, // swiftlint:disable:this identifier_name
 		throws expectedError: E,
-		file: StaticString = #file, line: UInt = #line
+		file: StaticString = #filePath, 
+		line: UInt = #line
 	) {
 		XCTAssertThrowsError(try fn()) { anyError in
 			guard let error = anyError as? E else {
