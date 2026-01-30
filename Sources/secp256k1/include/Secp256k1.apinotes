@@ -1,0 +1,9 @@
+Name: Secp256k1
+Functions:
+- Name: ecdh_hash_function_asn1_x963_apinotes_test
+  SwiftName: ecdhHashASN1x963(output:x:)
+  Parameters:
+  - Position: 0
+    Nullability: N   # output
+  - Position: 1
+    Nullability: N   # x32

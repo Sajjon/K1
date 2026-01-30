@@ -1,5 +1,5 @@
 import Foundation
-import secp256k1
+import Secp256k1
 
 // MARK: Format
 extension K1.Format {

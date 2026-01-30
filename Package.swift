@@ -67,6 +67,15 @@ let package = Package(
 				.define("ENABLE_MODULE_EXTRAKEYS"),
 			]
 		),
+		.testTarget(
+			name: "ApinotesTests",
+			dependencies: [
+				"secp256k1",
+			],
+			swiftSettings: [
+				.define("CRYPTO_IN_SWIFTPM_FORCE_BUILD_API"),
+			]
+		),
 		.target(
 			name: "K1",
 			dependencies: [

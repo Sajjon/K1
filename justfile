@@ -32,6 +32,10 @@ bootstrap:
 
 dev: bootstrap init
 
+synthesize-interface:
+	xcrun swift-synthesize-interface -I Sources/secp256k1/include -module-name Secp256k1 -target arm64-apple-macos15 -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.sdk
+
+
 format:
 	swiftformat --config .swiftformat "{{ROOT_DIR}}"
 

@@ -1,5 +1,5 @@
 // FFI to C
-import secp256k1
+import Secp256k1
 
 // MARK: - FFI.Context
 extension FFI {
