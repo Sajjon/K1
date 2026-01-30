@@ -9,7 +9,7 @@ extension K1 {
 // MARK: - K1.ECDSA.ValidationOptions
 extension K1.ECDSA {
 	/// Additional parameters used during validation of ECDSA signatures.
-	public struct ValidationOptions {
+	public struct ValidationOptions: Sendable {
 		/// Whether or not to consider malleable signatures valid.
 		public let malleabilityStrictness: MalleabilityStrictness
 
@@ -30,7 +30,7 @@ extension K1.ECDSA.ValidationOptions {
 	/// Whether or not to consider malleable signatures valid.
 	///
 	/// [more]: https://github.com/bitcoin-core/secp256k1/blob/2e5e4b67dfb67950563c5f0ab2a62e25eb1f35c5/include/secp256k1.h#L510-L550
-	public enum MalleabilityStrictness {
+	public enum MalleabilityStrictness: Sendable {
 		/// Considers all malleable signatures **invalid**.
 		case rejected
 

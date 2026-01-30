@@ -121,7 +121,7 @@ struct RecoveryTestVector: Decodable, Equatable {
 }
 
 // MARK: - K1.ECDSAWithKeyRecovery.Signature.RecoveryID + ExpressibleByIntegerLiteral
-extension K1.ECDSAWithKeyRecovery.Signature.RecoveryID: @retroactive ExpressibleByIntegerLiteral {
+extension K1.ECDSAWithKeyRecovery.Signature.RecoveryID: ExpressibleByIntegerLiteral {
 	public init(integerLiteral value: UInt8) {
 		self.init(rawValue: value)!
 	}
