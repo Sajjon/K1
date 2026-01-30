@@ -24,9 +24,13 @@ submodules:  ## Update all submodules .
 
 init: purge submodules
 
-dev:
+typos:
+	typos -w
+
+bootstrap:
 	./scripts/bootstrap
-	just init
+
+dev: bootstrap init
 
 format:
 	swiftformat --config .swiftformat "{{ROOT_DIR}}"

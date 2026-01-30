@@ -3,23 +3,53 @@
 set -o errexit # exit out if any command fails
 set -o nounset # exit out if any used variable is unset
 
-echo "Installing CLI tools (if missing)"
+echo "Installing CLI tools (if missing)..."
 if ! command -v grealpath &> /dev/null; then
     brew install coreutils
+	echo "coreutils (CLI tools) have been installed."
+else
+	echo "coreutils is already installed."
 fi
+
+echo "Installing swiftformat (if missing)..."
 if ! command -v swiftformat &> /dev/null; then
     brew install swiftformat
+	echo "swiftformat has been installed."
+else
+	echo "swiftformat is already installed."
 fi
 
-DIR=$(cd "$(dirname "$BASH_SOURCE")" && pwd)
+echo "Installing just (if missing)..."
+if ! command -v just &> /dev/null; then
+    brew install just
+    echo "just has been installed."
+else
+	echo "just is already installed."
+fi
 
-pushd "$DIR/.." > /dev/null
+echo "Installing pre-commit (if missing)..."
+if ! command -v pre-commit &> /dev/null; then
+    brew install pre-commit
+    echo "pre-commit has been installed."
+else
+    echo "pre-commit is already installed."
+fi
 
-echo "Symlinking Git hooks"
-GIT_HOOKS_DIR=.git/hooks
-mkdir -p "$GIT_HOOKS_DIR"
-ln -sf "$(grealpath --relative-to=.git/hooks scripts)/pre-commit" "$GIT_HOOKS_DIR"
+echo "Installing typos (if missing)..."
+if ! command -v typos &> /dev/null; then
+    if command -v cargo &> /dev/null; then
+        cargo install typos-cli --locked
+        echo "typos has been installed with cargo."
+    else
+        brew install typos-cli
+        echo "typos has been installed with brew."
+    fi
+else
+    echo "typos is already installed."
+fi
+
+echo "Adding git hooks..."
+pre-commit install
+echo "Git hooks added."
 
 echo "Done ✅"
-
-popd > /dev/null
