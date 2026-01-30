@@ -92,18 +92,3 @@ extension FFI.PublicKey.Wrapped {
 		return Self(raw: result)
 	}
 }
-
-#if DEBUG
-
-// MARK: Debug Extensions
-extension FFI.PublicKey.Wrapped {
-	/// `G`, the generator point of the curve `secp256k1`
-	// swiftlint:disable:next identifier_name
-	static let g: Self = FFI.PrivateKey.Wrapped.one.publicKey
-	static let gx2: Self = FFI.PrivateKey.Wrapped.two.publicKey
-	static let gx3: Self = FFI.PrivateKey.Wrapped.three.publicKey
-	static let gx4: Self = FFI.PrivateKey.Wrapped.four.publicKey
-	static let gx5: Self = FFI.PrivateKey.Wrapped.five.publicKey
-	static let gx6: Self = FFI.PrivateKey.Wrapped.six.publicKey
-}
-#endif

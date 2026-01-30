@@ -40,7 +40,7 @@ extension FFI {
 
 // MARK: Init
 extension FFI.PrivateKey.Wrapped {
-	fileprivate init(bytes: [UInt8]) throws {
+	init(bytes: [UInt8]) throws {
 		try self.init(secureBytes: .init(bytes: bytes))
 	}
 
@@ -84,32 +84,3 @@ extension FFI.PrivateKey {
 		try Wrapped(bytes: rawRepresentation.bytes)
 	}
 }
-
-// swiftlint:disable force_try
-
-#if DEBUG
-
-// MARK: Debug Extensions
-extension FFI.PrivateKey.Wrapped {
-	init(scalar: UInt) throws {
-		// Convert to big-endian bytes
-		let valueBytes = withUnsafeBytes(of: scalar.bigEndian, Array.init)
-
-		// Pad with leading zeros to get exactly 32 bytes
-		let paddingCount = 32 - valueBytes.count
-		let paddedBytes = Array(repeating: UInt8(0), count: paddingCount) + valueBytes
-
-		try self.init(bytes: paddedBytes)
-	}
-
-	static let one = try! Self(scalar: 1)
-	static let two = try! Self(scalar: 2)
-	static let three = try! Self(scalar: 3)
-	static let four = try! Self(scalar: 4)
-	static let five = try! Self(scalar: 5)
-	static let six = try! Self(scalar: 6)
-}
-
-#endif
-
-// swiftlint:enable force_try

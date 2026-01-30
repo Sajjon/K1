@@ -249,11 +249,13 @@ assert(aliceBob.count == 65) // pass
 
 # Development
 
+`K1` uses [`just`](https://github.com/casey/just) as a command runner instead of make.
+
 ## Setup submodule
 Stand in root and run to setup submodule
 
 ```sh
-make submodules
+just submodules
 ```
 
 ## Update submodule
@@ -278,7 +280,10 @@ You run `gyb` for a single file like so:
 ./scripts/gyb --line-directive "" Sources/Foobar.swift.gyb -o Sources/Foobar.swift
 ```
 
-More conveniently you can run the bash script `./scripts/generate_boilerplate_files_with_gyb.sh` to generate all Swift files from their corresponding gyb template.
+More conveniently, to generate all Swift files from their corresponding gyb template, you can run:
+```sh
+just gyb
+```
 
 **If you add a new `.gyb` file, you should append a `// MARK: - Generated file, do NOT edit` warning** inside it, e.g.
 

@@ -51,6 +51,8 @@ let package = Package(
 				"libsecp256k1/src/precompute_ecmult.c",
 				"libsecp256k1/src/precompute_ecmult_gen.c",
 				"libsecp256k1/src/tests_exhaustive.c",
+				"libsecp256k1/src/testrand.h",
+				"libsecp256k1/src/unit_test.c",
 				"libsecp256k1/src/tests.c",
 				"libsecp256k1/src/ctime_tests.c",
 
