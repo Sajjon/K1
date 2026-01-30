@@ -45,7 +45,7 @@ extension K1.ECDSA.ValidationOptions {
 extension K1.ECDSA {
 	/// Additional parameters used during signing, affects the signature produced.
 	public struct SigningOptions: Sendable, Hashable {
-		/// Behavior of nonce generation used durring signing.
+		/// Behavior of nonce generation used during signing.
 		public let nonceFunction: NonceFunction
 
 		public init(nonceFunction: NonceFunction) {
@@ -58,7 +58,7 @@ extension K1.ECDSA.SigningOptions {
 	/// The default behavior used during ECDSA signing.
 	public static let `default`: Self = .init(nonceFunction: .deterministic())
 
-	/// Behavior of nonce generation used durring signing.
+	/// Behavior of nonce generation used during signing.
 	public enum NonceFunction: Sendable, Hashable {
 		/// Use securely generate random data as nonce during ECDSA signing.
 		case random

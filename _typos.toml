@@ -1,0 +1,12 @@
+[files]
+extend-exclude = [
+    "Sources/secp256k1/libsecp256k1",
+    "Tests/K1Tests/TestVectors/*.json",
+    "scripts/gyb.py",
+]
+
+[default]
+extend-ignore-identifiers-re = [
+    "MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgvddDDSbMRcLWZETSUOyD",
+    "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEScGX3ICtHaR6Q0K5OJPo4fsLuU",
+]

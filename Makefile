@@ -18,7 +18,7 @@ purge:
 	make rmsubmod
 	make clean
 
-submodules:  ## Update all sumodules .
+submodules:  ## Update all submodules .
 	git submodule update --init
 	
 init:

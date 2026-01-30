@@ -244,7 +244,7 @@ extension Program {
 	func commitChanges(newVersion: Version) async throws {
 		print("💾 Committing changes…")
 		try await doCommitChanges(newVersion: newVersion)
-		print("💾 Commited changes ☑️.")
+		print("💾 Committed changes ☑️.")
 	}
 
 	func doCommitChanges(newVersion: Version) async throws {

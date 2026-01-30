@@ -28,7 +28,7 @@ final class SecureBytesTests: XCTestCase {
 		XCTAssertEqual(first, second)
 
 		first.append(Data("world".utf8))
-		second.append(Data("wrold".utf8))
+		second.append(Data("sweden".utf8))
 		XCTAssertNotEqual(first, second)
 	}
 

@@ -134,7 +134,7 @@ extension K1.Error: CustomDebugStringConvertible {
 				case .ecdsaSignatureParseDER:
 					return "ECDSA signature parse DER"
 				case .ecdsaSignatureSerializeCompact:
-					return "ECDSA signature serialzie compact"
+					return "ECDSA signature serialize compact"
 				case .ecdsaSignatureSerializeDER:
 					return "ECDSA signature serialize DER"
 				case .recoverableSignatureParseCompact:
