@@ -135,7 +135,8 @@ extension K1.ECDSAWithKeyRecovery.Signature.Compact {
 		/// This is the default value of this library.
 		case rsv
 
-		/// We use `R || S || V` as default values since `libsecp256k1` v0.3.0 uses it as its representation.
+		/// We use `R || S || V` as default values since `libsecp256k1` v0.7.1
+		/// uses it as its internal representation.
 		public static let `default`: Self = .rsv
 
 		/// `V || R || S`.
