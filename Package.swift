@@ -65,11 +65,6 @@ let package = Package(
 				.define("ENABLE_MODULE_RECOVERY"),
 				.define("ENABLE_MODULE_SCHNORRSIG"),
 				.define("ENABLE_MODULE_EXTRAKEYS"),
-
-				// Suppress build warnings
-				.unsafeFlags(
-					["-Wno-shorten-64-to-32"]
-				),
 			]
 		),
 		.target(
