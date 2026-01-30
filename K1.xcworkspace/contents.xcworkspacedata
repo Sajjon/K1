@@ -1,0 +1,1090 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:_typos.toml">
+   </FileRef>
+   <FileRef
+      location = "group:justfile">
+   </FileRef>
+   <FileRef
+      location = "group:LICENSE.txt">
+   </FileRef>
+   <FileRef
+      location = "group:Package.swift">
+   </FileRef>
+   <FileRef
+      location = "group:README.md">
+   </FileRef>
+   <Group
+      location = "group:scripts"
+      name = "scripts">
+      <FileRef
+         location = "group:bootstrap">
+      </FileRef>
+      <FileRef
+         location = "group:gyb.py">
+      </FileRef>
+      <FileRef
+         location = "group:generate_boilerplate_files_with_gyb.sh">
+      </FileRef>
+      <FileRef
+         location = "group:gyb">
+      </FileRef>
+      <FileRef
+         location = "group:gyb.pyc">
+      </FileRef>
+      <FileRef
+         location = "group:update-libsecp">
+      </FileRef>
+   </Group>
+   <Group
+      location = "group:Sources"
+      name = "Sources">
+      <Group
+         location = "group:secp256k1"
+         name = "secp256k1">
+         <Group
+            location = "group:include"
+            name = "include">
+            <FileRef
+               location = "group:secp256k1.h">
+            </FileRef>
+         </Group>
+         <Group
+            location = "group:libsecp256k1"
+            name = "libsecp256k1">
+            <Group
+               location = "group:build-aux"
+               name = "build-aux">
+               <Group
+                  location = "group:m4"
+                  name = "m4">
+                  <FileRef
+                     location = "group:bitcoin_secp.m4">
+                  </FileRef>
+               </Group>
+            </Group>
+            <FileRef
+               location = "group:configure.ac">
+            </FileRef>
+            <Group
+               location = "group:tools"
+               name = "tools">
+               <FileRef
+                  location = "group:wycheproof_utils.py">
+               </FileRef>
+               <FileRef
+                  location = "group:symbol-check.py">
+               </FileRef>
+               <FileRef
+                  location = "group:tests_wycheproof_generate_ecdh.py">
+               </FileRef>
+               <FileRef
+                  location = "group:check-abi.sh">
+               </FileRef>
+               <FileRef
+                  location = "group:test_vectors_musig2_generate.py">
+               </FileRef>
+               <FileRef
+                  location = "group:tests_wycheproof_generate_ecdsa.py">
+               </FileRef>
+            </Group>
+            <FileRef
+               location = "group:CMakeLists.txt">
+            </FileRef>
+            <Group
+               location = "group:cmake"
+               name = "cmake">
+               <FileRef
+                  location = "group:source_arm32.s">
+               </FileRef>
+               <FileRef
+                  location = "group:CheckX86_64Assembly.cmake">
+               </FileRef>
+               <FileRef
+                  location = "group:x86_64-w64-mingw32.toolchain.cmake">
+               </FileRef>
+               <FileRef
+                  location = "group:FindValgrind.cmake">
+               </FileRef>
+               <FileRef
+                  location = "group:arm-linux-gnueabihf.toolchain.cmake">
+               </FileRef>
+               <FileRef
+                  location = "group:CheckArm32Assembly.cmake">
+               </FileRef>
+               <FileRef
+                  location = "group:GeneratePkgConfigFile.cmake">
+               </FileRef>
+               <FileRef
+                  location = "group:config.cmake.in">
+               </FileRef>
+               <FileRef
+                  location = "group:CheckStringOptionValue.cmake">
+               </FileRef>
+               <FileRef
+                  location = "group:CheckMemorySanitizer.cmake">
+               </FileRef>
+               <FileRef
+                  location = "group:TryAppendCFlags.cmake">
+               </FileRef>
+            </Group>
+            <FileRef
+               location = "group:CHANGELOG.md">
+            </FileRef>
+            <Group
+               location = "group:ci"
+               name = "ci">
+               <FileRef
+                  location = "group:linux-debian.Dockerfile">
+               </FileRef>
+               <FileRef
+                  location = "group:ci.sh">
+               </FileRef>
+            </Group>
+            <Group
+               location = "group:include"
+               name = "include">
+               <FileRef
+                  location = "group:secp256k1_ecdh.h">
+               </FileRef>
+               <FileRef
+                  location = "group:secp256k1_schnorrsig.h">
+               </FileRef>
+               <FileRef
+                  location = "group:secp256k1_musig.h">
+               </FileRef>
+               <FileRef
+                  location = "group:secp256k1_recovery.h">
+               </FileRef>
+               <FileRef
+                  location = "group:secp256k1_extrakeys.h">
+               </FileRef>
+               <FileRef
+                  location = "group:secp256k1_ellswift.h">
+               </FileRef>
+               <FileRef
+                  location = "group:secp256k1_preallocated.h">
+               </FileRef>
+               <FileRef
+                  location = "group:secp256k1.h">
+               </FileRef>
+            </Group>
+            <Group
+               location = "group:contrib"
+               name = "contrib">
+               <FileRef
+                  location = "group:lax_der_parsing.h">
+               </FileRef>
+               <FileRef
+                  location = "group:lax_der_privatekey_parsing.c">
+               </FileRef>
+               <FileRef
+                  location = "group:lax_der_parsing.c">
+               </FileRef>
+               <FileRef
+                  location = "group:lax_der_privatekey_parsing.h">
+               </FileRef>
+            </Group>
+            <FileRef
+               location = "group:libsecp256k1.pc.in">
+            </FileRef>
+            <FileRef
+               location = "group:Makefile.am">
+            </FileRef>
+            <FileRef
+               location = "group:README.md">
+            </FileRef>
+            <FileRef
+               location = "group:CMakePresets.json">
+            </FileRef>
+            <FileRef
+               location = "group:COPYING">
+            </FileRef>
+            <FileRef
+               location = "group:CONTRIBUTING.md">
+            </FileRef>
+            <Group
+               location = "group:examples"
+               name = "examples">
+               <FileRef
+                  location = "group:CMakeLists.txt">
+               </FileRef>
+               <FileRef
+                  location = "group:ecdh.c">
+               </FileRef>
+               <FileRef
+                  location = "group:examples_util.h">
+               </FileRef>
+               <FileRef
+                  location = "group:ellswift.c">
+               </FileRef>
+               <FileRef
+                  location = "group:musig.c">
+               </FileRef>
+               <FileRef
+                  location = "group:ecdsa.c">
+               </FileRef>
+               <FileRef
+                  location = "group:schnorr.c">
+               </FileRef>
+               <FileRef
+                  location = "group:EXAMPLES_COPYING">
+               </FileRef>
+            </Group>
+            <Group
+               location = "group:doc"
+               name = "doc">
+               <FileRef
+                  location = "group:safegcd_implementation.md">
+               </FileRef>
+               <FileRef
+                  location = "group:musig.md">
+               </FileRef>
+               <FileRef
+                  location = "group:release-process.md">
+               </FileRef>
+               <FileRef
+                  location = "group:ellswift.md">
+               </FileRef>
+            </Group>
+            <Group
+               location = "group:sage"
+               name = "sage">
+               <FileRef
+                  location = "group:secp256k1_params.sage">
+               </FileRef>
+               <FileRef
+                  location = "group:prove_group_implementations.sage">
+               </FileRef>
+               <FileRef
+                  location = "group:gen_split_lambda_constants.sage">
+               </FileRef>
+               <FileRef
+                  location = "group:weierstrass_prover.sage">
+               </FileRef>
+               <FileRef
+                  location = "group:group_prover.sage">
+               </FileRef>
+               <FileRef
+                  location = "group:gen_exhaustive_groups.sage">
+               </FileRef>
+            </Group>
+            <FileRef
+               location = "group:SECURITY.md">
+            </FileRef>
+            <FileRef
+               location = "group:autogen.sh">
+            </FileRef>
+            <Group
+               location = "group:src"
+               name = "src">
+               <FileRef
+                  location = "group:precompute_ecmult_gen.c">
+               </FileRef>
+               <FileRef
+                  location = "group:scalar_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:field_10x26_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:testrand_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:precomputed_ecmult_gen.c">
+               </FileRef>
+               <FileRef
+                  location = "group:ecmult_compute_table.h">
+               </FileRef>
+               <FileRef
+                  location = "group:modinv32_impl.h">
+               </FileRef>
+               <Group
+                  location = "group:asm"
+                  name = "asm">
+                  <FileRef
+                     location = "group:field_10x26_arm.s">
+                  </FileRef>
+               </Group>
+               <FileRef
+                  location = "group:scratch.h">
+               </FileRef>
+               <FileRef
+                  location = "group:ecmult_gen_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:CMakeLists.txt">
+               </FileRef>
+               <FileRef
+                  location = "group:selftest.h">
+               </FileRef>
+               <FileRef
+                  location = "group:field_10x26.h">
+               </FileRef>
+               <FileRef
+                  location = "group:modinv32.h">
+               </FileRef>
+               <FileRef
+                  location = "group:scalar_8x32_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:hsort_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:field_5x52.h">
+               </FileRef>
+               <FileRef
+                  location = "group:tests_common.h">
+               </FileRef>
+               <FileRef
+                  location = "group:field.h">
+               </FileRef>
+               <FileRef
+                  location = "group:bench.h">
+               </FileRef>
+               <FileRef
+                  location = "group:field_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:scalar_4x64.h">
+               </FileRef>
+               <FileRef
+                  location = "group:field_5x52_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:ecmult_const_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:secp256k1.c">
+               </FileRef>
+               <FileRef
+                  location = "group:ecmult_gen_compute_table_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:ecdsa.h">
+               </FileRef>
+               <FileRef
+                  location = "group:unit_test.c">
+               </FileRef>
+               <FileRef
+                  location = "group:precomputed_ecmult.h">
+               </FileRef>
+               <FileRef
+                  location = "group:tests_exhaustive.c">
+               </FileRef>
+               <FileRef
+                  location = "group:scalar.h">
+               </FileRef>
+               <FileRef
+                  location = "group:ecdsa_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:precompute_ecmult.c">
+               </FileRef>
+               <FileRef
+                  location = "group:modinv64.h">
+               </FileRef>
+               <FileRef
+                  location = "group:ecmult_gen.h">
+               </FileRef>
+               <FileRef
+                  location = "group:precomputed_ecmult_gen.h">
+               </FileRef>
+               <FileRef
+                  location = "group:int128_native_impl.h">
+               </FileRef>
+               <Group
+                  location = "group:wycheproof"
+                  name = "wycheproof">
+                  <FileRef
+                     location = "group:WYCHEPROOF_COPYING">
+                  </FileRef>
+                  <FileRef
+                     location = "group:ecdsa_secp256k1_sha256_bitcoin_test.json">
+                  </FileRef>
+                  <FileRef
+                     location = "group:ecdh_secp256k1_test.h">
+                  </FileRef>
+                  <FileRef
+                     location = "group:ecdsa_secp256k1_sha256_bitcoin_test.h">
+                  </FileRef>
+                  <FileRef
+                     location = "group:ecdh_secp256k1_test.json">
+                  </FileRef>
+               </Group>
+               <FileRef
+                  location = "group:scalar_low_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:hash_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:ecmult.h">
+               </FileRef>
+               <FileRef
+                  location = "group:scratch_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:ecmult_compute_table_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:ecmult_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:group.h">
+               </FileRef>
+               <FileRef
+                  location = "group:util_local_visibility.h">
+               </FileRef>
+               <FileRef
+                  location = "group:int128_struct.h">
+               </FileRef>
+               <FileRef
+                  location = "group:tests.c">
+               </FileRef>
+               <FileRef
+                  location = "group:checkmem.h">
+               </FileRef>
+               <FileRef
+                  location = "group:util.h">
+               </FileRef>
+               <FileRef
+                  location = "group:ctime_tests.c">
+               </FileRef>
+               <FileRef
+                  location = "group:int128.h">
+               </FileRef>
+               <FileRef
+                  location = "group:assumptions.h">
+               </FileRef>
+               <FileRef
+                  location = "group:field_5x52_int128_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:modinv64_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:scalar_4x64_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:int128_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:ecmult_gen_compute_table.h">
+               </FileRef>
+               <FileRef
+                  location = "group:group_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:int128_native.h">
+               </FileRef>
+               <FileRef
+                  location = "group:bench.c">
+               </FileRef>
+               <FileRef
+                  location = "group:ecmult_const.h">
+               </FileRef>
+               <FileRef
+                  location = "group:bench_internal.c">
+               </FileRef>
+               <FileRef
+                  location = "group:int128_struct_impl.h">
+               </FileRef>
+               <Group
+                  location = "group:modules"
+                  name = "modules">
+                  <Group
+                     location = "group:recovery"
+                     name = "recovery">
+                     <FileRef
+                        location = "group:bench_impl.h">
+                     </FileRef>
+                     <FileRef
+                        location = "group:Makefile.am.include">
+                     </FileRef>
+                     <FileRef
+                        location = "group:tests_impl.h">
+                     </FileRef>
+                     <FileRef
+                        location = "group:tests_exhaustive_impl.h">
+                     </FileRef>
+                     <FileRef
+                        location = "group:main_impl.h">
+                     </FileRef>
+                  </Group>
+                  <Group
+                     location = "group:musig"
+                     name = "musig">
+                     <FileRef
+                        location = "group:session_impl.h">
+                     </FileRef>
+                     <FileRef
+                        location = "group:keyagg.h">
+                     </FileRef>
+                     <FileRef
+                        location = "group:Makefile.am.include">
+                     </FileRef>
+                     <FileRef
+                        location = "group:tests_impl.h">
+                     </FileRef>
+                     <FileRef
+                        location = "group:vectors.h">
+                     </FileRef>
+                     <FileRef
+                        location = "group:keyagg_impl.h">
+                     </FileRef>
+                     <FileRef
+                        location = "group:session.h">
+                     </FileRef>
+                     <FileRef
+                        location = "group:main_impl.h">
+                     </FileRef>
+                  </Group>
+                  <Group
+                     location = "group:ecdh"
+                     name = "ecdh">
+                     <FileRef
+                        location = "group:bench_impl.h">
+                     </FileRef>
+                     <FileRef
+                        location = "group:Makefile.am.include">
+                     </FileRef>
+                     <FileRef
+                        location = "group:tests_impl.h">
+                     </FileRef>
+                     <FileRef
+                        location = "group:main_impl.h">
+                     </FileRef>
+                  </Group>
+                  <Group
+                     location = "group:extrakeys"
+                     name = "extrakeys">
+                     <FileRef
+                        location = "group:Makefile.am.include">
+                     </FileRef>
+                     <FileRef
+                        location = "group:tests_impl.h">
+                     </FileRef>
+                     <FileRef
+                        location = "group:tests_exhaustive_impl.h">
+                     </FileRef>
+                     <FileRef
+                        location = "group:main_impl.h">
+                     </FileRef>
+                  </Group>
+                  <Group
+                     location = "group:ellswift"
+                     name = "ellswift">
+                     <FileRef
+                        location = "group:bench_impl.h">
+                     </FileRef>
+                     <FileRef
+                        location = "group:Makefile.am.include">
+                     </FileRef>
+                     <FileRef
+                        location = "group:tests_impl.h">
+                     </FileRef>
+                     <FileRef
+                        location = "group:tests_exhaustive_impl.h">
+                     </FileRef>
+                     <FileRef
+                        location = "group:main_impl.h">
+                     </FileRef>
+                  </Group>
+                  <Group
+                     location = "group:schnorrsig"
+                     name = "schnorrsig">
+                     <FileRef
+                        location = "group:bench_impl.h">
+                     </FileRef>
+                     <FileRef
+                        location = "group:Makefile.am.include">
+                     </FileRef>
+                     <FileRef
+                        location = "group:tests_impl.h">
+                     </FileRef>
+                     <FileRef
+                        location = "group:tests_exhaustive_impl.h">
+                     </FileRef>
+                     <FileRef
+                        location = "group:main_impl.h">
+                     </FileRef>
+                  </Group>
+               </Group>
+               <FileRef
+                  location = "group:precomputed_ecmult.c">
+               </FileRef>
+               <FileRef
+                  location = "group:hash.h">
+               </FileRef>
+               <FileRef
+                  location = "group:eckey_impl.h">
+               </FileRef>
+               <FileRef
+                  location = "group:bench_ecmult.c">
+               </FileRef>
+               <FileRef
+                  location = "group:testrand.h">
+               </FileRef>
+               <FileRef
+                  location = "group:unit_test.h">
+               </FileRef>
+               <FileRef
+                  location = "group:testutil.h">
+               </FileRef>
+               <FileRef
+                  location = "group:scalar_8x32.h">
+               </FileRef>
+               <FileRef
+                  location = "group:scalar_low.h">
+               </FileRef>
+               <FileRef
+                  location = "group:eckey.h">
+               </FileRef>
+               <FileRef
+                  location = "group:hsort.h">
+               </FileRef>
+            </Group>
+         </Group>
+         <Group
+            location = "group:src"
+            name = "src">
+            <FileRef
+               location = "group:ecdh_variants.h">
+            </FileRef>
+            <FileRef
+               location = "group:ecdh_variants.c">
+            </FileRef>
+         </Group>
+      </Group>
+      <Group
+         location = "group:K1"
+         name = "K1">
+         <Group
+            location = "group:Support"
+            name = "Support">
+            <Group
+               location = "group:Misc"
+               name = "Misc">
+               <FileRef
+                  location = "group:Curve.swift">
+               </FileRef>
+               <FileRef
+                  location = "group:K1+Error.swift">
+               </FileRef>
+               <FileRef
+                  location = "group:SharedSecret.swift">
+               </FileRef>
+            </Group>
+            <Group
+               location = "group:ThirdyParty"
+               name = "ThirdyParty">
+               <Group
+                  location = "group:swift-crypto"
+                  name = "swift-crypto">
+                  <Group
+                     location = "group:ASN1"
+                     name = "ASN1">
+                     <FileRef
+                        location = "group:SEC1PrivateKey.swift">
+                     </FileRef>
+                     <FileRef
+                        location = "group:ECDSASignature.swift">
+                     </FileRef>
+                     <FileRef
+                        location = "group:PKCS8PrivateKey.swift">
+                     </FileRef>
+                     <Group
+                        location = "group:Basic ASN1 Types"
+                        name = "Basic ASN1 Types">
+                        <FileRef
+                           location = "group:ASN1OctetString.swift">
+                        </FileRef>
+                        <FileRef
+                           location = "group:ASN1Null.swift">
+                        </FileRef>
+                        <FileRef
+                           location = "group:ASN1Boolean.swift">
+                        </FileRef>
+                        <FileRef
+                           location = "group:ASN1Integer.swift">
+                        </FileRef>
+                        <FileRef
+                           location = "group:ArraySliceBigint.swift">
+                        </FileRef>
+                        <FileRef
+                           location = "group:ASN1BitString.swift">
+                        </FileRef>
+                        <FileRef
+                           location = "group:ObjectIdentifier.swift">
+                        </FileRef>
+                        <FileRef
+                           location = "group:ASN1Any.swift">
+                        </FileRef>
+                        <FileRef
+                           location = "group:ASN1Strings.swift">
+                        </FileRef>
+                        <FileRef
+                           location = "group:ASN1Identifier.swift">
+                        </FileRef>
+                        <FileRef
+                           location = "group:GeneralizedTime.swift">
+                        </FileRef>
+                     </Group>
+                     <FileRef
+                        location = "group:PEMDocument.swift">
+                     </FileRef>
+                     <FileRef
+                        location = "group:SubjectPublicKeyInfo.swift">
+                     </FileRef>
+                     <FileRef
+                        location = "group:ASN1.swift">
+                     </FileRef>
+                  </Group>
+                  <FileRef
+                     location = "group:SafeCompare_boring.swift">
+                  </FileRef>
+                  <FileRef
+                     location = "group:ASN1Error.swift">
+                  </FileRef>
+                  <FileRef
+                     location = "group:BytesUtil.swift">
+                  </FileRef>
+                  <FileRef
+                     location = "group:SecureBytes.swift">
+                  </FileRef>
+                  <FileRef
+                     location = "group:RNG_boring.swift">
+                  </FileRef>
+               </Group>
+            </Group>
+            <Group
+               location = "group:Extensions"
+               name = "Extensions">
+               <FileRef
+                  location = "group:Data+Extensions.swift">
+               </FileRef>
+            </Group>
+            <Group
+               location = "group:FFI"
+               name = "FFI">
+               <Group
+                  location = "group:Internals"
+                  name = "Internals">
+                  <FileRef
+                     location = "group:FFI+Context.swift">
+                  </FileRef>
+                  <FileRef
+                     location = "group:FFI+Format.swift">
+                  </FileRef>
+                  <FileRef
+                     location = "group:FFI+Call.swift">
+                  </FileRef>
+                  <FileRef
+                     location = "group:FFI+Raw.swift">
+                  </FileRef>
+               </Group>
+               <Group
+                  location = "group:API"
+                  name = "API">
+                  <Group
+                     location = "group:ECDSA"
+                     name = "ECDSA">
+                     <Group
+                        location = "group:NonRecovery"
+                        name = "NonRecovery">
+                        <FileRef
+                           location = "group:FFI+ECDSA+NonRecovery.swift">
+                        </FileRef>
+                        <FileRef
+                           location = "group:ECDSA+NonRecovery+Wrapped.swift">
+                        </FileRef>
+                     </Group>
+                     <Group
+                        location = "group:Recovery"
+                        name = "Recovery">
+                        <FileRef
+                           location = "group:FFI+ECDSA+Recovery.swift">
+                        </FileRef>
+                        <FileRef
+                           location = "group:ECDSA+Recovery+Wrapped.swift">
+                        </FileRef>
+                     </Group>
+                     <FileRef
+                        location = "group:FFI+ECDSA.swift">
+                     </FileRef>
+                  </Group>
+                  <Group
+                     location = "group:Schnorr"
+                     name = "Schnorr">
+                     <FileRef
+                        location = "group:FFI+Schnorr.swift">
+                     </FileRef>
+                     <FileRef
+                        location = "group:Schnorr+Wrapped.swift">
+                     </FileRef>
+                  </Group>
+                  <Group
+                     location = "group:ECDH"
+                     name = "ECDH">
+                     <FileRef
+                        location = "group:FFI+ECDH.swift">
+                     </FileRef>
+                  </Group>
+                  <Group
+                     location = "group:Keys"
+                     name = "Keys">
+                     <Group
+                        location = "group:PublicKey"
+                        name = "PublicKey">
+                        <FileRef
+                           location = "group:PublicKey+Wrapped.swift">
+                        </FileRef>
+                        <FileRef
+                           location = "group:FFI+PublicKey.swift">
+                        </FileRef>
+                     </Group>
+                     <Group
+                        location = "group:PrivateKey"
+                        name = "PrivateKey">
+                        <FileRef
+                           location = "group:PrivateKey+Wrapped.swift">
+                        </FileRef>
+                     </Group>
+                  </Group>
+               </Group>
+            </Group>
+         </Group>
+         <Group
+            location = "group:K1"
+            name = "K1">
+            <Group
+               location = "group:ECDSA"
+               name = "ECDSA">
+               <FileRef
+                  location = "group:RecoveryID.swift">
+               </FileRef>
+               <FileRef
+                  location = "group:ECDSA.swift">
+               </FileRef>
+               <FileRef
+                  location = "group:ECDSASignatureNonRecoverable.swift">
+               </FileRef>
+               <FileRef
+                  location = "group:ECDSASignatureRecoverable.swift">
+               </FileRef>
+            </Group>
+            <Group
+               location = "group:Signing"
+               name = "Signing">
+               <FileRef
+                  location = "group:Signing.swift.gyb">
+               </FileRef>
+               <FileRef
+                  location = "group:Signing.generated.swift">
+               </FileRef>
+            </Group>
+            <Group
+               location = "group:Schnorr"
+               name = "Schnorr">
+               <FileRef
+                  location = "group:Schnorr.swift">
+               </FileRef>
+               <FileRef
+                  location = "group:Schnorr+Signature.swift">
+               </FileRef>
+            </Group>
+            <Group
+               location = "group:ECDH"
+               name = "ECDH">
+               <FileRef
+                  location = "group:KeyAgreement.swift">
+               </FileRef>
+            </Group>
+            <Group
+               location = "group:Keys"
+               name = "Keys">
+               <FileRef
+                  location = "group:PrivateKeyImplementation.swift">
+               </FileRef>
+               <FileRef
+                  location = "group:Keys.swift.gyb">
+               </FileRef>
+               <FileRef
+                  location = "group:PublicKeyImplementation.swift">
+               </FileRef>
+               <FileRef
+                  location = "group:Keys.generated.swift">
+               </FileRef>
+            </Group>
+            <Group
+               location = "group:Validation"
+               name = "Validation">
+               <FileRef
+                  location = "group:Validation.swift.gyb">
+               </FileRef>
+               <FileRef
+                  location = "group:Validation.generated.swift">
+               </FileRef>
+            </Group>
+         </Group>
+         <FileRef
+            location = "group:K1.swift">
+         </FileRef>
+      </Group>
+   </Group>
+   <Group
+      location = "group:Tests"
+      name = "Tests">
+      <Group
+         location = "group:K1Tests"
+         name = "K1Tests">
+         <Group
+            location = "group:Util"
+            name = "Util">
+            <FileRef
+               location = "group:XCTestUtils.swift">
+            </FileRef>
+            <FileRef
+               location = "group:Wycheproof.swift">
+            </FileRef>
+            <FileRef
+               location = "group:ECSignature.swift">
+            </FileRef>
+         </Group>
+         <Group
+            location = "group:TestVectors"
+            name = "TestVectors">
+            <FileRef
+               location = "group:wycheproof_ecdsa_verify_p1363.json">
+            </FileRef>
+            <FileRef
+               location = "group:warta_cyon_publickey_recovery.json">
+            </FileRef>
+            <FileRef
+               location = "group:wycheproof_ecdh_ASN1x963.json">
+            </FileRef>
+            <FileRef
+               location = "group:bip340_schnorr_verify.json">
+            </FileRef>
+            <FileRef
+               location = "group:bip340_schnorr_sign.json">
+            </FileRef>
+            <FileRef
+               location = "group:trezor_ecdsa_sign_rfc6979.json">
+            </FileRef>
+            <FileRef
+               location = "group:cyon_ecdh_two_variants_with_kdf.json">
+            </FileRef>
+            <FileRef
+               location = "group:wycheproof_ecdsa_verify_der.json">
+            </FileRef>
+         </Group>
+         <Group
+            location = "group:TestCases"
+            name = "TestCases">
+            <Group
+               location = "group:ECDSA"
+               name = "ECDSA">
+               <FileRef
+                  location = "group:ECDSASignatureTests.swift">
+               </FileRef>
+               <FileRef
+                  location = "group:ECDSAWycheproofASNDEREncodedSignaturesTests.swift">
+               </FileRef>
+               <FileRef
+                  location = "group:ECDSARecoverableSignatureRoundtripTests.swift">
+               </FileRef>
+               <FileRef
+                  location = "group:ECDSAWycheproofIEEEP1364RSEncodedSignaturesTests.swift">
+               </FileRef>
+               <FileRef
+                  location = "group:ECDSASignatureTrezorTests.swift">
+               </FileRef>
+            </Group>
+            <FileRef
+               location = "group:APITest.swift">
+            </FileRef>
+            <Group
+               location = "group:Schnorr"
+               name = "Schnorr">
+               <FileRef
+                  location = "group:SchnorrSignatureBitcoinCoreTests.swift">
+               </FileRef>
+               <FileRef
+                  location = "group:SchnorrSignatureTests.swift">
+               </FileRef>
+            </Group>
+            <Group
+               location = "group:SecureBytes"
+               name = "SecureBytes">
+               <FileRef
+                  location = "group:SecureBytesTests.swift">
+               </FileRef>
+            </Group>
+            <Group
+               location = "group:PublicKeyRecovery"
+               name = "PublicKeyRecovery">
+               <FileRef
+                  location = "group:ECDASignaturePublicKeyRecoveryTests.swift">
+               </FileRef>
+            </Group>
+            <Group
+               location = "group:ECDH"
+               name = "ECDH">
+               <FileRef
+                  location = "group:ECDHTests.swift">
+               </FileRef>
+               <FileRef
+                  location = "group:ECDHWycheproofTests.swift">
+               </FileRef>
+               <FileRef
+                  location = "group:TwoVariantsOfECDHWithKDFTests.swift">
+               </FileRef>
+            </Group>
+            <Group
+               location = "group:Keys"
+               name = "Keys">
+               <Group
+                  location = "group:PublicKey"
+                  name = "PublicKey">
+                  <FileRef
+                     location = "group:PublicKeyEncodingTests.swift.gyb">
+                  </FileRef>
+                  <FileRef
+                     location = "group:PublicKeyGroupOperationsTests.swift">
+                  </FileRef>
+                  <FileRef
+                     location = "group:PublicKeyEncodingTests.generated.swift">
+                  </FileRef>
+                  <FileRef
+                     location = "group:PublicKeyImportTests.swift">
+                  </FileRef>
+               </Group>
+               <Group
+                  location = "group:PrivateKey"
+                  name = "PrivateKey">
+                  <FileRef
+                     location = "group:PrivateKeyGenerationTests.swift">
+                  </FileRef>
+                  <FileRef
+                     location = "group:PrivateKeyImportTests.swift">
+                  </FileRef>
+                  <FileRef
+                     location = "group:PrivateKeyEncodingTests.swift">
+                  </FileRef>
+               </Group>
+            </Group>
+            <Group
+               location = "group:Performance"
+               name = "Performance">
+               <FileRef
+                  location = "group:PerformanceTests.swift">
+               </FileRef>
+            </Group>
+         </Group>
+      </Group>
+   </Group>
+</Workspace>
