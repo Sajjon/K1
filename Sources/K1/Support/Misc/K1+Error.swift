@@ -36,7 +36,7 @@ extension K1.Error {
 
 // MARK: - InternalFailure
 enum InternalFailure: UInt, Sendable, Swift.Error, Hashable {
-	/// Failed to cast to `CryptoKit.SharedSecret` from representation.
+	/// Failed to cast to `CryptoKit.SharedSecret` from internal representation.
 	case sharedSecretIncorrectSize
 }
 
@@ -111,7 +111,7 @@ extension K1.Error: CustomDebugStringConvertible {
 		case .invalidKey: return "invalidKey"
 		case let .internalFailure(rawValue):
 			guard let internalFailure = InternalFailure(rawValue: rawValue) else {
-				return "failure"
+				return "internal failure"
 			}
 			let reason: String = {
 				switch internalFailure {
@@ -119,7 +119,7 @@ extension K1.Error: CustomDebugStringConvertible {
 					return "Failed to form SharedSecret"
 				}
 			}()
-			return "failure reason: \(reason)"
+			return "Internal failure reason: \(reason)"
 		case let .underlyingLibsecp256k1(rawValue):
 			guard let ffi = FFI.Error(rawValue: rawValue) else {
 				return "Underlying libsecp256k1 failure."

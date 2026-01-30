@@ -18,7 +18,7 @@
 #else
 import Foundation
 
-/// A protocol that represents any object that can present itself as a INTEGER, or be parsed from
+/// A protocol that represents any internal object that can present itself as a INTEGER, or be parsed from
 /// a INTEGER.
 ///
 /// This is not a very good solution for a fully-fledged ASN.1 library: we'd rather have a better numerics
