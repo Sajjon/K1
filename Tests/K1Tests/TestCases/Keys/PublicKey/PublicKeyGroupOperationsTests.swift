@@ -1,6 +1,46 @@
 import XCTest
 @testable import K1
 
+
+// swiftlint:disable force_try
+
+
+// MARK: Debug Extensions
+extension FFI.PrivateKey.Wrapped {
+	init(scalar: UInt) throws {
+		// Convert to big-endian bytes
+		let valueBytes = withUnsafeBytes(of: scalar.bigEndian, Array.init)
+
+		// Pad with leading zeros to get exactly 32 bytes
+		let paddingCount = 32 - valueBytes.count
+		let paddedBytes = Array(repeating: UInt8(0), count: paddingCount) + valueBytes
+
+		try self.init(bytes: paddedBytes)
+	}
+
+	static let one = try! Self(scalar: 1)
+	static let two = try! Self(scalar: 2)
+	static let three = try! Self(scalar: 3)
+	static let four = try! Self(scalar: 4)
+	static let five = try! Self(scalar: 5)
+	static let six = try! Self(scalar: 6)
+}
+
+
+// swiftlint:enable force_try
+
+
+extension FFI.PublicKey.Wrapped {
+	/// `G`, the generator point of the curve `secp256k1`
+	// swiftlint:disable:next identifier_name
+	static let g: Self = FFI.PrivateKey.Wrapped.one.publicKey
+	static let gx2: Self = FFI.PrivateKey.Wrapped.two.publicKey
+	static let gx3: Self = FFI.PrivateKey.Wrapped.three.publicKey
+	static let gx4: Self = FFI.PrivateKey.Wrapped.four.publicKey
+	static let gx5: Self = FFI.PrivateKey.Wrapped.five.publicKey
+	static let gx6: Self = FFI.PrivateKey.Wrapped.six.publicKey
+}
+
 final class PublicKeyGroupOperationsTests: XCTestCase {
 	
 	func testGeneratorPointCoordinates() throws {
@@ -151,7 +191,7 @@ final class PublicKeyGroupOperationsTests: XCTestCase {
 	
 	func testGroupNegationWithG2G3G4() throws {
 		// Test negation operations
-		
+
 		// Test: -g2 should be different from g2
 		let negG2 = try FFI.PublicKey.Wrapped.gx2.negate()
 		XCTAssertFalse(try negG2.compare(to: FFI.PublicKey.Wrapped.gx2))

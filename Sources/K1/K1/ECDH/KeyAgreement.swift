@@ -3,7 +3,8 @@ import Foundation
 
 // MARK: - K1.KeyAgreement
 extension K1 {
-	/// A mechanism used to create a shared secret between two users by performing `secp256k1` elliptic curve Diffie Hellman (ECDH) key exchange.
+	/// A mechanism used to create a shared secret between two users by
+	/// performing `secp256k1` elliptic curve Diffie Hellman (ECDH) key exchange.
 	public enum KeyAgreement {
 		// Just a namespace
 	}

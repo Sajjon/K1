@@ -1,3 +1,5 @@
+// swiftlint:disable all
+
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the SwiftCrypto open source project
@@ -42,7 +44,6 @@ extension ASN1 {
             guard case .primitive(var content) = node.content else {
                 preconditionFailure("ASN.1 parser generated primitive node with constructed content")
             }
-
             // We have to parse the content. From the spec:
             //
             // > Each subidentifier is represented as a series of (one or more) octets. Bit 8 of each octet indicates whether it
@@ -112,7 +113,8 @@ extension ASN1 {
         }
 
         private static func writeOIDSubidentifier(_ identifier: UInt, into array: inout [UInt8]) {
-            // An OID subidentifier is written as an integer over 7-bit bytes, where the last byte has the top bit unset.
+            // An OID subidentifier is written as an integer over 7-bit bytes,
+			// where the last byte has the top bit unset.
             // The first thing we need is to know how many bits we need to write
             let bitsToWrite = UInt.bitWidth - identifier.leadingZeroBitCount
             let bytesToWrite = (bitsToWrite + 6) / 7
@@ -146,24 +148,22 @@ extension ASN1.ASN1ObjectIdentifier: ExpressibleByArrayLiteral {
 
 extension ASN1.ASN1ObjectIdentifier {
     enum NamedCurves {
-        
-        /// ASN1 identifier for `secp256k1`
+		/// ASN1 identifier for `secp256k1`
         /// https://oidref.com/1.3.132.0.10
         static let secp256k1: ASN1.ASN1ObjectIdentifier = [1, 3, 132, 0, 10]
-
     }
-    
-    enum HashFunctions {
+
+	enum HashFunctions {
         static let sha256: ASN1.ASN1ObjectIdentifier = [2, 16, 840, 1, 101, 3, 4, 2, 1]
         static let sha384: ASN1.ASN1ObjectIdentifier = [2, 16, 840, 1, 101, 3, 4, 2, 2]
         static let sha512: ASN1.ASN1ObjectIdentifier = [2, 16, 840, 1, 101, 3, 4, 2, 3]
     }
 
-    enum AlgorithmIdentifier {
+	enum AlgorithmIdentifier {
         static let idEcPublicKey: ASN1.ASN1ObjectIdentifier = [1, 2, 840, 10_045, 2, 1]
     }
 
-    enum NameAttributes {
+	enum NameAttributes {
         static let name: ASN1.ASN1ObjectIdentifier = [2, 5, 4, 41]
         static let surname: ASN1.ASN1ObjectIdentifier = [2, 5, 4, 4]
         static let givenName: ASN1.ASN1ObjectIdentifier = [2, 5, 4, 42]
@@ -220,3 +220,5 @@ extension UInt {
 }
 
 #endif // Linux or !SwiftPM
+
+// swiftlint:enable all

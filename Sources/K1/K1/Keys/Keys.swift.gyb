@@ -4,6 +4,8 @@
 
 import Foundation
 
+// swiftlint:disable all
+
 %{
 	LIST_KEY_FOR_FEATURE_WITH_DOCS = [
 		{
@@ -52,8 +54,8 @@ extension K1.${FEATURE} {
 		typealias Impl = K1._PrivateKeyImplementation
 		public typealias PublicKey = K1.${FEATURE}.PublicKey
 
-		internal let impl: Impl
-		internal let publicKeyImpl: K1._PublicKeyImplementation
+		let impl: Impl
+		let publicKeyImpl: K1._PublicKeyImplementation
 
 		/// The corresponding public key.
 		public var publicKey: PublicKey {
@@ -154,8 +156,8 @@ extension K1.${FEATURE} {
 	public struct PublicKey: Sendable, Hashable {
 		
 		typealias Impl = K1._PublicKeyImplementation
-		internal let impl: Impl
-		internal init(impl: Impl) {
+		let impl: Impl
+		init(impl: Impl) {
 			self.impl = impl
 		}
 		
@@ -244,22 +246,22 @@ extension K1.${FEATURE} {
 		}
 
 		// MARK: Group Operations
-		
+
 		/// Adds two public keys (points) on the secp256k1 curve
 		public static func + (lhs: Self, rhs: Self) throws -> Self {
 			try Self(impl: lhs.impl + rhs.impl)
 		}
-		
+
 		/// Subtracts two public keys (points) on the secp256k1 curve
 		public static func - (lhs: Self, rhs: Self) throws -> Self {
 			try Self(impl: lhs.impl - rhs.impl)
 		}
-		
+
 		/// Negates a public key (point) on the secp256k1 curve
 		public func negate() throws -> Self {
 			try Self(impl: impl.negate())
 		}
-		
+
 		/// Combines multiple public keys (points) on the secp256k1 curve
 		public static func sum(keys: [Self]) throws -> Self {
 			let impls = keys.map { $0.impl }
@@ -277,6 +279,8 @@ extension K1.${FEATURE} {
 extension K1.${FEATURE}.PrivateKey: _K1PrivateKeyProtocol {}
 extension K1.${FEATURE}.PublicKey: _K1PublicKeyProtocol {}
 % end
+
+// swiftlint:enable all
 
 % end
 

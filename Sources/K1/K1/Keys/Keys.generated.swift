@@ -4,6 +4,8 @@
 
 import Foundation
 
+// swiftlint:disable all
+
 extension K1.KeyAgreement {
 	// MARK: KeyAgreement + PrivateKey
 	/// A `secp256k1` private key used for key agreement.
@@ -11,8 +13,8 @@ extension K1.KeyAgreement {
 		typealias Impl = K1._PrivateKeyImplementation
 		public typealias PublicKey = K1.KeyAgreement.PublicKey
 
-		internal let impl: Impl
-		internal let publicKeyImpl: K1._PublicKeyImplementation
+		let impl: Impl
+		let publicKeyImpl: K1._PublicKeyImplementation
 
 		/// The corresponding public key.
 		public var publicKey: PublicKey {
@@ -111,8 +113,8 @@ extension K1.KeyAgreement {
 	/// A `secp256k1` public key used for key agreement.
 	public struct PublicKey: Sendable, Hashable {
 		typealias Impl = K1._PublicKeyImplementation
-		internal let impl: Impl
-		internal init(impl: Impl) {
+		let impl: Impl
+		init(impl: Impl) {
 			self.impl = impl
 		}
 
@@ -201,25 +203,25 @@ extension K1.KeyAgreement {
 		}
 
 		// MARK: Group Operations
-		
+
 		/// Adds two public keys (points) on the secp256k1 curve
 		public static func + (lhs: Self, rhs: Self) throws -> Self {
 			try Self(impl: lhs.impl + rhs.impl)
 		}
-		
+
 		/// Subtracts two public keys (points) on the secp256k1 curve
 		public static func - (lhs: Self, rhs: Self) throws -> Self {
 			try Self(impl: lhs.impl - rhs.impl)
 		}
-		
+
 		/// Negates a public key (point) on the secp256k1 curve
 		public func negate() throws -> Self {
 			try Self(impl: impl.negate())
 		}
-		
+
 		/// Combines multiple public keys (points) on the secp256k1 curve
 		public static func sum(keys: [Self]) throws -> Self {
-			let impls = keys.map { $0.impl }
+			let impls = keys.map(\.impl)
 			return try Self(impl: K1._PublicKeyImplementation.sum(keys: impls))
 		}
 	}
@@ -233,8 +235,8 @@ extension K1.Schnorr {
 		typealias Impl = K1._PrivateKeyImplementation
 		public typealias PublicKey = K1.Schnorr.PublicKey
 
-		internal let impl: Impl
-		internal let publicKeyImpl: K1._PublicKeyImplementation
+		let impl: Impl
+		let publicKeyImpl: K1._PublicKeyImplementation
 
 		/// The corresponding public key.
 		public var publicKey: PublicKey {
@@ -334,8 +336,8 @@ extension K1.Schnorr {
 	/// more specifically Schnorr signatures
 	public struct PublicKey: Sendable, Hashable {
 		typealias Impl = K1._PublicKeyImplementation
-		internal let impl: Impl
-		internal init(impl: Impl) {
+		let impl: Impl
+		init(impl: Impl) {
 			self.impl = impl
 		}
 
@@ -442,7 +444,7 @@ extension K1.Schnorr {
 
 		/// Combines multiple public keys (points) on the secp256k1 curve
 		public static func sum(keys: [Self]) throws -> Self {
-			let impls = keys.map { $0.impl }
+			let impls = keys.map(\.impl)
 			return try Self(impl: K1._PublicKeyImplementation.sum(keys: impls))
 		}
 	}
@@ -456,8 +458,8 @@ extension K1.ECDSA {
 		typealias Impl = K1._PrivateKeyImplementation
 		public typealias PublicKey = K1.ECDSA.PublicKey
 
-		internal let impl: Impl
-		internal let publicKeyImpl: K1._PublicKeyImplementation
+		let impl: Impl
+		let publicKeyImpl: K1._PublicKeyImplementation
 
 		/// The corresponding public key.
 		public var publicKey: PublicKey {
@@ -557,8 +559,8 @@ extension K1.ECDSA {
 	/// more specifically ECDSA signatures, that do not offer recovery of the public key.
 	public struct PublicKey: Sendable, Hashable {
 		typealias Impl = K1._PublicKeyImplementation
-		internal let impl: Impl
-		internal init(impl: Impl) {
+		let impl: Impl
+		init(impl: Impl) {
 			self.impl = impl
 		}
 
@@ -665,7 +667,7 @@ extension K1.ECDSA {
 
 		/// Combines multiple public keys (points) on the secp256k1 curve
 		public static func sum(keys: [Self]) throws -> Self {
-			let impls = keys.map { $0.impl }
+			let impls = keys.map(\.impl)
 			return try Self(impl: K1._PublicKeyImplementation.sum(keys: impls))
 		}
 	}
@@ -679,8 +681,8 @@ extension K1.ECDSAWithKeyRecovery {
 		typealias Impl = K1._PrivateKeyImplementation
 		public typealias PublicKey = K1.ECDSAWithKeyRecovery.PublicKey
 
-		internal let impl: Impl
-		internal let publicKeyImpl: K1._PublicKeyImplementation
+		let impl: Impl
+		let publicKeyImpl: K1._PublicKeyImplementation
 
 		/// The corresponding public key.
 		public var publicKey: PublicKey {
@@ -780,8 +782,8 @@ extension K1.ECDSAWithKeyRecovery {
 	/// more specifically ECDSA signatures that offers recovery of the public key.
 	public struct PublicKey: Sendable, Hashable {
 		typealias Impl = K1._PublicKeyImplementation
-		internal let impl: Impl
-		internal init(impl: Impl) {
+		let impl: Impl
+		init(impl: Impl) {
 			self.impl = impl
 		}
 
@@ -888,7 +890,7 @@ extension K1.ECDSAWithKeyRecovery {
 
 		/// Combines multiple public keys (points) on the secp256k1 curve
 		public static func sum(keys: [Self]) throws -> Self {
-			let impls = keys.map { $0.impl }
+			let impls = keys.map(\.impl)
 			return try Self(impl: K1._PublicKeyImplementation.sum(keys: impls))
 		}
 	}
@@ -917,3 +919,5 @@ extension K1.ECDSAWithKeyRecovery.PrivateKey: _K1PrivateKeyProtocol {}
 
 // MARK: - K1.ECDSAWithKeyRecovery.PublicKey + _K1PublicKeyProtocol
 extension K1.ECDSAWithKeyRecovery.PublicKey: _K1PublicKeyProtocol {}
+
+// swiftlint:enable all

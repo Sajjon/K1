@@ -69,12 +69,12 @@ final class PerformanceTests: XCTestCase {
 					let bobPrivateKey = K1.KeyAgreement.PrivateKey()
 					let bobPublicKey = bobPrivateKey.publicKey
 
-					var ab = try alicePrivateKey.sharedSecretFromKeyAgreement(with: bobPublicKey)
-					var ba = try bobPrivateKey.sharedSecretFromKeyAgreement(with: alicePublicKey)
-					XCTAssertEqual(ab, ba)
-					ab = try alicePrivateKey.ecdh(with: bobPublicKey)
-					ba = try bobPrivateKey.ecdh(with: alicePublicKey)
-					XCTAssertEqual(ab, ba)
+					var aliceBob = try alicePrivateKey.sharedSecretFromKeyAgreement(with: bobPublicKey)
+					var bobAlice = try bobPrivateKey.sharedSecretFromKeyAgreement(with: alicePublicKey)
+					XCTAssertEqual(aliceBob, bobAlice)
+					aliceBob = try alicePrivateKey.ecdh(with: bobPublicKey)
+					bobAlice = try bobPrivateKey.ecdh(with: alicePublicKey)
+					XCTAssertEqual(aliceBob, bobAlice)
 				}
 			} catch {
 				XCTFail("abort")

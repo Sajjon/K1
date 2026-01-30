@@ -1,3 +1,5 @@
+// swiftlint:disable all
+
 // from: https://github.com/apple/swift-crypto/blob/eefb07cc5924023468861187234f6e3ea717e9d2/Sources/Crypto/Util/BoringSSL/SafeCompare_boring.swift
 // commit: eefb07cc5924023468861187234f6e3ea717e9d2
 
@@ -30,10 +32,12 @@ func safeCompare<LHS: ContiguousBytes, RHS: ContiguousBytes>(_ lhs: LHS, _ rhs: 
 
 /// A straightforward constant-time comparison function for any two collections of bytes.
 @inlinable
-internal func constantTimeCompare<LHS: Collection, RHS: Collection>(_ lhs: LHS, _ rhs: RHS) -> Bool where LHS.Element == UInt8, RHS.Element == UInt8 {
+func constantTimeCompare<LHS: Collection, RHS: Collection>(_ lhs: LHS, _ rhs: RHS) -> Bool where LHS.Element == UInt8, RHS.Element == UInt8 {
     guard lhs.count == rhs.count else {
         return false
     }
 
     return zip(lhs, rhs).reduce(into: 0) { $0 |= $1.0 ^ $1.1 } == 0
 }
+
+// swiftlint:enable all

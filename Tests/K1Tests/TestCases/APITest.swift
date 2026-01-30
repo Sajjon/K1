@@ -94,8 +94,8 @@ final class APITest: XCTestCase {
 	func testECDH() throws {
 		let alice = K1.KeyAgreement.PrivateKey()
 		let bob = K1.KeyAgreement.PrivateKey()
-		let ab = try alice.sharedSecretFromKeyAgreement(with: bob.publicKey)
-		let ba = try bob.sharedSecretFromKeyAgreement(with: alice.publicKey)
-		XCTAssertEqual(ab, ba)
+		let aliceBob = try alice.sharedSecretFromKeyAgreement(with: bob.publicKey)
+		let bobAlice = try bob.sharedSecretFromKeyAgreement(with: alice.publicKey)
+		XCTAssertEqual(aliceBob, bobAlice)
 	}
 }

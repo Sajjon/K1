@@ -4,9 +4,10 @@ import secp256k1
 // MARK: - FFI.PrivateKey
 extension FFI {
 	enum PrivateKey {
+		// swiftlint:disable:next nesting
 		struct Wrapped: @unchecked Sendable {
 			let publicKey: FFI.PublicKey.Wrapped
-			internal let secureBytes: SecureBytes
+			let secureBytes: SecureBytes
 
 			fileprivate init(secureBytes: SecureBytes) throws {
 				guard secureBytes.count == Curve.Field.byteCount else {
@@ -39,7 +40,7 @@ extension FFI {
 
 // MARK: Init
 extension FFI.PrivateKey.Wrapped {
-	fileprivate init(bytes: [UInt8]) throws {
+	init(bytes: [UInt8]) throws {
 		try self.init(secureBytes: .init(bytes: bytes))
 	}
 
@@ -51,7 +52,7 @@ extension FFI.PrivateKey.Wrapped {
 				defer { attempt += 1 }
 				do {
 					let secureBytes = SecureBytes(count: Curve.Field.byteCount)
-					let _ = try FFI.PrivateKey.Wrapped(secureBytes: secureBytes)
+					_ = try FFI.PrivateKey.Wrapped(secureBytes: secureBytes)
 					return secureBytes
 				} catch {
 					// Failure (due to unlikely scenario that the private key scalar > order of the curve) => retry
@@ -70,6 +71,7 @@ extension FFI.PrivateKey.Wrapped {
 				"""
 			)
 		}
+		// swiftlint:disable:next force_try
 		try! self.init(secureBytes: generateNew())
 	}
 }
@@ -82,26 +84,3 @@ extension FFI.PrivateKey {
 		try Wrapped(bytes: rawRepresentation.bytes)
 	}
 }
-
-#if DEBUG
-// MARK: Debug Extensions
-extension FFI.PrivateKey.Wrapped {
-	init(scalar: UInt) throws {
-		// Convert to big-endian bytes
-		let valueBytes = withUnsafeBytes(of: scalar.bigEndian, Array.init)
-		
-		// Pad with leading zeros to get exactly 32 bytes
-		let paddingCount = 32 - valueBytes.count
-		let paddedBytes = Array(repeating: UInt8(0), count: paddingCount) + valueBytes
-		
-		try self.init(bytes: paddedBytes)
-	}
-	
-	internal static let one = try! Self(scalar: 1)
-	internal static let two = try! Self(scalar: 2)
-	internal static let three = try! Self(scalar: 3)
-	internal static let four = try! Self(scalar: 4)
-	internal static let five = try! Self(scalar: 5)
-	internal static let six = try! Self(scalar: 6)
-}
-#endif

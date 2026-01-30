@@ -1,3 +1,5 @@
+// swiftlint:disable all
+
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the SwiftCrypto open source project
@@ -103,7 +105,7 @@ import Foundation
 // generally: that is, we don't hard-code special knowledge of these formats as part of the parsing process. Instead we have written a
 // parser that can divide the world of ASN.1 into parseable chunks, and then we try to decode specific formats from those chunks. This
 // allows us to extend things in the future without too much pain.
-internal enum ASN1 { }
+enum ASN1 { }
 
 // MARK: - Parser Node
 extension ASN1 {
@@ -135,7 +137,7 @@ extension ASN1.ASN1ParserNode: CustomStringConvertible {
 // MARK: - Sequence, SequenceOf, and Set
 extension ASN1 {
     /// Parse the node as an ASN.1 sequence.
-    internal static func sequence<T>(_ node: ASN1Node, identifier: ASN1.ASN1Identifier, _ builder: (inout ASN1.ASN1NodeCollection.Iterator) throws -> T) throws -> T {
+    static func sequence<T>(_ node: ASN1Node, identifier: ASN1.ASN1Identifier, _ builder: (inout ASN1.ASN1NodeCollection.Iterator) throws -> T) throws -> T {
         guard node.identifier == identifier, case .constructed(let nodes) = node.content else {
             throw CryptoKitASN1Error.unexpectedFieldType
         }
@@ -151,7 +153,7 @@ extension ASN1 {
         return result
     }
 
-    internal static func sequence<T: ASN1Parseable>(of: T.Type = T.self, identifier: ASN1.ASN1Identifier, rootNode: ASN1Node) throws -> [T] {
+    static func sequence<T: ASN1Parseable>(of: T.Type = T.self, identifier: ASN1.ASN1Identifier, rootNode: ASN1Node) throws -> [T] {
         guard rootNode.identifier == identifier, case .constructed(let nodes) = rootNode.content else {
             throw CryptoKitASN1Error.unexpectedFieldType
         }
@@ -159,7 +161,7 @@ extension ASN1 {
         return try nodes.map { try T(asn1Encoded: $0) }
     }
 
-    internal static func sequence<T: ASN1Parseable>(of: T.Type = T.self, identifier: ASN1.ASN1Identifier, nodes: inout ASN1.ASN1NodeCollection.Iterator) throws -> [T] {
+    static func sequence<T: ASN1Parseable>(of: T.Type = T.self, identifier: ASN1.ASN1Identifier, nodes: inout ASN1.ASN1NodeCollection.Iterator) throws -> [T] {
         guard let node = nodes.next() else {
             // Not present, throw.
             throw CryptoKitASN1Error.invalidASN1Object
@@ -169,7 +171,7 @@ extension ASN1 {
     }
 
     /// Parse the node as an ASN.1 set.
-    internal static func set<T>(_ node: ASN1Node, identifier: ASN1.ASN1Identifier, _ builder: (inout ASN1.ASN1NodeCollection.Iterator) throws -> T) throws -> T {
+    static func set<T>(_ node: ASN1Node, identifier: ASN1.ASN1Identifier, _ builder: (inout ASN1.ASN1NodeCollection.Iterator) throws -> T) throws -> T {
         // Shhhh these two are secretly the same with identifier.
         return try sequence(node, identifier: identifier, builder)
     }
@@ -180,7 +182,7 @@ extension ASN1 {
     /// Parses an optional explicitly tagged element. Throws on a tag mismatch, returns nil if the element simply isn't there.
     ///
     /// Expects to be used with the `ASN1.sequence` helper function.
-    internal static func optionalExplicitlyTagged<T>(_ nodes: inout ASN1.ASN1NodeCollection.Iterator, tagNumber: Int, tagClass: ASN1.ASN1Identifier.TagClass, _ builder: (ASN1Node) throws -> T) throws -> T? {
+    static func optionalExplicitlyTagged<T>(_ nodes: inout ASN1.ASN1NodeCollection.Iterator, tagNumber: Int, tagClass: ASN1.ASN1Identifier.TagClass, _ builder: (ASN1Node) throws -> T) throws -> T? {
         var localNodesCopy = nodes
         guard let node = localNodesCopy.next() else {
             // Node not present, return nil.
@@ -199,7 +201,7 @@ extension ASN1 {
 
         // We expect a single child.
         guard case .constructed(let nodes) = node.content else {
-            // This error is an internal parser error: the tag above is always constructed.
+            // This error is an parser error: the tag above is always constructed.
             preconditionFailure("Explicit tags are always constructed")
         }
 
@@ -218,7 +220,7 @@ extension ASN1 {
     /// be replaced with its default.
     ///
     /// Expects to be used with the `ASN1.sequence` helper function.
-    internal static func decodeDefault<T: ASN1Parseable & Equatable>(_ nodes: inout ASN1.ASN1NodeCollection.Iterator, identifier: ASN1.ASN1Identifier, defaultValue: T, _ builder: (ASN1Node) throws -> T) throws -> T {
+    static func decodeDefault<T: ASN1Parseable & Equatable>(_ nodes: inout ASN1.ASN1NodeCollection.Iterator, identifier: ASN1.ASN1Identifier, defaultValue: T, _ builder: (ASN1Node) throws -> T) throws -> T {
         // A weird trick here: we only want to consume the next node _if_ it has the right tag. To achieve that,
         // we work on a copy.
         var localNodesCopy = nodes
@@ -245,7 +247,7 @@ extension ASN1 {
         return parsed
     }
 
-    internal static func decodeDefaultExplicitlyTagged<T: ASN1Parseable & Equatable>(_ nodes: inout ASN1.ASN1NodeCollection.Iterator, tagNumber: Int, tagClass: ASN1.ASN1Identifier.TagClass, defaultValue: T, _ builder: (ASN1Node) throws -> T) throws -> T {
+    static func decodeDefaultExplicitlyTagged<T: ASN1Parseable & Equatable>(_ nodes: inout ASN1.ASN1NodeCollection.Iterator, tagNumber: Int, tagClass: ASN1.ASN1Identifier.TagClass, defaultValue: T, _ builder: (ASN1Node) throws -> T) throws -> T {
         if let result = try optionalExplicitlyTagged(&nodes, tagNumber: tagNumber, tagClass: tagClass, builder) {
             guard result != defaultValue else {
                 // DER forbids encoding DEFAULT values at their default state.
@@ -361,7 +363,7 @@ extension ASN1 {
     ///
     /// Constructed ASN.1 nodes are made up of multiple child nodes. This object represents the collection of those child nodes.
     /// It allows us to lazily construct the child nodes, potentially skipping over them when we don't care about them.
-    internal struct ASN1NodeCollection {
+    struct ASN1NodeCollection {
         private var nodes: ArraySlice<ASN1ParserNode>
 
         private var depth: Int
@@ -421,10 +423,10 @@ extension ASN1 {
     ///
     /// In this way, ASN.1 objects tend to form a "tree", where each object is represented by a single top-level constructed
     /// node that contains other objects and primitives, eventually reaching the bottom which is made up of primitive objects.
-    internal struct ASN1Node {
-        internal var identifier: ASN1Identifier
+    struct ASN1Node {
+        var identifier: ASN1Identifier
 
-        internal var content: Content
+        var content: Content
     }
 }
 
@@ -546,12 +548,12 @@ extension ASN1 {
 }
 
 // MARK: - Helpers
-internal protocol ASN1Parseable {
+protocol ASN1Parseable {
     init(asn1Encoded: ASN1.ASN1Node) throws
 }
 
 extension ASN1Parseable {
-    internal init(asn1Encoded sequenceNodeIterator: inout ASN1.ASN1NodeCollection.Iterator) throws {
+    init(asn1Encoded sequenceNodeIterator: inout ASN1.ASN1NodeCollection.Iterator) throws {
         guard let node = sequenceNodeIterator.next() else {
             throw CryptoKitASN1Error.invalidASN1Object
         }
@@ -559,21 +561,21 @@ extension ASN1Parseable {
         self = try .init(asn1Encoded: node)
     }
 
-    internal init(asn1Encoded: [UInt8]) throws {
+    init(asn1Encoded: [UInt8]) throws {
         self = try .init(asn1Encoded: ASN1.parse(asn1Encoded))
     }
 
-    internal init(asn1Encoded: ArraySlice<UInt8>) throws {
+    init(asn1Encoded: ArraySlice<UInt8>) throws {
         self = try .init(asn1Encoded: ASN1.parse(asn1Encoded))
     }
 }
 
-internal protocol ASN1Serializable {
+protocol ASN1Serializable {
     func serialize(into coder: inout ASN1.Serializer) throws
 }
 
 /// Covers ASN.1 types that may be implicitly tagged. Not all nodes can be!
-internal protocol ASN1ImplicitlyTaggable: ASN1Parseable, ASN1Serializable {
+protocol ASN1ImplicitlyTaggable: ASN1Parseable, ASN1Serializable {
     /// The tag that the first node will use "by default" if the grammar omits
     /// any more specific tag definition.
     static var defaultIdentifier: ASN1.ASN1Identifier { get }
@@ -584,7 +586,7 @@ internal protocol ASN1ImplicitlyTaggable: ASN1Parseable, ASN1Serializable {
 }
 
 extension ASN1ImplicitlyTaggable {
-    internal init(asn1Encoded sequenceNodeIterator: inout ASN1.ASN1NodeCollection.Iterator,
+    init(asn1Encoded sequenceNodeIterator: inout ASN1.ASN1NodeCollection.Iterator,
                   withIdentifier identifier: ASN1.ASN1Identifier = Self.defaultIdentifier) throws {
         guard let node = sequenceNodeIterator.next() else {
             throw CryptoKitASN1Error.invalidASN1Object
@@ -593,11 +595,11 @@ extension ASN1ImplicitlyTaggable {
         self = try .init(asn1Encoded: node, withIdentifier: identifier)
     }
 
-    internal init(asn1Encoded: [UInt8], withIdentifier identifier: ASN1.ASN1Identifier = Self.defaultIdentifier) throws {
+    init(asn1Encoded: [UInt8], withIdentifier identifier: ASN1.ASN1Identifier = Self.defaultIdentifier) throws {
         self = try .init(asn1Encoded: ASN1.parse(asn1Encoded), withIdentifier: identifier)
     }
 
-    internal init(asn1Encoded: ArraySlice<UInt8>, withIdentifier identifier: ASN1.ASN1Identifier = Self.defaultIdentifier) throws {
+    init(asn1Encoded: ArraySlice<UInt8>, withIdentifier identifier: ASN1.ASN1Identifier = Self.defaultIdentifier) throws {
         self = try .init(asn1Encoded: ASN1.parse(asn1Encoded), withIdentifier: identifier)
     }
 
@@ -637,7 +639,7 @@ extension ArraySlice where Element == UInt8 {
             let requiredBits = UInt.bitWidth - length.leadingZeroBitCount
             switch requiredBits {
             case 0...7:
-                // For 0 to 7 bits, the long form is unnacceptable and we require the short.
+                // For 0 to 7 bits, the long form is unacceptable and we require the short.
                 throw CryptoKitASN1Error.unsupportedFieldLength
             case 8...:
                 // For 8 or more bits, fieldLength should be the minimum required.
@@ -659,7 +661,7 @@ extension ArraySlice where Element == UInt8 {
 }
 
 extension FixedWidthInteger {
-    internal init<Bytes: Collection>(bigEndianBytes bytes: Bytes) throws where Bytes.Element == UInt8 {
+    init<Bytes: Collection>(bigEndianBytes bytes: Bytes) throws where Bytes.Element == UInt8 {
         guard bytes.count <= (Self.bitWidth / 8) else {
             throw CryptoKitASN1Error.invalidASN1Object
         }
@@ -719,10 +721,12 @@ extension Int {
 
 extension FixedWidthInteger {
     // Bytes needed to store a given integer.
-    internal var neededBytes: Int {
+    var neededBytes: Int {
         let neededBits = self.bitWidth - self.leadingZeroBitCount
         return (neededBits + 7) / 8
     }
 }
 
 #endif // Linux or !SwiftPM
+
+// swiftlint:enable all

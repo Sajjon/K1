@@ -46,7 +46,7 @@ extension K1.Schnorr.PublicKey {
 	}
 }
 
-// MARK: - SchnorrPublicKeyEncodingDecodingRoundtripTests
+// MARK: K1.Schnorr.PublicKey Tests
 final class SchnorrPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 	func test_pubkey_raw_is_x963_minus_prefix() throws {
 		let privateKey = K1.Schnorr.PrivateKey()
@@ -103,7 +103,7 @@ extension K1.ECDSA.PublicKey {
 	}
 }
 
-// MARK: - ECDSAPublicKeyEncodingDecodingRoundtripTests
+// MARK: K1.ECDSA.PublicKey Tests
 final class ECDSAPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 	func test_pubkey_raw_is_x963_minus_prefix() throws {
 		let privateKey = K1.ECDSA.PrivateKey()
@@ -160,7 +160,7 @@ extension K1.ECDSAWithKeyRecovery.PublicKey {
 	}
 }
 
-// MARK: - ECDSAWithKeyRecoveryPublicKeyEncodingDecodingRoundtripTests
+// MARK: K1.ECDSAWithKeyRecovery.PublicKey Tests
 final class ECDSAWithKeyRecoveryPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 	func test_pubkey_raw_is_x963_minus_prefix() throws {
 		let privateKey = K1.ECDSAWithKeyRecovery.PrivateKey()
@@ -217,7 +217,7 @@ extension K1.KeyAgreement.PublicKey {
 	}
 }
 
-// MARK: - KeyAgreementPublicKeyEncodingDecodingRoundtripTests
+// MARK: K1.KeyAgreement.PublicKey Tests
 final class KeyAgreementPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 	func test_pubkey_raw_is_x963_minus_prefix() throws {
 		let privateKey = K1.KeyAgreement.PrivateKey()
@@ -266,3 +266,4 @@ final class KeyAgreementPublicKeyEncodingDecodingRoundtripTests: XCTestCase {
 		)
 	}
 }
+

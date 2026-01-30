@@ -6,6 +6,8 @@ import protocol CryptoKit.Digest
 import struct CryptoKit.SHA256
 import Foundation
 
+// swiftlint:disable all
+
 // MARK: Verify + ECDSA
 extension K1.ECDSA.PublicKey {
 	/// Verifies an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature on some _hash_ over the `secp256k1` elliptic curve.
@@ -194,3 +196,5 @@ extension K1.Schnorr.PublicKey {
 		)
 	}
 }
+
+// swiftlint:enable all

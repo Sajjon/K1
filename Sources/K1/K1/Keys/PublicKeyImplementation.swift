@@ -1,6 +1,7 @@
 import Foundation
 
 // MARK: - _K1PublicKeyProtocol
+// swiftlint:disable:next type_name
 protocol _K1PublicKeyProtocol: _K1KeyPortable, Sendable, Hashable {
 	init(compressedRepresentation: some ContiguousBytes) throws
 	var compressedRepresentation: Data { get }
@@ -8,11 +9,13 @@ protocol _K1PublicKeyProtocol: _K1KeyPortable, Sendable, Hashable {
 
 // MARK: - K1._PublicKeyImplementation
 extension K1 {
+	// swiftlint:disable:next type_name
 	struct _PublicKeyImplementation: Sendable, Hashable, _K1PublicKeyProtocol {
+		// swiftlint:disable:next nesting
 		typealias Wrapped = FFI.PublicKey.Wrapped
-		internal let wrapped: Wrapped
+		let wrapped: Wrapped
 
-		internal init(wrapped: Wrapped) {
+		init(wrapped: Wrapped) {
 			self.wrapped = wrapped
 		}
 	}
@@ -80,11 +83,13 @@ extension K1._PublicKeyImplementation {
 
 	/// `04 || X || Y` (65 bytes)
 	var x963Representation: Data {
+		// swiftlint:disable:next force_try
 		try! FFI.PublicKey.serialize(wrapped, format: .uncompressed)
 	}
 
 	/// `02|03 || X` (33 bytes)
 	var compressedRepresentation: Data {
+		// swiftlint:disable:next force_try
 		try! FFI.PublicKey.serialize(wrapped, format: .compressed)
 	}
 
@@ -97,12 +102,13 @@ extension K1._PublicKeyImplementation {
 		var serializer = ASN1.Serializer()
 
 		// Serializing these keys can't throw
+		// swiftlint:disable:next force_try
 		try! serializer.serialize(spki)
 		return Data(serializer.serializedBytes)
 	}
 
 	/// A Privacy-Enhanced Mail (PEM) representation of the public key.
-	public var pemRepresentation: String {
+	var pemRepresentation: String {
 		let pemDocument = ASN1.PEMDocument(type: Self.pemType, derBytes: self.derRepresentation)
 		return pemDocument.pemString
 	}
@@ -137,23 +143,23 @@ extension K1._PublicKeyImplementation {
 // MARK: Group Operations
 extension K1._PublicKeyImplementation {
 	/// Adds two public keys (points) on the secp256k1 curve
-	public static func + (lhs: Self, rhs: Self) throws -> Self {
+	static func + (lhs: Self, rhs: Self) throws -> Self {
 		try Self(wrapped: lhs.wrapped + rhs.wrapped)
 	}
-	
+
 	/// Subtracts two public keys (points) on the secp256k1 curve
-	public static func - (lhs: Self, rhs: Self) throws -> Self {
+	static func - (lhs: Self, rhs: Self) throws -> Self {
 		try Self(wrapped: lhs.wrapped - rhs.wrapped)
 	}
-	
+
 	/// Negates a public key (point) on the secp256k1 curve
-	public func negate() throws -> Self {
+	func negate() throws -> Self {
 		try Self(wrapped: wrapped.negate())
 	}
-	
+
 	/// Combines multiple public keys (points) on the secp256k1 curve
-	public static func sum(keys: [Self]) throws -> Self {
-		let wrappedKeys = keys.map { $0.wrapped }
+	static func sum(keys: [Self]) throws -> Self {
+		let wrappedKeys = keys.map(\.wrapped)
 		return try Self(wrapped: FFI.PublicKey.Wrapped.sum(keys: wrappedKeys))
 	}
 }

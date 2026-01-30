@@ -12,7 +12,7 @@ _K1_ is Swift wrapper around [libsecp256k1 (bitcoin-core/secp256k1)][lib], offer
 Read full documentation [here on SwiftPackageIndex][doc].
 
 ## Quick overview
-The API of K1 maps almost 1:1 with Apple's [CryptoKit][ck], vendoring a set of keypairs, one per feature. E.g. in CryptoKit you have `Curve25519.KeyAgreement.PrivateKey` and `Curve25519.KeyAgreement.PublicKey` which are seperate for `Curve25519.Signing.PrivateKey` and `Curve25519.Signing.PublicKey`. 
+The API of K1 maps almost 1:1 with Apple's [CryptoKit][ck], vendoring a set of keypairs, one per feature. E.g. in CryptoKit you have `Curve25519.KeyAgreement.PrivateKey` and `Curve25519.KeyAgreement.PublicKey` which are separate for `Curve25519.Signing.PrivateKey` and `Curve25519.Signing.PublicKey`. 
 
 Just like that K1 vendors these key pairs:
 - `K1.KeyAgreement.PrivateKey` / `K1.KeyAgreement.PublicKey` for key agreement (ECDH)
@@ -112,7 +112,7 @@ let signature = try alice.signature(forUnhashed: message)
 
 ```swift
 let hashedMessage: Data = // from somewhere
-let publicKey: K1.ECDSA.PublicKey = alice.publcKey
+let publicKey: K1.ECDSA.PublicKey = alice.publicKey
 let signature: K1.ECDSA.Signature // from above
 
 assert(
@@ -205,12 +205,12 @@ Returning only the `X` coordinate of the point, following [ANSI X9.63][x963] sta
 You can retrieve the `X` coordinate as raw data using `withUnsafeBytes` if you need to.
 
 ```swift
-let ab: CryptoKit.SharedSecret = try alice.sharedSecretFromKeyAgreement(with: bob.publicKey) 
-let ba: CryptoKit.SharedSecret = try bob.sharedSecretFromKeyAgreement(with: alice.publicKey)
+let aliceBob: CryptoKit.SharedSecret = try alice.sharedSecretFromKeyAgreement(with: bob.publicKey) 
+let bobAlice: CryptoKit.SharedSecret = try bob.sharedSecretFromKeyAgreement(with: alice.publicKey)
 
-assert(ab == ba) // pass
+assert(aliceBob == bobAlice) // pass
 
-ab.withUnsafeBytes {
+aliceBob.withUnsafeBytes {
     assert(Data($0).count == 32) // pass
 }
 ```
@@ -220,11 +220,11 @@ ab.withUnsafeBytes {
 Using `libsecp256k1` default behaviour, returning a SHA-256 hash of the **compressed** point, embedded in a [`CryptoKit.SharedSecret`][ckss], which is useful since you can use `CryptoKit` key derivation functions.
 
 ```swift
-let ab: CryptoKit.SharedSecret = try alice.ecdh(with: bob.publicKey) 
-let ba: CryptoKit.SharedSecret = try bob.ecdh(with: alice.publicKey)
-assert(ab == ba) // pass
+let aliceBob: CryptoKit.SharedSecret = try alice.ecdh(with: bob.publicKey) 
+let bobAlice: CryptoKit.SharedSecret = try bob.ecdh(with: alice.publicKey)
+assert(aliceBob == bobAlice) // pass
 
-ab.withUnsafeBytes {
+aliceBob.withUnsafeBytes {
     assert(Data($0).count == 32) // pass
 }
 ```
@@ -234,11 +234,11 @@ ab.withUnsafeBytes {
 Returns an entire uncompressed EC point, without hashing it. Might be useful if you wanna construct your own cryptographic functions, e.g. some custom ECIES.
 
 ```swift
-let ab: Data = try alice.ecdhPoint(with: bob.publicKey) 
-let ba: Data = try bob.ecdhPoint(with: alice.publicKey)
-assert(ab == ba) // pass
+let aliceBob: Data = try alice.ecdhPoint(with: bob.publicKey) 
+let bobAlice: Data = try bob.ecdhPoint(with: alice.publicKey)
+assert(aliceBob == bobAlice) // pass
 
-assert(ab.count == 65) // pass
+assert(aliceBob.count == 65) // pass
 ```
 
 
@@ -249,11 +249,13 @@ assert(ab.count == 65) // pass
 
 # Development
 
+`K1` uses [`just`](https://github.com/casey/just) as a command runner instead of make.
+
 ## Setup submodule
 Stand in root and run to setup submodule
 
 ```sh
-make submodules
+just submodules
 ```
 
 ## Update submodule
@@ -278,7 +280,10 @@ You run `gyb` for a single file like so:
 ./scripts/gyb --line-directive "" Sources/Foobar.swift.gyb -o Sources/Foobar.swift
 ```
 
-More conveniently you can run the bash script `./scripts/generate_boilerplate_files_with_gyb.sh` to generate all Swift files from their corresponding gyb template.
+More conveniently, to generate all Swift files from their corresponding gyb template, you can run:
+```sh
+just gyb
+```
 
 **If you add a new `.gyb` file, you should append a `// MARK: - Generated file, do NOT edit` warning** inside it, e.g.
 

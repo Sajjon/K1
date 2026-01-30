@@ -26,7 +26,7 @@ import XCTest
 // MARK: - ECDHWycheproofTests
 final class ECDHWycheproofTests: XCTestCase {
 	func testECDHWycheproof() throws {
-		let _ = try testSuite(
+		_ = try testSuite(
 			jsonName: "wycheproof_ecdh_ASN1x963",
 			testFunction: { (group: ECDHTestGroup) in
 				testGroup(group: group)
@@ -83,7 +83,7 @@ private extension ECDHWycheproofTests {
 				privateBytes = try padKeyIfNecessary(vector: testVector.privateKey)
 				let privateKey = try K1.KeyAgreement.PrivateKey(rawRepresentation: privateBytes)
 
-				/// ANS1 X9.63 serialization of shared secret, returning a `CryptoKit.SharedSecret`
+				// ANS1 X9.63 serialization of shared secret, returning a `CryptoKit.SharedSecret`
 				let sharedPublicKeyPoint = try privateKey.sharedSecretFromKeyAgreement(with: publicKey)
 				let got = sharedPublicKeyPoint.withUnsafeBytes {
 					Data($0)

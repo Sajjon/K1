@@ -1,3 +1,5 @@
+// swiftlint:disable all
+
 // From: https://github.com/apple/swift-crypto/blob/22fd38919566816705c57d5f4dd5a97a4edcf25e/Sources/Crypto/Util/SecureBytes.swift
 // Commit: 22fd38919566816705c57d5f4dd5a97a4edcf25e
 
@@ -87,7 +89,7 @@ extension SecureBytes: Collection {
     struct Index {
         /* fileprivate but usableFromInline */ @usableFromInline var offset: Int
 
-        /*@inlinable*/ @usableFromInline internal init(offset: Int) {
+        /*@inlinable*/ @usableFromInline init(offset: Int) {
             self.offset = offset
         }
     }
@@ -214,16 +216,16 @@ extension SecureBytes.Index: Strideable {
 // MARK: - Heap allocated backing storage.
 extension SecureBytes {
     @usableFromInline
-    internal struct BackingHeader {
+    struct BackingHeader {
         @usableFromInline
-        internal var count: Int
+        var count: Int
 
         @usableFromInline
-        internal var capacity: Int
+        var capacity: Int
     }
 
     @usableFromInline
-    internal class Backing: ManagedBuffer<BackingHeader, UInt8> {
+    class Backing: ManagedBuffer<BackingHeader, UInt8> {
         @usableFromInline
         class func create(capacity: Int) -> Backing {
             let capacity = Int(UInt32(capacity).nextPowerOf2ClampedToMax())
@@ -490,3 +492,5 @@ extension Data {
         }
     }
 }
+
+// swiftlint:enable all

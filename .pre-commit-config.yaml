@@ -1,0 +1,23 @@
+fail_fast: true
+default_install_hook_types: [pre-commit]
+default_stages: [pre-commit]
+repos:
+    - repo: https://github.com/crate-ci/typos
+      rev: v1.42.3
+      hooks:
+          - id: typos
+
+    - repo: local
+      hooks:
+          - id: lint
+            name: lint
+            language: system
+            types: [file, swift]
+            entry: swiftformat . --lint
+            pass_filenames: false
+          - id: unit tests
+            name: unit tests
+            language: system
+            types: [file, swift]
+            entry: swift test
+            pass_filenames: false

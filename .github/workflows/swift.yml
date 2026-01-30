@@ -14,6 +14,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  spelling:
+    name: Spell Check with Typos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Actions Repository
+        uses: actions/checkout@v4
+      - name: Spell Check Repo
+        uses: crate-ci/typos@v1.42.3
+        
   linting:
     runs-on: macos-26
     steps:
@@ -30,14 +39,20 @@ jobs:
       - linting
     strategy:
       matrix:
-        xcode: ['14.1']
+        xcode: ['26.2']
     steps:
       - uses: actions/checkout@v3
+      - name: "Install just"
+        run: |
+          if ! command -v just >/dev/null; then
+            brew update
+            brew install just
+          fi
       - name: "Select Xcode ${{ matrix.xcode }}"
         run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
       - name: "Clean and init submodules"
-        run: make init
+        run: just init
       - name: "Run test in debug"
-        run: make testdebug
+        run: just testdebug
       - name: "Run test in production"
-        run: make testprod
+        run: just testprod

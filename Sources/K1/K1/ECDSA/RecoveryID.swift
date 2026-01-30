@@ -3,12 +3,14 @@ import Foundation
 // MARK: - K1.ECDSAWithKeyRecovery.Signature.RecoveryID
 extension K1.ECDSAWithKeyRecovery.Signature {
 	public enum RecoveryID: UInt8, Sendable, Hashable, Codable {
+		// swiftlint:disable identifier_name
 		case _0 = 0
 		case _1 = 1
 		case _2 = 2
 		case _3 = 3
+		// swiftlint:enable identifier_name
 
-		internal var recid: Int32 {
+		var recid: Int32 {
 			Int32(rawValue)
 		}
 	}
@@ -16,6 +18,7 @@ extension K1.ECDSAWithKeyRecovery.Signature {
 
 extension K1.ECDSAWithKeyRecovery.Signature.RecoveryID {
 	public init(byte: UInt8) throws {
+		// swiftlint:disable:next identifier_name
 		guard let self_ = Self(rawValue: byte) else {
 			throw K1.Error.invalidParameter
 		}

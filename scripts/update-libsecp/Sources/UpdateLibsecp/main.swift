@@ -3,6 +3,8 @@ import Subprocess
 import System
 
 // MARK: - UpdateLibsecpTool
+// swiftlint:disable file_length
+
 @main
 enum UpdateLibsecpTool {
 	static func main() async throws {
@@ -55,7 +57,7 @@ extension Program {
 			)
 
 			await cleanUp(
-				currentBranch: currentBranch,
+				currentBranch: currentBranch
 			)
 		} catch {
 			await cleanUp(
@@ -242,7 +244,7 @@ extension Program {
 	func commitChanges(newVersion: Version) async throws {
 		print("💾 Committing changes…")
 		try await doCommitChanges(newVersion: newVersion)
-		print("💾 Commited changes ☑️.")
+		print("💾 Committed changes ☑️.")
 	}
 
 	func doCommitChanges(newVersion: Version) async throws {
@@ -433,13 +435,15 @@ extension Program {
 		let regex = try NSRegularExpression(pattern: oldLinePattern, options: [])
 		let range = NSRange(location: 0, length: (content as NSString).length)
 
+		let url = "https://github.com/bitcoin-core/secp256k1/releases/tag/\(newTag)"
 		let replacement =
-			"> Current `libsecp256k1` version is [\(newTag) (\(newVersion.commit))](https://github.com/bitcoin-core/secp256k1/releases/tag/\(newTag))"
+			"> Current `libsecp256k1` version is [\(newTag) (\(newVersion.commit))](\(url))"
 
 		let matches = regex.matches(in: content, options: [], range: range)
 		guard let match = matches.first else {
 			throw ToolError(
-				"Could not find README version line to replace, searched for line:\n\(oldLinePattern)")
+				"Could not find README version line to replace, searched for line:\n\(oldLinePattern)"
+			)
 		}
 
 		if dryRun {
@@ -471,7 +475,8 @@ private func firstLineOf(
 	)
 	guard let firstLine = stdout.split(separator: "\n").first else {
 		throw ToolError(
-			"No first line returned from command. Output was: '\(stdout)', stderr: '\(stderr)'")
+			"No first line returned from command. Output was: '\(stdout)', stderr: '\(stderr)'"
+		)
 	}
 	return String(firstLine)
 }
@@ -527,8 +532,14 @@ private func runCommand(
 // MARK: - ToolError
 private struct ToolError: LocalizedError {
 	let message: String
-	init(_ message: String) { self.message = message }
-	var errorDescription: String? { message }
+
+	init(_ message: String) {
+		self.message = message
+	}
+
+	var errorDescription: String? {
+		message
+	}
 }
 
 extension String {
@@ -536,3 +547,5 @@ extension String {
 		trimmingCharacters(in: .whitespacesAndNewlines)
 	}
 }
+
+// swiftlint:enable file_length

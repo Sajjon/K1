@@ -74,44 +74,44 @@ extension TwoVariantsOfECDHWithKDFTests {
 		for outcome in vector.outcomes {
 			switch outcome.ecdhVariant {
 			case .asn1X963:
-				let sharedSecretAB = try alice.sharedSecretFromKeyAgreement(with: bob.publicKey)
-				let sharedSecretBA = try bob.sharedSecretFromKeyAgreement(with: alice.publicKey)
+				let aliceBob = try alice.sharedSecretFromKeyAgreement(with: bob.publicKey)
+				let bobAlice = try bob.sharedSecretFromKeyAgreement(with: alice.publicKey)
 
-				XCTAssertEqual(sharedSecretAB, sharedSecretBA)
-				sharedSecretAB.withUnsafeBytes {
+				XCTAssertEqual(aliceBob, bobAlice)
+				aliceBob.withUnsafeBytes {
 					XCTAssertEqual(Data($0).hex, outcome.ecdhSharedKey, "Wrong ECDH secret, mismatched expected from vector.")
 				}
 
 				for derivedKeys in outcome.derivedKeys {
 					let info = try XCTUnwrap(derivedKeys.info.data(using: .utf8))
 					let salt = try Data(hex: derivedKeys.salt)
-					let x963 = sharedSecretBA.x963DerivedSymmetricKey(using: hash, sharedInfo: info, outputByteCount: outputByteCount)
+					let x963 = bobAlice.x963DerivedSymmetricKey(using: hash, sharedInfo: info, outputByteCount: outputByteCount)
 					x963.withUnsafeBytes {
 						XCTAssertEqual(Data($0).hex, derivedKeys.x963, "Wrong X963 KDF result, mismatched expected from vector.")
 					}
-					let hkdf = sharedSecretBA.hkdfDerivedSymmetricKey(using: hash, salt: salt, sharedInfo: info, outputByteCount: outputByteCount)
+					let hkdf = bobAlice.hkdfDerivedSymmetricKey(using: hash, salt: salt, sharedInfo: info, outputByteCount: outputByteCount)
 					hkdf.withUnsafeBytes {
 						XCTAssertEqual(Data($0).hex, derivedKeys.hkdf, "Wrong HKDF result, mismatched expected from vector.")
 					}
 				}
 
 			case .libsecp256k1:
-				let sharedSecretAB = try alice.ecdh(with: bob.publicKey)
-				let sharedSecretBA = try bob.ecdh(with: alice.publicKey)
+				let aliceBob = try alice.ecdh(with: bob.publicKey)
+				let bobAlice = try bob.ecdh(with: alice.publicKey)
 
-				XCTAssertEqual(sharedSecretAB, sharedSecretBA)
-				sharedSecretAB.withUnsafeBytes {
+				XCTAssertEqual(aliceBob, bobAlice)
+				aliceBob.withUnsafeBytes {
 					XCTAssertEqual(Data($0).hex, outcome.ecdhSharedKey, "Wrong ECDH secret, mismatched expected from vector.")
 				}
 
 				for derivedKeys in outcome.derivedKeys {
 					let info = try XCTUnwrap(derivedKeys.info.data(using: .utf8))
 					let salt = try Data(hex: derivedKeys.salt)
-					let x963 = sharedSecretAB.x963DerivedSymmetricKey(using: hash, sharedInfo: info, outputByteCount: outputByteCount)
+					let x963 = aliceBob.x963DerivedSymmetricKey(using: hash, sharedInfo: info, outputByteCount: outputByteCount)
 					x963.withUnsafeBytes {
 						XCTAssertEqual(Data($0).hex, derivedKeys.x963, "Wrong X963 KDF result, mismatched expected from vector.")
 					}
-					let hkdf = sharedSecretAB.hkdfDerivedSymmetricKey(using: hash, salt: salt, sharedInfo: info, outputByteCount: outputByteCount)
+					let hkdf = aliceBob.hkdfDerivedSymmetricKey(using: hash, salt: salt, sharedInfo: info, outputByteCount: outputByteCount)
 					hkdf.withUnsafeBytes {
 						XCTAssertEqual(Data($0).hex, derivedKeys.hkdf, "Wrong HKDF result, mismatched expected from vector.")
 					}

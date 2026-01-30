@@ -7,8 +7,9 @@ extension K1.ECDSA {
 	/// A `secp256k1` elliptic curve digital signature algorithm (ECDSA) signature,
 	/// from which users can recover a public key with the message that was signed.
 	public struct Signature: Sendable, Hashable, ContiguousBytes {
+		// swiftlint:disable:next nesting
 		typealias Wrapped = FFI.ECDSA.Wrapped
-		internal let wrapped: Wrapped
+		let wrapped: Wrapped
 
 		init(wrapped: Wrapped) {
 			self.wrapped = wrapped
@@ -78,7 +79,7 @@ extension K1.ECDSA.Signature {
 }
 
 extension K1.ECDSA.Signature {
-	internal static let byteCount = FFI.ECDSAWithKeyRecovery.byteCount
+	static let byteCount = FFI.ECDSAWithKeyRecovery.byteCount
 }
 
 // MARK: Equatable

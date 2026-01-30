@@ -1,3 +1,5 @@
+// swiftlint:disable all
+
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the SwiftCrypto open source project
@@ -39,7 +41,7 @@ extension ASN1IntegerRepresentable {
         .integer
     }
 
-    internal init(asn1Encoded node: ASN1.ASN1Node, withIdentifier identifier: ASN1.ASN1Identifier) throws {
+    init(asn1Encoded node: ASN1.ASN1Node, withIdentifier identifier: ASN1.ASN1Identifier) throws {
         guard node.identifier == identifier else {
             throw CryptoKitASN1Error.unexpectedFieldType
         }
@@ -79,7 +81,7 @@ extension ASN1IntegerRepresentable {
         self = try Self(asn1IntegerBytes: dataBytes)
     }
 
-    internal func serialize(into coder: inout ASN1.Serializer, withIdentifier identifier: ASN1.ASN1Identifier) throws {
+    func serialize(into coder: inout ASN1.Serializer, withIdentifier identifier: ASN1.ASN1Identifier) throws {
         coder.appendPrimitiveNode(identifier: identifier) { bytes in
             self.withBigEndianIntegerBytes { integerBytes in
                 // If the number of bytes is 0, we're encoding a zero. That actually _does_ require one byte.
@@ -270,3 +272,5 @@ extension UInt8 {
 }
 
 #endif // Linux or !SwiftPM
+
+// swiftlint:enable all

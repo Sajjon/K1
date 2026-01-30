@@ -1,3 +1,5 @@
+// swiftlint:disable all
+
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the SwiftCrypto open source project
@@ -38,3 +40,5 @@ extension ArraySlice: ASN1IntegerRepresentable where Element == UInt8 {
 }
 
 #endif // Linux or !SwiftPM
+
+// swiftlint:enable all

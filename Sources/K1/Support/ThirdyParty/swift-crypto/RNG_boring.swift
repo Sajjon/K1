@@ -1,3 +1,5 @@
+// swiftlint:disable all
+
 // from: https://github.com/apple/swift-crypto/blob/64a1a98e47e6643e6d43d30b87a244483b51d8ad/Sources/Crypto/Util/BoringSSL/RNG_boring.swift
 // commit: 64a1a98e47e6643e6d43d30b87a244483b51d8ad
 
@@ -41,3 +43,5 @@ extension UnsafeMutableRawBufferPointer {
         }
     }
 }
+
+// swiftlint:enable all

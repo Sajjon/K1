@@ -9,6 +9,7 @@ extension FFI {
 // MARK: - FFI.PublicKey.Wrapped
 extension FFI.PublicKey {
 	struct Wrapped: @unchecked Sendable, ContiguousBytes {
+		// swiftlint:disable:next nesting
 		typealias Raw = secp256k1_pubkey
 		let raw: Raw
 		init(raw: Raw) {
@@ -43,17 +44,17 @@ extension FFI.PublicKey.Wrapped {
 // MARK: Group Operations
 extension FFI.PublicKey.Wrapped {
 	/// Adds two public keys (points) on the secp256k1 curve
-	public static func + (lhs: Self, rhs: Self) throws -> Self {
+	static func + (lhs: Self, rhs: Self) throws -> Self {
 		try sum(keys: [lhs, rhs])
 	}
-	
+
 	/// Subtracts two public keys (points) on the secp256k1 curve
-	public static func - (lhs: Self, rhs: Self) throws -> Self {
+	static func - (lhs: Self, rhs: Self) throws -> Self {
 		try lhs + rhs.negate()
 	}
-	
+
 	/// Negates a public key (point) on the secp256k1 curve
-	public func negate() throws -> Self {
+	func negate() throws -> Self {
 		var result = self.raw
 		try FFI.toC { ffi in
 			try ffi.call(ifFailThrow: .publicKeyCreate) { context in
@@ -62,47 +63,32 @@ extension FFI.PublicKey.Wrapped {
 		}
 		return Self(raw: result)
 	}
-	
-    /// Combines multiple public keys (points) on the secp256k1 curve
-    public static func sum(keys: [Self]) throws -> Self {
-        guard !keys.isEmpty else {
-            throw K1.Error.invalidParameter
-        }
-        
-        var result = secp256k1_pubkey()
-        var mutableKeys = keys.map { $0.raw }
-        
-        try mutableKeys.withUnsafeMutableBufferPointer { keysBuffer in
-            var keyPointers = [UnsafePointer<secp256k1_pubkey>?]()
-            keyPointers.reserveCapacity(keys.count)
-            
-            for i in 0..<keys.count {
-                keyPointers.append(keysBuffer.baseAddress!.advanced(by: i))
-            }
-            
-            try keyPointers.withUnsafeBufferPointer { pointers in
-                try FFI.toC { ffi in
-                    try ffi.call(ifFailThrow: .groupOperation) { context in
-                        secp256k1_ec_pubkey_combine(context, &result, pointers.baseAddress!, keys.count)
-                    }
-                }
-            }
-        }
-        
-        return Self(raw: result)
-    }
-}
 
-#if DEBUG
-// MARK: Debug Extensions
-extension FFI.PublicKey.Wrapped {
-	/// `G`, the generator point of the curve `secp256k1`
-	public static let g: Self = FFI.PrivateKey.Wrapped.one.publicKey
-	
-	public static let gx2: Self = FFI.PrivateKey.Wrapped.two.publicKey
-	public static let gx3: Self = FFI.PrivateKey.Wrapped.three.publicKey
-	public static let gx4: Self = FFI.PrivateKey.Wrapped.four.publicKey
-	public static let gx5: Self = FFI.PrivateKey.Wrapped.five.publicKey
-	public static let gx6: Self = FFI.PrivateKey.Wrapped.six.publicKey
+	/// Combines multiple public keys (points) on the secp256k1 curve
+	static func sum(keys: [Self]) throws -> Self {
+		guard !keys.isEmpty else {
+			throw K1.Error.invalidParameter
+		}
+
+		var result = secp256k1_pubkey()
+		var mutableKeys = keys.map(\.raw)
+
+		try mutableKeys.withUnsafeMutableBufferPointer { keysBuffer in
+			var keyPointers = [UnsafePointer<secp256k1_pubkey>?]()
+			keyPointers.reserveCapacity(keys.count)
+
+			for index in 0 ..< keys.count {
+				keyPointers.append(keysBuffer.baseAddress!.advanced(by: index))
+			}
+
+			try keyPointers.withUnsafeBufferPointer { pointers in
+				try FFI.toC { ffi in
+					try ffi.call(ifFailThrow: .groupOperation) { context in
+						secp256k1_ec_pubkey_combine(context, &result, pointers.baseAddress!, keys.count)
+					}
+				}
+			}
+		}
+		return Self(raw: result)
+	}
 }
-#endif

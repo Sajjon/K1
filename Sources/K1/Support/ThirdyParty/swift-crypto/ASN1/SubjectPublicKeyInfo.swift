@@ -1,3 +1,5 @@
+// swiftlint:disable all
+
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the SwiftCrypto open source project
@@ -52,7 +54,7 @@ extension ASN1 {
             self.key = key
         }
         
-        internal init(algorithmIdentifier: RFC5480AlgorithmIdentifier, key: [UInt8]) {
+        init(algorithmIdentifier: RFC5480AlgorithmIdentifier, key: [UInt8]) {
             self.algorithmIdentifier = algorithmIdentifier
             self.key = ASN1BitString(bytes: key[...])
         }
@@ -123,3 +125,5 @@ extension ASN1.RFC5480AlgorithmIdentifier {
 }
 
 #endif // Linux or !SwiftPM
+
+// swiftlint:enable all

@@ -23,12 +23,15 @@ protocol WrappedECDSASignature {
 	associatedtype Raw: RawECDSASignature
 	init(raw: Raw)
 	var raw: Raw { get }
+
+	// swiftlint:disable:next line_length
 	static func sign() -> (OpaquePointer, UnsafeMutablePointer<Raw>, UnsafePointer<UInt8>, UnsafePointer<UInt8>, secp256k1_nonce_function?, UnsafeRawPointer?) -> Int32
 }
 
 // MARK: ECDSA Shared
 extension FFI {
-	internal static func _ecdsa<WrappedSignature>(
+	// swiftlint:disable:next identifier_name
+	static func _ecdsa<WrappedSignature>(
 		message: [UInt8],
 		privateKey: FFI.PrivateKey.Wrapped,
 		options: K1.ECDSA.SigningOptions = .default
@@ -66,21 +69,27 @@ extension K1.ECDSA.SigningOptions {
 }
 
 extension K1.ECDSA.SigningOptions.NonceFunction {
-	fileprivate func function() -> Optional< @convention(c) (UnsafeMutablePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafeMutableRawPointer?, UInt32) -> Int32> {
+	// swiftlint:disable:next line_length
+	fileprivate func function() -> (@convention(c) (UnsafeMutablePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafeMutableRawPointer?, UInt32) -> Int32)? {
 		switch self {
 		case .deterministic:
 			return secp256k1_nonce_function_rfc6979
 
 		case .random:
-			return { (
-				nonce32: UnsafeMutablePointer<UInt8>?, // Out: pointer to a 32-byte array to be filled by the function.
-				_: UnsafePointer<UInt8>?, // In: the 32-byte message hash being verified (will not be NULL)
-				_: UnsafePointer<UInt8>?, // In: pointer to a 32-byte secret key (will not be NULL)
-				_: UnsafePointer<UInt8>?, // In:  pointer to a 16-byte array describing the signature algorithm (will be NULL for ECDSA for compatibility).
-				_: UnsafeMutableRawPointer?, // In: Arbitrary data pointer that is passed through.
-				_: UInt32 // In: how many iterations we have tried to find a nonce. This will almost always be 0, but different attempt values are required to result in a different nonce.
-			) -> Int32 /* Returns: 1 if a nonce was successfully generated. 0 will cause signing to fail. */ in
-
+			// swiftlint:disable closure_parameter_position
+			return {
+				(
+					nonce32: UnsafeMutablePointer<UInt8>?, // Out: pointer to a 32-byte array to be filled by the function.
+					_: UnsafePointer<UInt8>?, // In: the 32-byte message hash being verified (will not be NULL)
+					_: UnsafePointer<UInt8>?, // In: pointer to a 32-byte secret key (will not be NULL)
+					_: UnsafePointer<UInt8>?, // In:  pointer to a 16-byte array describing the
+					// signature algorithm (will be NULL for ECDSA for compatibility).
+					_: UnsafeMutableRawPointer?, // In: Arbitrary data pointer that is passed through.
+					_: UInt32 // In: how many iterations we have tried to find a nonce.
+					// This will almost always be 0, but different attempt values are
+					// required to result in a different nonce.
+				) -> Int32 /* Returns: 1 if a nonce was successfully generated. 0 will cause signing to fail. */ in
+				// swiftlint:enable closure_parameter_position
 				let count = Curve.Field.byteCount
 				let secureBytes = SecureBytes(count: count)
 

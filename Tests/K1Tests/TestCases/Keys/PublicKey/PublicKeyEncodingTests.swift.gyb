@@ -39,18 +39,14 @@ public func doTestSerializationRoundtrip<T, Enc>(
 	XCTAssertEqual(unique.count, count)
 }
 
-
-
 %{
 	FEATURES = ["Schnorr", "ECDSA", "ECDSAWithKeyRecovery", "KeyAgreement"]
 }%
-
 % for FEATURE in FEATURES:
 %{
 	MODULE = "K1." + FEATURE
 	PUBLIC_KEY_TYPE = MODULE + ".PublicKey"
 }%
-
 extension ${PUBLIC_KEY_TYPE} {
 	init() {
 		let pubKey = ${MODULE}.PrivateKey().publicKey
@@ -60,9 +56,7 @@ extension ${PUBLIC_KEY_TYPE} {
 
 // MARK: ${PUBLIC_KEY_TYPE} Tests
 final class ${FEATURE.replace('.','')+"PublicKey"}EncodingDecodingRoundtripTests: XCTestCase {
-	
 	func test_pubkey_raw_is_x963_minus_prefix() throws {
-		
 		let privateKey = ${MODULE}.PrivateKey()
 		let publicKey = privateKey.publicKey
 

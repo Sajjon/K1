@@ -109,10 +109,9 @@ extension K1.Error: CustomDebugStringConvertible {
 		case .invalidParameter:
 			return "invalid parameter"
 		case .invalidKey: return "invalidKey"
-
 		case let .internalFailure(rawValue):
 			guard let internalFailure = InternalFailure(rawValue: rawValue) else {
-				return "Internal failure"
+				return "internal failure"
 			}
 			let reason: String = {
 				switch internalFailure {
@@ -121,7 +120,6 @@ extension K1.Error: CustomDebugStringConvertible {
 				}
 			}()
 			return "Internal failure reason: \(reason)"
-
 		case let .underlyingLibsecp256k1(rawValue):
 			guard let ffi = FFI.Error(rawValue: rawValue) else {
 				return "Underlying libsecp256k1 failure."
@@ -136,7 +134,7 @@ extension K1.Error: CustomDebugStringConvertible {
 				case .ecdsaSignatureParseDER:
 					return "ECDSA signature parse DER"
 				case .ecdsaSignatureSerializeCompact:
-					return "ECDSA signature serialzie compact"
+					return "ECDSA signature serialize compact"
 				case .ecdsaSignatureSerializeDER:
 					return "ECDSA signature serialize DER"
 				case .recoverableSignatureParseCompact:
