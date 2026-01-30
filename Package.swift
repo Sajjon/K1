@@ -103,7 +103,6 @@ if development {
 			.unsafeFlags([
 				"-Xfrontend", "-warn-concurrency",
 				"-Xfrontend", "-enable-actor-data-race-checks",
-				"-enable-library-evolution",
 			])
 		)
 	}

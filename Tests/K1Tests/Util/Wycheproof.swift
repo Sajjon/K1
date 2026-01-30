@@ -82,7 +82,7 @@ extension XCTestCase {
 		hashFunction: HF.Type,
 		skipIfContainsFlags: [String] = [],
 		skipIfContainsComment: [String] = [],
-		file: StaticString = #file,
+		file: StaticString = #filePath,
 		line: UInt = #line
 	) throws -> ResultOfTestGroup {
 		guard group.key.curve == "secp256k1" else {
