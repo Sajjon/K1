@@ -3,7 +3,33 @@ Functions:
 - Name: ecdh_hash_function_asn1_x963_apinotes_test
   SwiftName: ecdhHashASN1x963(output:x:)
   Parameters:
-  - Position: 0
-    Nullability: N   # output
-  - Position: 1
-    Nullability: N   # x32
+  - Position: 0 # output
+    Nullability: N
+  - Position: 1 # x32
+    Nullability: N
+- Name: fill_with_fives
+  SwiftName: fillWithFives(span:)
+  Parameters:
+  - Position: 0 # buf
+    Lifetimebound: true
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "len"
+    Nullability: N
+  - Position: 1 # len
+    Nullability: N
+- Name: clone_buf_of_len_three
+  SwiftName: cloneSpanOfLength3Unsafe(into:from:)
+  Parameters:
+  - Position: 0 # destination
+    Lifetimebound: true
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: 3
+    Nullability: N
+  - Position: 1 # source
+    Lifetimebound: true
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: 3
+    Nullability: N

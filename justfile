@@ -3,12 +3,12 @@ ROOT_DIR := justfile_directory()
 default: testdebug
 
 testdebug: 
-  swift test
+  swift test --enable-experimental-prebuilts
 
 test: clean testdebug clean testprod
 
 testprod:
-	swift test -c release -Xswiftc -enable-testing
+	swift test -c release -Xswiftc -enable-testing --enable-experimental-prebuilts
 
 rmsubmod:
 	rm -rf "$(ROOT_DIR)Sources/secp256k1/libsecp256k1"
@@ -43,7 +43,7 @@ gyb:
 	./scripts/generate_boilerplate_files_with_gyb.sh
 
 bump-dep dryRun="false":
-  swift run \
+  swift run --enable-experimental-prebuilts \
     --package-path scripts/update-libsecp \
     update-libsecp \
     {{ if dryRun == "true" { "--dry-run" } else { "" } }}

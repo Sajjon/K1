@@ -48,3 +48,17 @@ int ecdh_hash_function_asn1_x963_apinotes_test(
 		x32
 	);
 }
+
+void fill_with_fives(
+	unsigned char *buf,
+	int len
+) {
+	memset(buf, 5, len);
+}
+
+void clone_buf_of_len_three(
+    unsigned char *destination,
+    const unsigned char *source
+) {
+	memcpy(destination, source, 3);
+}

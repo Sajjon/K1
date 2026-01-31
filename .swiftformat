@@ -6,7 +6,6 @@
 --tabwidth 4
 
 --stripunusedargs closure-only
---enable marktypes
 --disable redundantNilInit,redundantSelf,extensionAccessControl,simplifyGenericConstraints
 --lineaftermarks false
 --ifdef no-indent
