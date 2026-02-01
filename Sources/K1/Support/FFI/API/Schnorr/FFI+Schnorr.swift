@@ -17,11 +17,11 @@ extension FFI.Schnorr {
 			var publicKeyX = secp256k1_xonly_pubkey()
 			var publicKeyRaw = publicKey.raw
 			try FFI.call(ifFailThrow: .xonlyPublicKeyFromPublicKey) { context in
-				secp256k1_xonly_pubkey_from_pubkey(
-					context,
-					&publicKeyX,
-					nil,
-					&publicKeyRaw
+				xOnlyKeyFromPublicKey(
+					context: context,
+					outputXOnlyKey: &publicKeyX,
+					parity: nil,
+					publicKey: &publicKeyRaw
 				)
 			}
 

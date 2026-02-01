@@ -1,5 +1,16 @@
 Name: Secp256k1
 Functions:
+- Name: secp256k1_xonly_pubkey_from_pubkey
+  SwiftName: xOnlyKeyFromPublicKey(context:outputXOnlyKey:parity:publicKey:)
+  Parameters:
+  - Position: 0 # ctx (secp256k1_context)
+    Nullability: N
+  - Position: 1 # output (secp256k1_xonly_pubkey)
+    Nullability: N
+  - Position: 2 # Parity (int)
+    Nullability: O
+  - Position: 3 # publicKey (secp256k1_pubkey)
+    Nullability: N
 - Name: secp256k1_ecdh
   SwiftName: ecdh(context:outputSharedPointBytes:publicKey:privateKeyBytes:hashFunction:arbitraryData:)
   Parameters:
