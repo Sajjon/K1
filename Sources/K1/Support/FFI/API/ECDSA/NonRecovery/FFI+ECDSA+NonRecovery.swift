@@ -83,7 +83,7 @@ extension FFI.ECDSA {
 			throw K1.Error.incorrectParameterSize
 		}
 		var compact = [UInt8](nonRecoverableCompact)
-		var recoverable = secp256k1_ecdsa_recoverable_signature()
+		var recoverable = ECDSARecoverableSignatureRaw()
 		try FFI.call(ifFailThrow: .recoverableSignatureParseCompact) { context in
 			secp256k1_ecdsa_recoverable_signature_parse_compact(
 				context,
@@ -116,7 +116,7 @@ extension FFI.ECDSA {
 		try FFI.toC { ffi -> Bool in
 			var publicKeyRaw = publicKey.raw
 			var maybeMalleable = signature.raw
-			var normalized = secp256k1_ecdsa_signature()
+			var normalized = ECDSASignatureRaw()
 
 			let codeForSignatureWasMalleable = 1
 			let signatureWasMalleableResult = ffi.callWithResultCode { context in

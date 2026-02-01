@@ -7,20 +7,20 @@ extension FFI {
 	public enum ECDSA {}
 }
 
-// MARK: - RawECDSASignature
-protocol RawECDSASignature {
+// MARK: - EmptyInitializable
+protocol EmptyInitializable {
 	init()
 }
 
-// MARK: - secp256k1_ecdsa_recoverable_signature + RawECDSASignature
-extension secp256k1_ecdsa_recoverable_signature: RawECDSASignature {}
+// MARK: - ECDSARecoverableSignatureRaw + EmptyInitializable
+extension ECDSARecoverableSignatureRaw: EmptyInitializable {}
 
-// MARK: - secp256k1_ecdsa_signature + RawECDSASignature
-extension secp256k1_ecdsa_signature: RawECDSASignature {}
+// MARK: - ECDSASignatureRaw + EmptyInitializable
+extension ECDSASignatureRaw: EmptyInitializable {}
 
 // MARK: - WrappedECDSASignature
 protocol WrappedECDSASignature {
-	associatedtype Raw: RawECDSASignature
+	associatedtype Raw: EmptyInitializable
 	init(raw: Raw)
 	var raw: Raw { get }
 

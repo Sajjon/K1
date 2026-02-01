@@ -5,7 +5,7 @@ import Secp256k1
 extension FFI.ECDSA {
 	struct Wrapped: @unchecked Sendable, ContiguousBytes, WrappedECDSASignature {
 		// swiftlint:disable:next nesting
-		typealias Raw = secp256k1_ecdsa_signature
+		typealias Raw = ECDSASignatureRaw
 		let raw: Raw
 		init(raw: Raw) {
 			self.raw = raw

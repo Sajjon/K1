@@ -1,5 +1,12 @@
 Name: Secp256k1
 
+Tags:
+- Name: secp256k1_ecdsa_signature
+  SwiftName: ECDSASignatureRaw
+
+- Name: secp256k1_ecdsa_recoverable_signature
+  SwiftName: ECDSARecoverableSignatureRaw
+
 Functions:
 - Name: secp256k1_ecdsa_sign
   SwiftName: ecdsaSignNonRecoverable(context:outputSignature:hashedMessageBytes:privateKeyBytes:nonceFunctionPointer:arbitraryNonceData:)
@@ -74,6 +81,7 @@ Functions:
     Nullability: N
   - Position: 4 # pubkey (secp256k1_xonly_pubkey)
     Nullability: N
+
 - Name: secp256k1_xonly_pubkey_from_pubkey
   SwiftName: xOnlyPublicKeyFromPublicKey(context:outputXOnlyPublicKey:parity:publicKey:)
   Parameters:
@@ -85,6 +93,7 @@ Functions:
     Nullability: O
   - Position: 3 # publicKey (secp256k1_pubkey)
     Nullability: N
+
 - Name: secp256k1_ecdh
   SwiftName: ecdh(context:outputSharedPointBytes:publicKey:privateKeyBytes:hashFunction:arbitraryData:)
   Parameters:
@@ -100,6 +109,7 @@ Functions:
     Nullability: O
   - Position: 5 # data
     Nullability: O
+
 - Name: ecdh_hash_function_asn1_x963_apinotes_test
   SwiftName: ecdhHashASN1x963(output:x:)
   Parameters:
@@ -107,6 +117,7 @@ Functions:
     Nullability: N
   - Position: 1 # x32
     Nullability: N
+
 - Name: fill_with_fives
   SwiftName: fillWithFives(span:)
   Parameters:
@@ -118,6 +129,7 @@ Functions:
     Nullability: N
   - Position: 1 # len
     Nullability: N
+
 - Name: clone_buf_of_len_three
   SwiftName: cloneSpanOfLength3Unsafe(into:from:)
   Parameters:

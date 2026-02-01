@@ -60,7 +60,7 @@ extension FFI.ECDSAWithKeyRecovery {
 	static func nonRecoverable(
 		_ wrapped: Wrapped
 	) throws -> FFI.ECDSA.Wrapped {
-		var nonRecoverable = secp256k1_ecdsa_signature()
+		var nonRecoverable = ECDSASignatureRaw()
 		var recoverable = wrapped.raw
 
 		try FFI.call(
