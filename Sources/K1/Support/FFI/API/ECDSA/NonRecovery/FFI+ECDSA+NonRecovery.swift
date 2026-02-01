@@ -29,10 +29,10 @@ extension FFI.ECDSA {
 		var out = [UInt8](repeating: 0, count: Self.byteCount)
 		var rawSignature = wrapped.raw
 		try FFI.call(ifFailThrow: .ecdsaSignatureSerializeCompact) { context in
-			secp256k1_ecdsa_signature_serialize_compact(
-				context,
-				&out,
-				&rawSignature
+			serializeRecoverableECDSASignatureCompact(
+				context: context,
+				outputBytes: &out,
+				signature: &rawSignature
 			)
 		}
 		return Data(out)

@@ -24,6 +24,16 @@ Functions:
   - Position: 2 # sigin
     Nullability: N
 
+- Name: secp256k1_ecdsa_signature_serialize_compact
+  SwiftName: serializeRecoverableECDSASignatureCompact(context:outputBytes:signature:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+  - Position: 1 # output64
+    Nullability: N
+  - Position: 2 # sig
+    Nullability: N
+
 - Name: secp256k1_ecdsa_recoverable_signature_serialize_compact
   SwiftName: serializeRecoverableECDSASignatureCompact(context:outputBytes:recoveryID:recoverableSignature:)
   Parameters:
