@@ -84,7 +84,7 @@ extension FFI {
 		/// `secp256k1_xonly_pubkey_from_pubkey` failed
 		case xonlyPublicKeyFromPublicKey
 
-		/// `secp256k1_keypair_create` failed
+		/// `keypairFromPrivateKey` (`secp256k1_keypair_create`) failed
 		case keypairCreate
 
 		/// `secp256k1_schnorrsig_sign32` failed

@@ -57,10 +57,10 @@ extension FFI.Schnorr {
 		try FFI.call(
 			ifFailThrow: .keypairCreate
 		) { context in
-			secp256k1_keypair_create(
-				context,
-				&keyPair,
-				privateKey.secureBytes.backing.bytes
+			keypairFromPrivateKey(
+				context: context,
+				outputKeyPair: &keyPair,
+				privateKeyBytes: privateKey.secureBytes.backing.bytes
 			)
 		}
 

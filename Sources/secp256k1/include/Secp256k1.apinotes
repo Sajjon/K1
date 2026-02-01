@@ -1,7 +1,16 @@
 Name: Secp256k1
 Functions:
+- Name: secp256k1_keypair_create
+  SwiftName: keypairFromPrivateKey(context:outputKeyPair:privateKeyBytes:)
+  Parameters:
+  - Position: 0 # ctx (secp256k1_context)
+    Nullability: N
+  - Position: 1 # keypair output (secp256k1_keypair)
+    Nullability: N
+  - Position: 2 # seckey
+    Nullability: N
+
 - Name: secp256k1_schnorrsig_verify
-  # Keep the original arity in SwiftName; SafeInterop will still fuse msg/msglen into Span.
   SwiftName: verifySchnorrSignature(context:signatureBytes:msg:msglen:xOnlyPublicKey:)
   Parameters:
   - Position: 0 # ctx (secp256k1_context)
