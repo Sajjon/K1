@@ -21,11 +21,11 @@ extension FFI.ECDSAWithKeyRecovery {
 		try FFI.call(
 			ifFailThrow: .recoverableSignatureParseCompact
 		) { context in
-			secp256k1_ecdsa_recoverable_signature_parse_compact(
-				context,
-				&raw,
-				rs,
-				recid
+			parseRecoverableECDSASignatureFromCompactBytes(
+				context: context,
+				outputRecoveredSignature: &raw,
+				compactBytes: rs,
+				recoveryID: recid
 			)
 		}
 		return .init(raw: raw)

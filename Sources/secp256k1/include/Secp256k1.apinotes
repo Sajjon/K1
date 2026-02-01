@@ -14,6 +14,18 @@ Tags:
   SwiftName: PublicKeyRaw
 
 Functions:
+- Name: secp256k1_ecdsa_recoverable_signature_parse_compact
+  SwiftName: parseRecoverableECDSASignatureFromCompactBytes(context:outputRecoveredSignature:compactBytes:recoveryID:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+  - Position: 1 # sig
+    Nullability: N
+  - Position: 2 # input64
+    Nullability: N
+  - Position: 3 # recid
+    Nullability: N
+
 - Name: secp256k1_ecdsa_recover
   SwiftName: recoverPublicKeyFromECDSASignature(context:publicKey:signature:hashedMessage:)
   Parameters:

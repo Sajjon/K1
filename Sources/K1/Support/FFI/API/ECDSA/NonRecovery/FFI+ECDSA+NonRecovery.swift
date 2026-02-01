@@ -83,13 +83,13 @@ extension FFI.ECDSA {
 			throw K1.Error.incorrectParameterSize
 		}
 		var compact = [UInt8](nonRecoverableCompact)
-		var recoverable = ECDSARecoverableSignatureRaw()
+		var recovered = ECDSARecoverableSignatureRaw()
 		try FFI.call(ifFailThrow: .recoverableSignatureParseCompact) { context in
-			secp256k1_ecdsa_recoverable_signature_parse_compact(
-				context,
-				&recoverable,
-				&compact,
-				recoveryID
+			parseRecoverableECDSASignatureFromCompactBytes(
+				context: context,
+				outputRecoveredSignature: &recovered,
+				compactBytes: &compact,
+				recoveryID: recoveryID
 			)
 		}
 		var publicKeyRaw = PublicKeyRaw()
@@ -97,7 +97,7 @@ extension FFI.ECDSA {
 			recoverPublicKeyFromECDSASignature(
 				context: context,
 				publicKey: &publicKeyRaw,
-				signature: &recoverable,
+				signature: &recovered,
 				hashedMessage: message
 			)
 		}
