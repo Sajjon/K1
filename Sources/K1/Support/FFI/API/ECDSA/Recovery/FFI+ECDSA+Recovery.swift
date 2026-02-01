@@ -44,11 +44,11 @@ extension FFI.ECDSAWithKeyRecovery {
 		try FFI.call(
 			ifFailThrow: .recoverableSignatureSerializeCompact
 		) { context in
-			secp256k1_ecdsa_recoverable_signature_serialize_compact(
-				context,
-				&rs,
-				&recoveryID,
-				&rawSignature
+			serializeRecoverableECDSASignatureCompact(
+				context: context,
+				outputBytes: &rs,
+				recoveryID: &recoveryID,
+				recoverableSignature: &rawSignature
 			)
 		}
 		return (rs, recoveryID)
