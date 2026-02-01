@@ -45,11 +45,11 @@ extension FFI.ECDSA {
 		var derSignature = [UInt8](repeating: 0, count: derMaxLength)
 		var rawSignature = wrapped.raw
 		try FFI.call(ifFailThrow: .ecdsaSignatureSerializeDER) { context in
-			secp256k1_ecdsa_signature_serialize_der(
-				context,
-				&derSignature,
-				&derMaxLength,
-				&rawSignature
+			serializeECDSASignatureDER(
+				context: context,
+				outputBytes: &derSignature,
+				length: &derMaxLength,
+				signature: &rawSignature
 			)
 		}
 		return Data(derSignature.prefix(derMaxLength))
