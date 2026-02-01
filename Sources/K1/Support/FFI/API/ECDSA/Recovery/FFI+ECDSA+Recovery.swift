@@ -57,6 +57,7 @@ extension FFI.ECDSAWithKeyRecovery {
 
 // MARK: Convert
 extension FFI.ECDSAWithKeyRecovery {
+	/// Convert a recoverable signature into a normal signature.
 	static func nonRecoverable(
 		_ wrapped: Wrapped
 	) throws -> FFI.ECDSA.Wrapped {
@@ -66,10 +67,10 @@ extension FFI.ECDSAWithKeyRecovery {
 		try FFI.call(
 			ifFailThrow: .recoverableSignatureConvert
 		) { context in
-			secp256k1_ecdsa_recoverable_signature_convert(
-				context,
-				&nonRecoverable,
-				&recoverable
+			ecdsaRecoverableSignatureToNonRecoverable(
+				context: context,
+				outputNonRecoverableSignature: &nonRecoverable,
+				recoverableSignature: &recoverable
 			)
 		}
 
