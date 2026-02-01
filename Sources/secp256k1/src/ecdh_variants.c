@@ -8,7 +8,7 @@
 #include "./ecdh_variants.h"
 #include <string.h>
 
-static int ecdh_hash_function_asn1_x963_impl(
+int _ecdh_hash_function_asn1_x963_impl(
 	unsigned char *output,
 	const unsigned char *x32
 ) {
@@ -33,32 +33,8 @@ int ecdh_hash_function_asn1_x963(
 ) {
 	(void)y32;
 	(void)data;
-	return ecdh_hash_function_asn1_x963_impl(
+	return _ecdh_hash_function_asn1_x963_impl(
 		output,
 		x32
 	);
-}
-
-int ecdh_hash_function_asn1_x963_apinotes_test(
-	unsigned char *output,
-	const unsigned char *x32
-) {
-	return ecdh_hash_function_asn1_x963_impl(
-		output,
-		x32
-	);
-}
-
-void fill_with_fives(
-	unsigned char *buf,
-	int len
-) {
-	memset(buf, 5, len);
-}
-
-void clone_buf_of_len_three(
-    unsigned char *destination,
-    const unsigned char *source
-) {
-	memcpy(destination, source, 3);
 }

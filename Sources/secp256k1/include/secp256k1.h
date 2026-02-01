@@ -6,3 +6,4 @@
 #include "../libsecp256k1/include/secp256k1_schnorrsig.h"
 
 #include "../src/ecdh_variants.h"
+#include "../src/apinotes_tutorial.h"

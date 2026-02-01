@@ -73,23 +73,23 @@ extension FFI.ECDH {
 		) { context in
 			if var arbitraryData {
 				arbitraryData.withUnsafeMutableBytes { ptr in
-					secp256k1_ecdh(
-						context,
-						&sharedPublicPointBytes, // output
-						&publicKeyRaw, // pubkey
-						privateKey.secureBytes.backing.bytes, // seckey
-						hashFp.hashfp(), // hashfp
-						ptr.baseAddress // properly formed pointer
+					ecdh(
+						context: context,
+						outputSharedPointBytes: &sharedPublicPointBytes,
+						publicKey: &publicKeyRaw,
+						privateKeyBytes: privateKey.secureBytes.backing.bytes,
+						hashFunction: hashFp.hashfp(),
+						arbitraryData: ptr.baseAddress
 					)
 				}
 			} else {
-				secp256k1_ecdh(
-					context,
-					&sharedPublicPointBytes,
-					&publicKeyRaw,
-					privateKey.secureBytes.backing.bytes,
-					hashFp.hashfp(),
-					nil // No arbitrary data
+				ecdh(
+					context: context,
+					outputSharedPointBytes: &sharedPublicPointBytes,
+					publicKey: &publicKeyRaw,
+					privateKeyBytes: privateKey.secureBytes.backing.bytes,
+					hashFunction: hashFp.hashfp(),
+					arbitraryData: nil // No arbitrary data
 				)
 			}
 		}

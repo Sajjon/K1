@@ -1,5 +1,20 @@
 Name: Secp256k1
 Functions:
+- Name: secp256k1_ecdh
+  SwiftName: ecdh(context:outputSharedPointBytes:publicKey:privateKeyBytes:hashFunction:arbitraryData:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+  - Position: 1 # output
+    Nullability: N
+  - Position: 2 # pubkey
+    Nullability: N
+  - Position: 3 # seckey
+    Nullability: N
+  - Position: 4 # hashfp
+    Nullability: O
+  - Position: 5 # data
+    Nullability: O
 - Name: ecdh_hash_function_asn1_x963_apinotes_test
   SwiftName: ecdhHashASN1x963(output:x:)
   Parameters:
@@ -22,14 +37,6 @@ Functions:
   SwiftName: cloneSpanOfLength3Unsafe(into:from:)
   Parameters:
   - Position: 0 # destination
-    Lifetimebound: true
-    BoundsSafety:
-      Kind: counted_by
-      BoundedBy: 3
     Nullability: N
   - Position: 1 # source
-    Lifetimebound: true
-    BoundsSafety:
-      Kind: counted_by
-      BoundedBy: 3
     Nullability: N
