@@ -67,12 +67,12 @@ extension FFI.Schnorr {
 		try FFI.call(
 			ifFailThrow: .schnorrSign
 		) { context in
-			secp256k1_schnorrsig_sign32(
-				context,
-				&signatureOut,
-				message,
-				&keyPair,
-				options.auxiliaryRandomData.bytes
+			schnorrSign(
+				context: context,
+				outputSignatureBytes: &signatureOut,
+				message: message,
+				keypair: &keyPair,
+				auxiliaryRandomData: options.auxiliaryRandomData.bytes
 			)
 		}
 
