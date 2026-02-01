@@ -13,11 +13,20 @@ extension FFI.ECDSAWithKeyRecovery {
 	}
 }
 
+typealias ECDSAFunctionPointer<Raw> = (
+	OpaquePointer,
+	UnsafeMutablePointer<Raw>,
+	UnsafePointer<UInt8>,
+	UnsafePointer<UInt8>,
+	secp256k1_nonce_function?,
+	UnsafeRawPointer?
+) -> Int32
+
 // MARK: Sign
 extension FFI.ECDSAWithKeyRecovery.Wrapped {
 	// swiftlint:disable:next line_length
-	static func sign() -> (OpaquePointer, UnsafeMutablePointer<Raw>, UnsafePointer<UInt8>, UnsafePointer<UInt8>, secp256k1_nonce_function?, UnsafeRawPointer?) -> Int32 {
-		secp256k1_ecdsa_sign_recoverable
+	static func sign() -> ECDSAFunctionPointer<Raw> {
+		ecdsaSignRecoverable(context:outputSignature:hashedMessageBytes: privateKeyBytes:nonceFunctionPointer:arbitraryNonceData:)
 	}
 }
 

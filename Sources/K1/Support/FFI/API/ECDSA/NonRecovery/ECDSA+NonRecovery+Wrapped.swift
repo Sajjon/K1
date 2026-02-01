@@ -16,8 +16,8 @@ extension FFI.ECDSA {
 // MARK: Sign
 extension FFI.ECDSA.Wrapped {
 	// swiftlint:disable:next line_length
-	static func sign() -> (OpaquePointer, UnsafeMutablePointer<Raw>, UnsafePointer<UInt8>, UnsafePointer<UInt8>, secp256k1_nonce_function?, UnsafeRawPointer?) -> Int32 {
-		secp256k1_ecdsa_sign
+	static func sign() -> ECDSAFunctionPointer<Raw> {
+		ecdsaSignNonRecoverable(context:outputSignature:hashedMessageBytes: privateKeyBytes:nonceFunctionPointer:arbitraryNonceData:)
 	}
 }
 

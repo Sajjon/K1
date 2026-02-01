@@ -25,7 +25,7 @@ protocol WrappedECDSASignature {
 	var raw: Raw { get }
 
 	// swiftlint:disable:next line_length
-	static func sign() -> (OpaquePointer, UnsafeMutablePointer<Raw>, UnsafePointer<UInt8>, UnsafePointer<UInt8>, secp256k1_nonce_function?, UnsafeRawPointer?) -> Int32
+	static func sign() -> ECDSAFunctionPointer<Raw>
 }
 
 // MARK: ECDSA Shared
@@ -70,7 +70,7 @@ extension K1.ECDSA.SigningOptions {
 
 extension K1.ECDSA.SigningOptions.NonceFunction {
 	// swiftlint:disable:next line_length
-	fileprivate func function() -> (@convention(c) (UnsafeMutablePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafeMutableRawPointer?, UInt32) -> Int32)? {
+	fileprivate func function() -> secp256k1_nonce_function? {
 		switch self {
 		case .deterministic:
 			return secp256k1_nonce_function_rfc6979

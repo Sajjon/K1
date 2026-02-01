@@ -1,5 +1,38 @@
 Name: Secp256k1
+
 Functions:
+- Name: secp256k1_ecdsa_sign
+  SwiftName: ecdsaSignNonRecoverable(context:outputSignature:hashedMessageBytes:privateKeyBytes:nonceFunctionPointer:arbitraryNonceData:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+  - Position: 1 # sig / outputSignature
+    Nullability: N
+  - Position: 2 # msghash32
+    Nullability: N
+  - Position: 3 # seckey
+    Nullability: N
+  - Position: 4 # noncefp
+    Nullability: O
+  - Position: 5 # ndata
+    Nullability: O
+
+- Name: secp256k1_ecdsa_sign_recoverable
+  SwiftName: ecdsaSignRecoverable(context:outputSignature:hashedMessageBytes:privateKeyBytes:nonceFunctionPointer:arbitraryNonceData:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+  - Position: 1 # sig / outputSignature
+    Nullability: N
+  - Position: 2 # msghash32
+    Nullability: N
+  - Position: 3 # seckey
+    Nullability: N
+  - Position: 4 # noncefp
+    Nullability: O
+  - Position: 5 # ndata
+    Nullability: O
+
 - Name: secp256k1_schnorrsig_sign32
   SwiftName: schnorrSign(context:outputSignatureBytes:message:keypair:auxiliaryRandomData:)
   Parameters:
