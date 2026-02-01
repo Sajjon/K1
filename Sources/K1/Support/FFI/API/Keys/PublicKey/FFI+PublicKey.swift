@@ -52,7 +52,7 @@ extension FFI.PublicKey {
 	}
 
 	private static func _deserialize(bytes: [UInt8]) throws -> Wrapped {
-		var raw = secp256k1_pubkey()
+		var raw = PublicKeyRaw()
 		try FFI.call(
 			ifFailThrow: .publicKeyParse
 		) { context in

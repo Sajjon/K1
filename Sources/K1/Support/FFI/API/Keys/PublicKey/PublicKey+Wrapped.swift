@@ -10,7 +10,7 @@ extension FFI {
 extension FFI.PublicKey {
 	struct Wrapped: @unchecked Sendable, ContiguousBytes {
 		// swiftlint:disable:next nesting
-		typealias Raw = secp256k1_pubkey
+		typealias Raw = PublicKeyRaw
 		let raw: Raw
 		init(raw: Raw) {
 			self.raw = raw
@@ -70,11 +70,11 @@ extension FFI.PublicKey.Wrapped {
 			throw K1.Error.invalidParameter
 		}
 
-		var result = secp256k1_pubkey()
+		var result = PublicKeyRaw()
 		var mutableKeys = keys.map(\.raw)
 
 		try mutableKeys.withUnsafeMutableBufferPointer { keysBuffer in
-			var keyPointers = [UnsafePointer<secp256k1_pubkey>?]()
+			var keyPointers = [UnsafePointer<PublicKeyRaw>?]()
 			keyPointers.reserveCapacity(keys.count)
 
 			for index in 0 ..< keys.count {

@@ -92,13 +92,13 @@ extension FFI.ECDSA {
 				recoveryID
 			)
 		}
-		var publicKeyRaw = secp256k1_pubkey()
+		var publicKeyRaw = PublicKeyRaw()
 		try FFI.call(ifFailThrow: .recover) { context in
-			secp256k1_ecdsa_recover(
-				context,
-				&publicKeyRaw,
-				&recoverable,
-				message
+			recoverPublicKeyFromECDSASignature(
+				context: context,
+				publicKey: &publicKeyRaw,
+				signature: &recoverable,
+				hashedMessage: message
 			)
 		}
 		return FFI.PublicKey.Wrapped(raw: publicKeyRaw)

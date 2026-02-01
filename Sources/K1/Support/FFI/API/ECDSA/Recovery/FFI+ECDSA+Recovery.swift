@@ -87,15 +87,15 @@ extension FFI.ECDSAWithKeyRecovery {
 			throw K1.Error.incorrectParameterSize
 		}
 		var rawSignature = wrapped.raw
-		var rawPublicKey = secp256k1_pubkey()
+		var rawPublicKey = PublicKeyRaw()
 		try FFI.call(
 			ifFailThrow: .recover
 		) { context in
-			secp256k1_ecdsa_recover(
-				context,
-				&rawPublicKey,
-				&rawSignature,
-				message
+			recoverPublicKeyFromECDSASignature(
+				context: context,
+				publicKey: &rawPublicKey,
+				signature: &rawSignature,
+				hashedMessage: message
 			)
 		}
 		return FFI.PublicKey.Wrapped(raw: rawPublicKey)

@@ -21,7 +21,7 @@ extension FFI {
 				self.secureBytes = secureBytes
 				var secureBytes = secureBytes
 				self.publicKey = try secureBytes.withUnsafeMutableBytes { seckey in
-					var raw = secp256k1_pubkey()
+					var raw = PublicKeyRaw()
 
 					try FFI.call(ifFailThrow: .publicKeyCreate) { context in
 						secp256k1_ec_pubkey_create(

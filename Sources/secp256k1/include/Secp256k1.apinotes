@@ -7,7 +7,25 @@ Tags:
 - Name: secp256k1_ecdsa_recoverable_signature
   SwiftName: ECDSARecoverableSignatureRaw
 
+- Name: secp256k1_keypair
+  SwiftName: KeypairRaw
+
+- Name: secp256k1_pubkey
+  SwiftName: PublicKeyRaw
+
 Functions:
+- Name: secp256k1_ecdsa_recover
+  SwiftName: recoverPublicKeyFromECDSASignature(context:publicKey:signature:hashedMessage:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+  - Position: 1 # pubkey
+    Nullability: N
+  - Position: 2 # sig
+    Nullability: N
+  - Position: 3 # msghash32
+    Nullability: N
+
 - Name: secp256k1_ecdsa_sign
   SwiftName: ecdsaSignNonRecoverable(context:outputSignature:hashedMessageBytes:privateKeyBytes:nonceFunctionPointer:arbitraryNonceData:)
   Parameters:

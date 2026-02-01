@@ -52,7 +52,7 @@ extension FFI.Schnorr {
 
 		var signatureOut = [UInt8](repeating: 0, count: FFI.Schnorr.Wrapped.byteCount)
 
-		var keyPair = secp256k1_keypair()
+		var keyPair = KeypairRaw()
 
 		try FFI.call(
 			ifFailThrow: .keypairCreate
