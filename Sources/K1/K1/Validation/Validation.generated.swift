@@ -149,14 +149,58 @@ extension K1.Schnorr.PublicKey {
 	/// - Returns: A Boolean value that’s true if the Schnorr signature is valid for the given _hashed_ data.
 	public func isValidSignature(
 		_ signature: K1.Schnorr.Signature,
-		hashed: some DataProtocol
+		hashed: Span<UInt8>
 	) -> Bool {
 		do {
 			return try FFI.Schnorr.isValid(
 				signature: signature.wrapped,
 				publicKey: self.impl.wrapped,
-				message: [UInt8](hashed)
+				message: hashed
 			)
+		} catch {
+			return false
+		}
+	}
+
+	/// Verifies Schnorr signature on some _hash_ over the `secp256k1` elliptic curve.
+	/// - Parameters:
+	///   - signature: The Schnorr signature to check against the _hashed_ data.
+	///   - hashed: The _hashed_ data covered by the signature.
+	/// - Returns: A Boolean value that’s true if the Schnorr signature is valid for the given _hashed_ data.
+	public func isValidSignature(
+		_ signature: K1.Schnorr.Signature,
+		hashed bytes: [UInt8]
+	) -> Bool {
+		do {
+			return try withSpanFromArray(bytes) { span in
+				try FFI.Schnorr.isValid(
+					signature: signature.wrapped,
+					publicKey: self.impl.wrapped,
+					message: span
+				)
+			}
+		} catch {
+			return false
+		}
+	}
+
+	/// Verifies Schnorr signature on some _hash_ over the `secp256k1` elliptic curve.
+	/// - Parameters:
+	///   - signature: The Schnorr signature to check against the _hashed_ data.
+	///   - hashed: The _hashed_ data covered by the signature.
+	/// - Returns: A Boolean value that’s true if the Schnorr signature is valid for the given _hashed_ data.
+	public func isValidSignature(
+		_ signature: K1.Schnorr.Signature,
+		hashed data: some DataProtocol
+	) -> Bool {
+		do {
+			return try withSpanFromData(data) { span in
+				try FFI.Schnorr.isValid(
+					signature: signature.wrapped,
+					publicKey: self.impl.wrapped,
+					message: span
+				)
+			}
 		} catch {
 			return false
 		}

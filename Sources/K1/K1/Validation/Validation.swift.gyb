@@ -50,6 +50,69 @@ import protocol CryptoKit.Digest
 extension K1.${FEATURE}.PublicKey {
 	/// Verifies ${VARIANT} signature on some _hash_ over the `secp256k1` elliptic curve.
 	/// - Parameters:
+% if FEATURE == "Schnorr":
+	///   - signature: The ${VARIANT} signature to check against the _hashed_ data.
+	///   - hashed: The _hashed_ data covered by the signature.${DOC_VALIDATION_PARAM_OPTIONS}
+	/// - Returns: A Boolean value that’s true if the ${VARIANT} signature is valid for the given _hashed_ data.
+	public func isValidSignature(
+		_ signature: K1.${FEATURE}.Signature,
+		hashed: Span<UInt8>${VALIDATION_OPTIONS_ARG}
+	) -> Bool {
+		do {
+			return try FFI.${FEATURE}.isValid(
+				signature: signature.wrapped,
+				publicKey: self.impl.wrapped,
+				message: hashed${VALIDATION_OPTIONS_FWD}
+			)
+		} catch {
+			return false
+		}
+	}
+
+	/// Verifies ${VARIANT} signature on some _hash_ over the `secp256k1` elliptic curve.
+	/// - Parameters:
+	///   - signature: The ${VARIANT} signature to check against the _hashed_ data.
+	///   - hashed: The _hashed_ data covered by the signature.${DOC_VALIDATION_PARAM_OPTIONS}
+	/// - Returns: A Boolean value that’s true if the ${VARIANT} signature is valid for the given _hashed_ data.
+	public func isValidSignature(
+		_ signature: K1.${FEATURE}.Signature,
+		hashed bytes: [UInt8]${VALIDATION_OPTIONS_ARG}
+	) -> Bool {
+		do {
+			return try withSpanFromArray(bytes) { span in
+				try FFI.${FEATURE}.isValid(
+					signature: signature.wrapped,
+					publicKey: self.impl.wrapped,
+					message: span${VALIDATION_OPTIONS_FWD}
+				)
+			}
+		} catch {
+			return false
+		}
+	}
+
+	/// Verifies ${VARIANT} signature on some _hash_ over the `secp256k1` elliptic curve.
+	/// - Parameters:
+	///   - signature: The ${VARIANT} signature to check against the _hashed_ data.
+	///   - hashed: The _hashed_ data covered by the signature.${DOC_VALIDATION_PARAM_OPTIONS}
+	/// - Returns: A Boolean value that’s true if the ${VARIANT} signature is valid for the given _hashed_ data.
+	public func isValidSignature(
+		_ signature: K1.${FEATURE}.Signature,
+		hashed data: some DataProtocol${VALIDATION_OPTIONS_ARG}
+	) -> Bool {
+		do {
+			return try withSpanFromData(data) { span in
+				try FFI.${FEATURE}.isValid(
+					signature: signature.wrapped,
+					publicKey: self.impl.wrapped,
+					message: span${VALIDATION_OPTIONS_FWD}
+				)
+			}
+		} catch {
+			return false
+		}
+	}
+% else:
 	///   - signature: The ${VARIANT} signature to check against the _hashed_ data.
 	///   - hashed: The _hashed_ data covered by the signature.${DOC_VALIDATION_PARAM_OPTIONS}
 	/// - Returns: A Boolean value that’s true if the ${VARIANT} signature is valid for the given _hashed_ data.
@@ -67,6 +130,7 @@ extension K1.${FEATURE}.PublicKey {
 			return false
 		}
 	}
+% end
 
 	/// Verifies ${VARIANT} signature on a digest over the `secp256k1` elliptic curve.
 	/// - Parameters:

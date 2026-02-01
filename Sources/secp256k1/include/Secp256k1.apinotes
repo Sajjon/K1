@@ -1,7 +1,25 @@
 Name: Secp256k1
 Functions:
+- Name: secp256k1_schnorrsig_verify
+  # Keep the original arity in SwiftName; SafeInterop will still fuse msg/msglen into Span.
+  SwiftName: verifySchnorrSignature(context:signatureBytes:msg:msglen:xOnlyPublicKey:)
+  Parameters:
+  - Position: 0 # ctx (secp256k1_context)
+    Nullability: N
+  - Position: 1 # sig64
+    Nullability: N
+  - Position: 2 # msg
+    Lifetimebound: true
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "msglen"
+    Nullability: N
+  - Position: 3 # msglen
+    Nullability: N
+  - Position: 4 # pubkey (secp256k1_xonly_pubkey)
+    Nullability: N
 - Name: secp256k1_xonly_pubkey_from_pubkey
-  SwiftName: xOnlyKeyFromPublicKey(context:outputXOnlyKey:parity:publicKey:)
+  SwiftName: xOnlyPublicKeyFromPublicKey(context:outputXOnlyPublicKey:parity:publicKey:)
   Parameters:
   - Position: 0 # ctx (secp256k1_context)
     Nullability: N

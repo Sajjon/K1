@@ -77,6 +77,7 @@ let package = Package(
 				"libsecp256k1/SECURITY.md",
 			],
 			cSettings: [
+				.headerSearchPath("libsecp256k1/include"),
 				// Basic config values that are universal and require no dependencies.
 				// https://github.com/bitcoin-core/secp256k1/blob/master/src/basic-config.h#L12-L13
 				.define("ECMULT_WINDOW_SIZE", to: "15"),

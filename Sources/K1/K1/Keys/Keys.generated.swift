@@ -896,28 +896,13 @@ extension K1.ECDSAWithKeyRecovery {
 	}
 }
 
-// MARK: - K1.KeyAgreement.PrivateKey + _K1PrivateKeyProtocol
 extension K1.KeyAgreement.PrivateKey: _K1PrivateKeyProtocol {}
-
-// MARK: - K1.KeyAgreement.PublicKey + _K1PublicKeyProtocol
 extension K1.KeyAgreement.PublicKey: _K1PublicKeyProtocol {}
-
-// MARK: - K1.Schnorr.PrivateKey + _K1PrivateKeyProtocol
 extension K1.Schnorr.PrivateKey: _K1PrivateKeyProtocol {}
-
-// MARK: - K1.Schnorr.PublicKey + _K1PublicKeyProtocol
 extension K1.Schnorr.PublicKey: _K1PublicKeyProtocol {}
-
-// MARK: - K1.ECDSA.PrivateKey + _K1PrivateKeyProtocol
 extension K1.ECDSA.PrivateKey: _K1PrivateKeyProtocol {}
-
-// MARK: - K1.ECDSA.PublicKey + _K1PublicKeyProtocol
 extension K1.ECDSA.PublicKey: _K1PublicKeyProtocol {}
-
-// MARK: - K1.ECDSAWithKeyRecovery.PrivateKey + _K1PrivateKeyProtocol
 extension K1.ECDSAWithKeyRecovery.PrivateKey: _K1PrivateKeyProtocol {}
-
-// MARK: - K1.ECDSAWithKeyRecovery.PublicKey + _K1PublicKeyProtocol
 extension K1.ECDSAWithKeyRecovery.PublicKey: _K1PublicKeyProtocol {}
 
 // swiftlint:enable all

@@ -11,27 +11,26 @@ extension FFI.Schnorr {
 	static func isValid(
 		signature: FFI.Schnorr.Wrapped,
 		publicKey: FFI.PublicKey.Wrapped,
-		message: [UInt8]
+		message: Span<UInt8>
 	) throws -> Bool {
 		try FFI.toC { ffi -> Bool in
 			var publicKeyX = secp256k1_xonly_pubkey()
 			var publicKeyRaw = publicKey.raw
 			try FFI.call(ifFailThrow: .xonlyPublicKeyFromPublicKey) { context in
-				xOnlyKeyFromPublicKey(
+				xOnlyPublicKeyFromPublicKey(
 					context: context,
-					outputXOnlyKey: &publicKeyX,
+					outputXOnlyPublicKey: &publicKeyX,
 					parity: nil,
 					publicKey: &publicKeyRaw
 				)
 			}
 
 			return ffi.validate { context in
-				secp256k1_schnorrsig_verify(
-					context,
-					signature.bytes,
-					message,
-					message.count,
-					&publicKeyX
+				verifySchnorrSignature(
+					context: context,
+					signatureBytes: signature.bytes,
+					msg: message,
+					xOnlyPublicKey: &publicKeyX
 				)
 			}
 		}
