@@ -81,13 +81,13 @@ extension FFI {
 		/// `secp256k1_ecdsa_sign_recoverable` or `secp256k1_ecdsa_sign` failed
 		case ecdsaSign
 
-		/// `secp256k1_xonly_pubkey_from_pubkey` failed
+		/// `xOnlyPublicKeyFromPublicKey(context:outputXOnlyPublicKey:parity:publicKey:)` (`secp256k1_xonly_pubkey_from_pubkey`) failed
 		case xonlyPublicKeyFromPublicKey
 
-		/// `keypairFromPrivateKey` (`secp256k1_keypair_create`) failed
+		/// `keypairFromPrivateKey(context:outputKeyPair:privateKeyBytes:)` (`secp256k1_keypair_create`) failed
 		case keypairCreate
 
-		/// `secp256k1_schnorrsig_sign32` failed
+		/// `schnorrSign(context:outputSignatureBytes:message:keypair:auxiliaryRandomData:)` (`secp256k1_schnorrsig_sign32`) failed
 		case schnorrSign
 
 		/// `secp256k1_ec_pubkey_create`

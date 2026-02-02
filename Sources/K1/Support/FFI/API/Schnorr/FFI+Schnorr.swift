@@ -14,7 +14,7 @@ extension FFI.Schnorr {
 		message: Span<UInt8>
 	) throws -> Bool {
 		try FFI.toC { ffi -> Bool in
-			var publicKeyX = secp256k1_xonly_pubkey()
+			var publicKeyX = PublicKeyXOnlyRaw()
 			var publicKeyRaw = publicKey.raw
 			try FFI.call(ifFailThrow: .xonlyPublicKeyFromPublicKey) { context in
 				xOnlyPublicKeyFromPublicKey(

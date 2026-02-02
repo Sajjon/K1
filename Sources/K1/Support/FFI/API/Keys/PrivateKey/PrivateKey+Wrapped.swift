@@ -27,7 +27,7 @@ extension FFI {
 						createPublicKey(
 							context: context,
 							outputPublicKey: &raw,
-							seckeyBytes: seckey.baseAddress!
+							privateKeyBytes: seckey.baseAddress!
 						)
 					}
 

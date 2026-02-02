@@ -18,7 +18,7 @@ extension K1.Format {
 
 // MARK: - K1.Format
 extension K1 {
-	/// Bridging type for: `secp256k1_ec_pubkey_serialize`
+	/// Bridging type for: `serializePublicKey(context:outputBytes:outputByteCount:publicKey:formatFlags:)` (`secp256k1_ec_pubkey_serialize`)
 	enum Format: UInt32, CaseIterable {
 		case compressed, uncompressed
 	}

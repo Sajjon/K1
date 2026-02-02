@@ -13,6 +13,9 @@ Tags:
 - Name: secp256k1_pubkey
   SwiftName: PublicKeyRaw
 
+- Name: secp256k1_xonly_pubkey
+  SwiftName: PublicKeyXOnlyRaw
+
 Functions:
 - Name: secp256k1_ecdsa_recoverable_signature_convert
   SwiftName: ecdsaRecoverableSignatureToNonRecoverable(context:outputNonRecoverableSignature:recoverableSignature:)
@@ -233,7 +236,7 @@ Functions:
 
 # Secret keys and pubkeys
 - Name: secp256k1_ec_pubkey_create
-  SwiftName: createPublicKey(context:outputPublicKey:seckeyBytes:)
+  SwiftName: createPublicKey(context:outputPublicKey:privateKeyBytes:)
   Parameters:
   - Position: 0 # ctx
     Nullability: N
