@@ -45,40 +45,40 @@ extension FFI {
 	enum Error: Int, Sendable, Swift.Error, Hashable {
 		case failedToCreateContextForSecp256k1
 
-		//// `secp256k1_ecdsa_signature_parse_compact` failed
+		/// `parseEcdsaSignatureCompact(context:outputSignature:inputBytes:)` (`secp256k1_ecdsa_signature_parse_compact`) failed
 		case ecdsaSignatureParseCompact
 
-		/// `secp256k1_ecdsa_signature_parse_der` failed
+		/// `parseEcdsaSignatureDER(context:outputSignature:input:inputlen:)` (`secp256k1_ecdsa_signature_parse_der`) failed
 		case ecdsaSignatureParseDER
 
-		/// `secp256k1_ecdsa_signature_serialize_compact` failed
+		/// `serializeEcdsaSignatureCompact(context:outputBytes:signature:)` (`secp256k1_ecdsa_signature_serialize_compact`) failed
 		case ecdsaSignatureSerializeCompact
 
-		/// `secp256k1_ecdsa_signature_serialize_der` failed
+		/// `serializeEcdsaSignatureDER(context:outputBytes:outputByteCount:signature:)` (`secp256k1_ecdsa_signature_serialize_der`) failed
 		case ecdsaSignatureSerializeDER
 
-		/// `secp256k1_ecdsa_recoverable_signature_parse_compact` failed
+		/// `parseRecoverableECDSASignatureFromCompactBytes(context:outputRecoveredSignature:compactBytes:recoveryID:)` (`secp256k1_ecdsa_recoverable_signature_parse_compact`) failed
 		case recoverableSignatureParseCompact
 
-		/// `secp256k1_ecdsa_recoverable_signature_serialize_compact` failed
+		/// `serializeRecoverableECDSASignatureCompact(context:outputBytes:recoveryID:recoverableSignature:)` (`secp256k1_ecdsa_recoverable_signature_serialize_compact`) failed
 		case recoverableSignatureSerializeCompact
 
-		/// `secp256k1_ecdsa_recoverable_signature_convert` failed
+		/// `ecdsaRecoverableSignatureToNonRecoverable(context:outputNonRecoverableSignature:recoverableSignature:)` (`secp256k1_ecdsa_recoverable_signature_convert`) failed
 		case recoverableSignatureConvert
 
-		/// `secp256k1_ecdsa_recover` failed
+		/// `recoverPublicKeyFromECDSASignature(context:publicKey:signature:hashedMessage:)` (`secp256k1_ecdsa_recover`) failed
 		case recover
 
-		/// `secp256k1_ec_pubkey_parse` failed
+		/// `parsePublicKey(context:outputPublicKey:inputBytes:inputlen:)` (`secp256k1_ec_pubkey_parse`) failed
 		case publicKeyParse
 
-		/// `secp256k1_ec_pubkey_serialize` failed
+		/// `serializePublicKey(context:outputBytes:outputByteCount:publicKey:formatFlags:)` (`secp256k1_ec_pubkey_serialize`) failed
 		case publicKeySerialize
 
-		/// `secp256k1_ecdh` failed
+		/// `ecdh(context:outputSharedPointBytes:publicKey:privateKeyBytes:hashFunction:arbitraryData:)` (`secp256k1_ecdh`) failed
 		case ecdh
 
-		/// `secp256k1_ecdsa_sign_recoverable` or `secp256k1_ecdsa_sign` failed
+		/// `ecdsaSignRecoverable(context:outputSignature:hashedMessageBytes:privateKeyBytes:nonceFunctionPointer:arbitraryNonceData:)` (`secp256k1_ecdsa_sign_recoverable`) or `ecdsaSignNonRecoverable(context:outputSignature:hashedMessageBytes:privateKeyBytes:nonceFunctionPointer:arbitraryNonceData:)` (`secp256k1_ecdsa_sign`) failed
 		case ecdsaSign
 
 		/// `xOnlyPublicKeyFromPublicKey(context:outputXOnlyPublicKey:parity:publicKey:)` (`secp256k1_xonly_pubkey_from_pubkey`) failed
@@ -90,7 +90,7 @@ extension FFI {
 		/// `schnorrSign(context:outputSignatureBytes:message:keypair:auxiliaryRandomData:)` (`secp256k1_schnorrsig_sign32`) failed
 		case schnorrSign
 
-		/// `secp256k1_ec_pubkey_create`
+		/// `createPublicKey(context:outputPublicKey:privateKeyBytes:)` (`secp256k1_ec_pubkey_create`)
 		case publicKeyCreate
 
 		/// Group operation (point addition, subtraction, etc.) failed
