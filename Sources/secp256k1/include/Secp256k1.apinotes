@@ -24,34 +24,15 @@ Functions:
   - Position: 2 # sigin
     Nullability: N
 
-- Name: secp256k1_ecdsa_signature_serialize_compact
-  SwiftName: serializeRecoverableECDSASignatureCompact(context:outputBytes:signature:)
-  Parameters:
-  - Position: 0 # ctx
-    Nullability: N
-  - Position: 1 # output64
-    Nullability: N
-  - Position: 2 # sig
-    Nullability: N
-
-- Name: secp256k1_ecdsa_signature_serialize_der
-  SwiftName: serializeECDSASignatureDER(context:outputBytes:length:signature:)
-  Parameters:
-  - Position: 0 # ctx
-    Nullability: N
-  - Position: 1 # output64
-    Nullability: N
-  - Position: 2 # recid
-    Nullability: N
-  - Position: 3 # sig
-    Nullability: N
-
 - Name: secp256k1_ecdsa_recoverable_signature_serialize_compact
   SwiftName: serializeRecoverableECDSASignatureCompact(context:outputBytes:recoveryID:recoverableSignature:)
   Parameters:
   - Position: 0 # ctx
     Nullability: N
   - Position: 1 # output64
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "64"
     Nullability: N
   - Position: 2 # recid
     Nullability: N
@@ -66,6 +47,9 @@ Functions:
   - Position: 1 # sig
     Nullability: N
   - Position: 2 # input64
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "64"
     Nullability: N
   - Position: 3 # recid
     Nullability: N
@@ -80,6 +64,9 @@ Functions:
   - Position: 2 # sig
     Nullability: N
   - Position: 3 # msghash32
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "32"
     Nullability: N
 
 - Name: secp256k1_ecdsa_sign
@@ -90,8 +77,14 @@ Functions:
   - Position: 1 # sig / outputSignature
     Nullability: N
   - Position: 2 # msghash32
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "32"
     Nullability: N
   - Position: 3 # seckey
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "32"
     Nullability: N
   - Position: 4 # noncefp
     Nullability: O
@@ -106,8 +99,14 @@ Functions:
   - Position: 1 # sig / outputSignature
     Nullability: N
   - Position: 2 # msghash32
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "32"
     Nullability: N
   - Position: 3 # seckey
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "32"
     Nullability: N
   - Position: 4 # noncefp
     Nullability: O
@@ -120,12 +119,21 @@ Functions:
   - Position: 0 # ctx (secp256k1_context)
     Nullability: N
   - Position: 1 # sig64
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "64"
     Nullability: N
   - Position: 2 # msg32
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "32"
     Nullability: N
   - Position: 3 # keypair
     Nullability: N
   - Position: 4 # aux_rand32
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "32"
     Nullability: O
 
 - Name: secp256k1_keypair_create
@@ -136,6 +144,9 @@ Functions:
   - Position: 1 # keypair output (secp256k1_keypair)
     Nullability: N
   - Position: 2 # seckey
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "32"
     Nullability: N
 
 - Name: secp256k1_schnorrsig_verify
@@ -178,19 +189,14 @@ Functions:
   - Position: 2 # pubkey
     Nullability: N
   - Position: 3 # seckey
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "32"
     Nullability: N
   - Position: 4 # hashfp
     Nullability: O
   - Position: 5 # data
     Nullability: O
-
-- Name: ecdh_hash_function_asn1_x963_apinotes_test
-  SwiftName: ecdhHashASN1x963(output:x:)
-  Parameters:
-  - Position: 0 # output
-    Nullability: N
-  - Position: 1 # x32
-    Nullability: N
 
 - Name: fill_with_fives
   SwiftName: fillWithFives(span:)
@@ -210,4 +216,182 @@ Functions:
   - Position: 0 # destination
     Nullability: N
   - Position: 1 # source
+    Nullability: N
+
+# Context management
+- Name: secp256k1_context_create
+  SwiftName: createContext(flags:)
+  Parameters:
+  - Position: 0 # flags
+    Nullability: N
+
+- Name: secp256k1_context_destroy
+  SwiftName: destroyContext(_:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+
+# Secret keys and pubkeys
+- Name: secp256k1_ec_pubkey_create
+  SwiftName: createPublicKey(context:outputPublicKey:seckeyBytes:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+  - Position: 1 # pubkey
+    Nullability: N
+  - Position: 2 # seckey
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "32"
+    Nullability: N
+
+- Name: secp256k1_ec_pubkey_parse
+  SwiftName: parsePublicKey(context:outputPublicKey:inputBytes:inputlen:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+  - Position: 1 # pubkey
+    Nullability: N
+  - Position: 2 # input
+    Lifetimebound: true
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "inputlen"
+    Nullability: N
+  - Position: 3 # inputlen
+    Nullability: N
+
+- Name: secp256k1_ec_pubkey_serialize
+  SwiftName: serializePublicKey(context:outputBytes:outputByteCount:publicKey:formatFlags:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+  - Position: 1 # output
+    Nullability: N
+  - Position: 2 # outputlen
+    Nullability: N
+  - Position: 3 # pubkey
+    Nullability: N
+  - Position: 4 # flags
+    Nullability: N
+
+- Name: secp256k1_ec_pubkey_cmp
+  SwiftName: comparePublicKeys(context:first:second:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+  - Position: 1 # pubkey1
+    Nullability: N
+  - Position: 2 # pubkey2
+    Nullability: N
+
+- Name: secp256k1_ec_pubkey_negate
+  SwiftName: negatePublicKey(context:publicKey:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+  - Position: 1 # pubkey
+    Nullability: N
+
+- Name: secp256k1_ec_pubkey_combine
+  SwiftName: combinePublicKeys(context:outputPublicKey:inputs:inputCount:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+  - Position: 1 # out
+    Nullability: N
+  - Position: 2 # ins
+    Nullability: N
+  - Position: 3 # n
+    Nullability: N
+
+- Name: secp256k1_ec_pubkey_sort
+  SwiftName: sortPublicKeys(context:pubkeys:count:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+  - Position: 1 # pubkeys
+    Nullability: N
+  - Position: 2 # len
+    Nullability: N
+
+# ECDSA signature parsing/serialization
+- Name: secp256k1_ecdsa_signature_parse_compact
+  SwiftName: parseEcdsaSignatureCompact(context:outputSignature:inputBytes:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+  - Position: 1 # sig
+    Nullability: N
+  - Position: 2 # input64
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "64"
+    Nullability: N
+
+- Name: secp256k1_ecdsa_signature_parse_der
+  SwiftName: parseEcdsaSignatureDER(context:outputSignature:input:inputlen:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+  - Position: 1 # sig
+    Nullability: N
+  - Position: 2 # input
+    Lifetimebound: true
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "inputlen"
+    Nullability: N
+  - Position: 3 # inputlen
+    Nullability: N
+
+- Name: secp256k1_ecdsa_signature_serialize_der
+  SwiftName: serializeEcdsaSignatureDER(context:outputBytes:outputByteCount:signature:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+  - Position: 1 # output
+    Nullability: N
+  - Position: 2 # outputlen
+    Nullability: N
+  - Position: 3 # sig
+    Nullability: N
+
+- Name: secp256k1_ecdsa_signature_serialize_compact
+  SwiftName: serializeEcdsaSignatureCompact(context:outputBytes:signature:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+  - Position: 1 # output64
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "64"
+    Nullability: N
+  - Position: 2 # sig
+    Nullability: N
+
+# ECDSA verify/normalize
+- Name: secp256k1_ecdsa_signature_normalize
+  SwiftName: normalizeEcdsaSignature(context:outputSignature:inputSignature:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+  - Position: 1 # sigout
+    Nullability: N
+  - Position: 2 # sigin
+    Nullability: N
+
+- Name: secp256k1_ecdsa_verify
+  SwiftName: verifyEcdsaSignature(context:signature:messageHash:publicKey:)
+  Parameters:
+  - Position: 0 # ctx
+    Nullability: N
+  - Position: 1 # sig
+    Nullability: N
+  - Position: 2 # msg32
+    BoundsSafety:
+      Kind: counted_by
+      BoundedBy: "32"
+    Nullability: N
+  - Position: 3 # pubkey
     Nullability: N

@@ -46,7 +46,6 @@ let package = Package(
 			],
 			path: "Sources/K1MacrosImpl"
 		),
-		// Target `libsecp256k1` https://github.com/bitcoin-core/secp256k1
 		.target(
 			name: "secp256k1",
 			exclude: [
@@ -91,17 +90,6 @@ let package = Package(
 				.define("ENABLE_MODULE_EXTRAKEYS"),
 			],
 			swiftSettings: [
-				.enableExperimentalFeature("SafeInteropWrappers"),
-			]
-		),
-		.testTarget(
-			name: "ApinotesTests",
-			dependencies: [
-				"secp256k1",
-				"K1Macros",
-			],
-			swiftSettings: [
-				.define("CRYPTO_IN_SWIFTPM_FORCE_BUILD_API"),
 				.enableExperimentalFeature("SafeInteropWrappers"),
 			]
 		),

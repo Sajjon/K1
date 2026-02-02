@@ -16,12 +16,12 @@ extension FFI.PublicKey {
 	static func deserialize(
 		x963Representation contiguousBytes: some ContiguousBytes
 	) throws -> Wrapped {
-		try contiguousBytes.withUnsafeBytes { bufferPointer throws -> Wrapped in
+		try withSpanFromContiguousBytes(contiguousBytes) { span in
 			let expected = Self.x963ByteCount
-			guard bufferPointer.count == expected else {
+			guard span.count == expected else {
 				throw K1.Error.incorrectKeySize
 			}
-			return try Self._deserialize(bytes: [UInt8](bufferPointer))
+			return try Self._deserialize(span: span)
 		}
 	}
 
@@ -29,12 +29,20 @@ extension FFI.PublicKey {
 	static func deserialize(
 		rawRepresentation contiguousBytes: some ContiguousBytes
 	) throws -> Wrapped {
-		try contiguousBytes.withUnsafeBytes { bufferPointer throws -> Wrapped in
+		try withSpanFromContiguousBytes(contiguousBytes) { span in
 			let expected = Self.rawByteCount
-			guard bufferPointer.count == expected else {
+			guard span.count == expected else {
 				throw K1.Error.incorrectKeySize
 			}
-			return try Self.deserialize(x963Representation: [0x04] + [UInt8](bufferPointer))
+			// Prepend 0x04 prefix into a small temporary buffer
+			var prefixed = [UInt8](repeating: 0, count: expected + 1)
+			prefixed[0] = 0x04
+			for index in 0 ..< span.count {
+				prefixed[index + 1] = span[index]
+			}
+			return try prefixed.withUnsafeBufferPointer { buf in
+				try Self._deserialize(span: Span(_unsafeElements: buf))
+			}
 		}
 	}
 
@@ -42,26 +50,27 @@ extension FFI.PublicKey {
 	static func deserialize(
 		compressedRepresentation contiguousBytes: some ContiguousBytes
 	) throws -> Wrapped {
-		try contiguousBytes.withUnsafeBytes { bufferPointer throws -> Wrapped in
+		try withSpanFromContiguousBytes(contiguousBytes) { span in
 			let expected = Self.compressedByteCount
-			guard bufferPointer.count == expected else {
+			guard span.count == expected else {
 				throw K1.Error.incorrectKeySize
 			}
-			return try Self._deserialize(bytes: [UInt8](bufferPointer))
+			return try Self._deserialize(span: span)
 		}
 	}
 
-	private static func _deserialize(bytes: [UInt8]) throws -> Wrapped {
+	static func deserialize(
+		compressedRepresentation span: Span<UInt8>
+	) throws -> Wrapped {
+		try _deserialize(span: span)
+	}
+
+	private static func _deserialize(span: Span<UInt8>) throws -> Wrapped {
 		var raw = PublicKeyRaw()
 		try FFI.call(
 			ifFailThrow: .publicKeyParse
 		) { context in
-			secp256k1_ec_pubkey_parse(
-				context,
-				&raw,
-				bytes,
-				bytes.count
-			)
+			parsePublicKey(context: context, outputPublicKey: &raw, inputBytes: span)
 		}
 		return .init(raw: raw)
 	}
@@ -77,12 +86,12 @@ extension FFI.PublicKey {
 		var out = [UInt8](repeating: 0x00, count: byteCount)
 		var publicKeyRaw = wrapped.raw
 		try FFI.call(ifFailThrow: .publicKeySerialize) { context in
-			secp256k1_ec_pubkey_serialize(
-				context,
-				&out,
-				&byteCount,
-				&publicKeyRaw,
-				format.rawValue
+			serializePublicKey(
+				context: context,
+				outputBytes: &out,
+				outputByteCount: &byteCount,
+				publicKey: &publicKeyRaw,
+				formatFlags: format.rawValue
 			)
 		}
 		return Data(out.prefix(byteCount))

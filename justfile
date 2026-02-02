@@ -43,7 +43,7 @@ gyb:
 	./scripts/generate_boilerplate_files_with_gyb.sh
 
 bump-dep dryRun="false":
-  swift run --enable-experimental-prebuilts \
+  swift run \
     --package-path scripts/update-libsecp \
     update-libsecp \
     {{ if dryRun == "true" { "--dry-run" } else { "" } }}

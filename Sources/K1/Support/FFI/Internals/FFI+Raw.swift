@@ -23,16 +23,34 @@ extension Raw {
 		return raw
 	}
 
+	@available(macOS 26.0, iOS 26.0, tvOS 26.0, watchOS 26.0, *)
+	static func nonRecoverableSignature(
+		compactBytes array: InlineArray<64, UInt8>
+	) throws -> ECDSASignatureRaw {
+		var raw = ECDSASignatureRaw()
+		// FIXME: Declare a `parseEcdsaSignatureCompact` taking an InlineArray<64, UInt8> and use it directly
+		try array.span.withUnsafeBufferPointer { compactBytes in
+			try FFI.call(ifFailThrow: .ecdsaSignatureParseCompact) { context in
+				parseEcdsaSignatureCompact(
+					context: context,
+					outputSignature: &raw,
+					inputBytes: compactBytes
+				)
+			}
+		}
+		return raw
+	}
+
 	static func nonRecoverableSignature(
 		compactBytes: [UInt8]
 	) throws -> ECDSASignatureRaw {
 		var raw = ECDSASignatureRaw()
 
 		try FFI.call(ifFailThrow: .ecdsaSignatureParseCompact) { context in
-			secp256k1_ecdsa_signature_parse_compact(
-				context,
-				&raw,
-				compactBytes
+			parseEcdsaSignatureCompact(
+				context: context,
+				outputSignature: &raw,
+				inputBytes: compactBytes
 			)
 		}
 
@@ -40,17 +58,12 @@ extension Raw {
 	}
 
 	static func nonRecoverableSignature(
-		derBytes: [UInt8]
+		derBytes: Span<UInt8>
 	) throws -> ECDSASignatureRaw {
 		var raw = ECDSASignatureRaw()
 
 		try FFI.call(ifFailThrow: .ecdsaSignatureParseDER) { context in
-			secp256k1_ecdsa_signature_parse_der(
-				context,
-				&raw,
-				derBytes,
-				derBytes.count
-			)
+			parseEcdsaSignatureDER(context: context, outputSignature: &raw, input: derBytes)
 		}
 
 		return raw

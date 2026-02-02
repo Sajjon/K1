@@ -31,3 +31,14 @@ func withSpanFromData<R>(
 		return try body(Span(_unsafeElements: readonly))
 	}
 }
+
+@usableFromInline
+func withSpanFromContiguousBytes<C: ContiguousBytes, R>(
+	_ bytes: C,
+	_ body: (Span<UInt8>) throws -> R
+) rethrows -> R {
+	try bytes.withUnsafeBytes { raw in
+		let buf = raw.bindMemory(to: UInt8.self)
+		return try body(Span(_unsafeElements: buf))
+	}
+}

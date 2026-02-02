@@ -7,7 +7,7 @@ final class FFI {
 	init() throws {
 		guard
 			/* "Create a secp256k1 context object." */
-			let context = secp256k1_context_create(Context.sign.rawValue | Context.verify.rawValue)
+			let context = createContext(flags: Context.sign.rawValue | Context.verify.rawValue)
 		else {
 			throw K1.Error.underlyingLibsecp256k1Error(.failedToCreateContextForSecp256k1)
 		}
@@ -16,7 +16,7 @@ final class FFI {
 	}
 
 	deinit {
-		secp256k1_context_destroy(context)
+		destroyContext(context)
 	}
 }
 

@@ -24,10 +24,10 @@ extension FFI {
 					var raw = PublicKeyRaw()
 
 					try FFI.call(ifFailThrow: .publicKeyCreate) { context in
-						secp256k1_ec_pubkey_create(
-							context,
-							&raw,
-							seckey.baseAddress!
+						createPublicKey(
+							context: context,
+							outputPublicKey: &raw,
+							seckeyBytes: seckey.baseAddress!
 						)
 					}
 

@@ -35,7 +35,7 @@ extension FFI.PublicKey.Wrapped {
 		var otherRaw = other.raw
 		return try FFI.toC { ffi in
 			ffi.callWithResultCode { context in
-				secp256k1_ec_pubkey_cmp(context, &selfRaw, &otherRaw)
+				comparePublicKeys(context: context, first: &selfRaw, second: &otherRaw)
 			} == 0
 		}
 	}
@@ -58,7 +58,7 @@ extension FFI.PublicKey.Wrapped {
 		var result = self.raw
 		try FFI.toC { ffi in
 			try ffi.call(ifFailThrow: .publicKeyCreate) { context in
-				secp256k1_ec_pubkey_negate(context, &result)
+				negatePublicKey(context: context, publicKey: &result)
 			}
 		}
 		return Self(raw: result)
@@ -84,7 +84,12 @@ extension FFI.PublicKey.Wrapped {
 			try keyPointers.withUnsafeBufferPointer { pointers in
 				try FFI.toC { ffi in
 					try ffi.call(ifFailThrow: .groupOperation) { context in
-						secp256k1_ec_pubkey_combine(context, &result, pointers.baseAddress!, keys.count)
+						combinePublicKeys(
+							context: context,
+							outputPublicKey: &result,
+							inputs: pointers.baseAddress!,
+							inputCount: keys.count
+						)
 					}
 				}
 			}
