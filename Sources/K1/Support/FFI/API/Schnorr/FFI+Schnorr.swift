@@ -12,12 +12,12 @@ extension FFI.Schnorr {
 		signature: FFI.Schnorr.Wrapped,
 		publicKey: FFI.PublicKey.Wrapped,
 		message: Span<UInt8>
-	) throws -> Bool {
-		try FFI.toC { ffi -> Bool in
+	) -> Bool {
+		FFI.toC { ffi -> Bool in
 			var publicKeyX = PublicKeyXOnlyRaw()
 			var publicKeyRaw = publicKey.raw
-			try FFI.call(ifFailThrow: .xonlyPublicKeyFromPublicKey) { context in
-				xOnlyPublicKeyFromPublicKey(
+			ffi.call { context in
+				_ = xOnlyPublicKeyFromPublicKey(
 					context: context,
 					outputXOnlyPublicKey: &publicKeyX,
 					parity: nil,
@@ -25,14 +25,14 @@ extension FFI.Schnorr {
 				)
 			}
 
-			return ffi.validate { context in
+			return ffi.call { context in
 				verifySchnorrSignature(
 					context: context,
 					signatureBytes: signature.bytes,
 					msg: message,
 					xOnlyPublicKey: &publicKeyX
 				)
-			}
+			} == .success
 		}
 	}
 }

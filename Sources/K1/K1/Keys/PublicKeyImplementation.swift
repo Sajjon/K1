@@ -83,14 +83,12 @@ extension K1._PublicKeyImplementation {
 
 	/// `04 || X || Y` (65 bytes)
 	var x963Representation: Data {
-		// swiftlint:disable:next force_try
-		try! FFI.PublicKey.serialize(wrapped, format: .uncompressed)
+		FFI.PublicKey.serialize(wrapped, format: .uncompressed)
 	}
 
 	/// `02|03 || X` (33 bytes)
 	var compressedRepresentation: Data {
-		// swiftlint:disable:next force_try
-		try! FFI.PublicKey.serialize(wrapped, format: .compressed)
+		FFI.PublicKey.serialize(wrapped, format: .compressed)
 	}
 
 	/// `DER`
@@ -119,15 +117,7 @@ extension K1._PublicKeyImplementation {
 	static func == (lhsSelf: Self, rhsSelf: Self) -> Bool {
 		let lhs = lhsSelf.wrapped
 		let rhs = rhsSelf.wrapped
-		do {
-			return try lhs.compare(to: rhs)
-		} catch {
-			return lhs.withUnsafeBytes { lhsBytes in
-				rhs.withUnsafeBytes { rhsBytes in
-					safeCompare(lhsBytes, rhsBytes)
-				}
-			}
-		}
+		return lhs.isEqual(to: rhs)
 	}
 }
 

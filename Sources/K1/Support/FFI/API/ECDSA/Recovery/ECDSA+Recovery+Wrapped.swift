@@ -20,7 +20,7 @@ typealias ECDSAFunctionPointer<Raw> = (
 	UnsafePointer<UInt8>,
 	secp256k1_nonce_function?,
 	UnsafeRawPointer?
-) -> Int32
+) -> ResultRaw
 
 // MARK: Sign
 extension FFI.ECDSAWithKeyRecovery.Wrapped {

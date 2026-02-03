@@ -46,7 +46,7 @@ extension FFI.ECDSA {
 	static func compact(_ wrapped: Wrapped) throws -> Data {
 		var out = [UInt8](repeating: 0, count: Self.byteCount)
 		var rawSignature = wrapped.raw
-		try FFI.call(ifFailThrow: .ecdsaSignatureSerializeCompact) { context in
+		FFI.call { context in
 			serializeEcdsaSignatureCompact(
 				context: context,
 				outputBytes: &out,
@@ -130,25 +130,25 @@ extension FFI.ECDSA {
 		publicKey: FFI.PublicKey.Wrapped,
 		message: [UInt8],
 		options: K1.ECDSA.ValidationOptions = .default
-	) throws -> Bool {
-		try FFI.toC { ffi -> Bool in
+	) -> Bool {
+		FFI.toC { ffi -> Bool in
 			var publicKeyRaw = publicKey.raw
 			var maybeMalleable = signature.raw
 			var normalized = ECDSASignatureRaw()
 
-			let codeForSignatureWasMalleable = 1
-			let signatureWasMalleableResult = ffi.callWithResultCode { context in
+			let signatureWasMalleable = ffi.call { context in
 				normalizeEcdsaSignature(context: context, outputSignature: &normalized, inputSignature: &maybeMalleable)
-			}
-			let signatureWasMalleable = signatureWasMalleableResult == codeForSignatureWasMalleable
-			let isSignatureValid = ffi.validate { context in
+			} == .wasntNormalized
+
+			let isSignatureValid = ffi.call { context in
 				verifyEcdsaSignature(
 					context: context,
 					signature: &normalized,
 					messageHash: message,
 					publicKey: &publicKeyRaw
 				)
-			}
+			} == .signatureValid
+
 			let acceptMalleableSignatures = options.malleabilityStrictness == .accepted
 			switch (isSignatureValid, signatureWasMalleable, acceptMalleableSignatures) {
 			case (true, false, _):

@@ -21,16 +21,12 @@ extension K1.ECDSA.PublicKey {
 		hashed: some DataProtocol,
 		options: K1.ECDSA.ValidationOptions = .default
 	) -> Bool {
-		do {
-			return try FFI.ECDSA.isValid(
-				signature: signature.wrapped,
-				publicKey: self.impl.wrapped,
-				message: [UInt8](hashed),
-				options: options
-			)
-		} catch {
-			return false
-		}
+		FFI.ECDSA.isValid(
+			signature: signature.wrapped,
+			publicKey: self.impl.wrapped,
+			message: [UInt8](hashed),
+			options: options
+		)
 	}
 
 	/// Verifies an Elliptic Curve Digital Signature Algorithm (ECDSA) non recoverable signature on a digest over the `secp256k1` elliptic curve.
@@ -87,16 +83,12 @@ extension K1.ECDSAWithKeyRecovery.PublicKey {
 		hashed: some DataProtocol,
 		options: K1.ECDSA.ValidationOptions = .default
 	) -> Bool {
-		do {
-			return try FFI.ECDSAWithKeyRecovery.isValid(
-				signature: signature.wrapped,
-				publicKey: self.impl.wrapped,
-				message: [UInt8](hashed),
-				options: options
-			)
-		} catch {
-			return false
-		}
+		FFI.ECDSAWithKeyRecovery.isValid(
+			signature: signature.wrapped,
+			publicKey: self.impl.wrapped,
+			message: [UInt8](hashed),
+			options: options
+		)
 	}
 
 	/// Verifies an Elliptic Curve Digital Signature Algorithm (ECDSA) recoverable signature on a digest over the `secp256k1` elliptic curve.
@@ -151,15 +143,11 @@ extension K1.Schnorr.PublicKey {
 		_ signature: K1.Schnorr.Signature,
 		hashed: Span<UInt8>
 	) -> Bool {
-		do {
-			return try FFI.Schnorr.isValid(
-				signature: signature.wrapped,
-				publicKey: self.impl.wrapped,
-				message: hashed
-			)
-		} catch {
-			return false
-		}
+		FFI.Schnorr.isValid(
+			signature: signature.wrapped,
+			publicKey: self.impl.wrapped,
+			message: hashed
+		)
 	}
 
 	/// Verifies Schnorr signature on some _hash_ over the `secp256k1` elliptic curve.
@@ -171,16 +159,12 @@ extension K1.Schnorr.PublicKey {
 		_ signature: K1.Schnorr.Signature,
 		hashed bytes: [UInt8]
 	) -> Bool {
-		do {
-			return try withSpanFromArray(bytes) { span in
-				try FFI.Schnorr.isValid(
-					signature: signature.wrapped,
-					publicKey: self.impl.wrapped,
-					message: span
-				)
-			}
-		} catch {
-			return false
+		withSpanFromArray(bytes) { span in
+			FFI.Schnorr.isValid(
+				signature: signature.wrapped,
+				publicKey: self.impl.wrapped,
+				message: span
+			)
 		}
 	}
 
@@ -193,16 +177,12 @@ extension K1.Schnorr.PublicKey {
 		_ signature: K1.Schnorr.Signature,
 		hashed data: some DataProtocol
 	) -> Bool {
-		do {
-			return try withSpanFromData(data) { span in
-				try FFI.Schnorr.isValid(
-					signature: signature.wrapped,
-					publicKey: self.impl.wrapped,
-					message: span
-				)
-			}
-		} catch {
-			return false
+		withSpanFromData(data) { span in
+			FFI.Schnorr.isValid(
+				signature: signature.wrapped,
+				publicKey: self.impl.wrapped,
+				message: span
+			)
 		}
 	}
 

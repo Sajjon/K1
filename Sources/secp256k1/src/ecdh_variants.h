@@ -1,10 +1,3 @@
-//
-//  ecdh_variants.h
-//  
-//
-//  Created by Alexander Cyon on 2022-01-31.
-//
-
 #ifndef ecdh_variants_h
 #define ecdh_variants_h
 

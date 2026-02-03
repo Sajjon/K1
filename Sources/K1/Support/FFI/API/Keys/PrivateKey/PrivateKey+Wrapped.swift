@@ -30,7 +30,6 @@ extension FFI {
 							privateKeyBytes: seckey.baseAddress!
 						)
 					}
-
 					return FFI.PublicKey.Wrapped(raw: raw)
 				}
 			}

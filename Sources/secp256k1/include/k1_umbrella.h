@@ -1,3 +1,5 @@
+#include "../src/k1_shim.h"
+
 #include "../libsecp256k1/include/secp256k1.h"
 #include "../libsecp256k1/include/secp256k1_ecdh.h"
 #include "../libsecp256k1/include/secp256k1_extrakeys.h"

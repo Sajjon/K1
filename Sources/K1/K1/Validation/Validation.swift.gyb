@@ -58,15 +58,11 @@ extension K1.${FEATURE}.PublicKey {
 		_ signature: K1.${FEATURE}.Signature,
 		hashed: Span<UInt8>${VALIDATION_OPTIONS_ARG}
 	) -> Bool {
-		do {
-			return try FFI.${FEATURE}.isValid(
-				signature: signature.wrapped,
-				publicKey: self.impl.wrapped,
-				message: hashed${VALIDATION_OPTIONS_FWD}
-			)
-		} catch {
-			return false
-		}
+		FFI.${FEATURE}.isValid(
+			signature: signature.wrapped,
+			publicKey: self.impl.wrapped,
+			message: hashed${VALIDATION_OPTIONS_FWD}
+		)
 	}
 
 	/// Verifies ${VARIANT} signature on some _hash_ over the `secp256k1` elliptic curve.
@@ -78,16 +74,12 @@ extension K1.${FEATURE}.PublicKey {
 		_ signature: K1.${FEATURE}.Signature,
 		hashed bytes: [UInt8]${VALIDATION_OPTIONS_ARG}
 	) -> Bool {
-		do {
-			return try withSpanFromArray(bytes) { span in
-				try FFI.${FEATURE}.isValid(
-					signature: signature.wrapped,
-					publicKey: self.impl.wrapped,
-					message: span${VALIDATION_OPTIONS_FWD}
-				)
-			}
-		} catch {
-			return false
+		withSpanFromArray(bytes) { span in
+			FFI.${FEATURE}.isValid(
+				signature: signature.wrapped,
+				publicKey: self.impl.wrapped,
+				message: span${VALIDATION_OPTIONS_FWD}
+			)
 		}
 	}
 
@@ -100,16 +92,12 @@ extension K1.${FEATURE}.PublicKey {
 		_ signature: K1.${FEATURE}.Signature,
 		hashed data: some DataProtocol${VALIDATION_OPTIONS_ARG}
 	) -> Bool {
-		do {
-			return try withSpanFromData(data) { span in
-				try FFI.${FEATURE}.isValid(
-					signature: signature.wrapped,
-					publicKey: self.impl.wrapped,
-					message: span${VALIDATION_OPTIONS_FWD}
-				)
-			}
-		} catch {
-			return false
+		withSpanFromData(data) { span in
+			FFI.${FEATURE}.isValid(
+				signature: signature.wrapped,
+				publicKey: self.impl.wrapped,
+				message: span${VALIDATION_OPTIONS_FWD}
+			)
 		}
 	}
 % else:
@@ -120,15 +108,11 @@ extension K1.${FEATURE}.PublicKey {
 		_ signature: K1.${FEATURE}.Signature,
 		hashed: some DataProtocol${VALIDATION_OPTIONS_ARG}
 	) -> Bool {
-		do {
-			return try FFI.${FEATURE}.isValid(
-				signature: signature.wrapped,
-				publicKey: self.impl.wrapped,
-				message: [UInt8](hashed)${VALIDATION_OPTIONS_FWD}
-			)
-		} catch {
-			return false
-		}
+		FFI.${FEATURE}.isValid(
+			signature: signature.wrapped,
+			publicKey: self.impl.wrapped,
+			message: [UInt8](hashed)${VALIDATION_OPTIONS_FWD}
+		)
 	}
 % end
 

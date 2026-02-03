@@ -33,7 +33,8 @@ bootstrap:
 dev: bootstrap init
 
 synthesize-interface:
-	xcrun swift-synthesize-interface -I Sources/secp256k1/include -module-name Secp256k1 -target arm64-apple-macos15 -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.sdk
+	mkdir -p "{{ROOT_DIR}}/.build/clang-module-cache"
+	CLANG_MODULE_CACHE_PATH="{{ROOT_DIR}}/.build/clang-module-cache" xcrun swift-synthesize-interface -I Sources/secp256k1/include -module-name Secp256k1 -target arm64-apple-macos15 -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.sdk
 
 
 format:

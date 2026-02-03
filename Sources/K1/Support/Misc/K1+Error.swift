@@ -43,8 +43,6 @@ enum InternalFailure: UInt, Sendable, Swift.Error, Hashable {
 // MARK: - FFI.Error
 extension FFI {
 	enum Error: Int, Sendable, Swift.Error, Hashable {
-		case failedToCreateContextForSecp256k1
-
 		/// `parseEcdsaSignatureCompact(context:outputSignature:inputBytes:)` (`secp256k1_ecdsa_signature_parse_compact`) failed
 		case ecdsaSignatureParseCompact
 
@@ -129,8 +127,6 @@ extension K1.Error: CustomDebugStringConvertible {
 				case .ecdh: return "ecdh"
 				case .ecdsaSign: return "ECDSA sign"
 				case .ecdsaSignatureParseCompact: return "ECDSA signature parse compact"
-				case .failedToCreateContextForSecp256k1:
-					return "create context"
 				case .ecdsaSignatureParseDER:
 					return "ECDSA signature parse DER"
 				case .ecdsaSignatureSerializeCompact:

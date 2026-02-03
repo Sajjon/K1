@@ -81,11 +81,11 @@ extension FFI.PublicKey {
 	static func serialize(
 		_ wrapped: Wrapped,
 		format: K1.Format
-	) throws -> Data {
+	) -> Data {
 		var byteCount = format.length
 		var out = [UInt8](repeating: 0x00, count: byteCount)
 		var publicKeyRaw = wrapped.raw
-		try FFI.call(ifFailThrow: .publicKeySerialize) { context in
+		FFI.call { context in
 			serializePublicKey(
 				context: context,
 				outputBytes: &out,

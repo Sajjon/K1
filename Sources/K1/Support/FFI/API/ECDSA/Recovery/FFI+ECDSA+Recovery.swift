@@ -36,14 +36,12 @@ extension FFI.ECDSAWithKeyRecovery {
 extension FFI.ECDSAWithKeyRecovery {
 	static func serializeCompact(
 		_ wrapped: Wrapped
-	) throws -> (rs: [UInt8], recoveryID: Int32) {
+	) -> (rs: [UInt8], recoveryID: Int32) {
 		// swiftlint:disable:next identifier_name
 		var rs = [UInt8](repeating: 0, count: FFI.ECDSA.byteCount)
 		var recoveryID: Int32 = 0
 		var rawSignature = wrapped.raw
-		try FFI.call(
-			ifFailThrow: .recoverableSignatureSerializeCompact
-		) { context in
+		FFI.call { context in
 			serializeRecoverableECDSASignatureCompact(
 				context: context,
 				outputBytes: &rs,
@@ -60,13 +58,11 @@ extension FFI.ECDSAWithKeyRecovery {
 	/// Convert a recoverable signature into a normal signature.
 	static func nonRecoverable(
 		_ wrapped: Wrapped
-	) throws -> FFI.ECDSA.Wrapped {
+	) -> FFI.ECDSA.Wrapped {
 		var nonRecoverable = ECDSASignatureRaw()
 		var recoverable = wrapped.raw
 
-		try FFI.call(
-			ifFailThrow: .recoverableSignatureConvert
-		) { context in
+		FFI.call { context in
 			ecdsaRecoverableSignatureToNonRecoverable(
 				context: context,
 				outputNonRecoverableSignature: &nonRecoverable,
@@ -110,19 +106,15 @@ extension FFI.ECDSAWithKeyRecovery {
 		publicKey: FFI.PublicKey.Wrapped,
 		message: [UInt8],
 		options: K1.ECDSA.ValidationOptions = .default
-	) throws -> Bool {
-		do {
-			let publicKeyNonRecoverable = FFI.PublicKey.Wrapped(raw: publicKey.raw)
-			let signatureNonRecoverable = try FFI.ECDSAWithKeyRecovery.nonRecoverable(signature)
-			return try FFI.ECDSA.isValid(
-				signature: signatureNonRecoverable,
-				publicKey: publicKeyNonRecoverable,
-				message: message,
-				options: options
-			)
-		} catch {
-			return false
-		}
+	) -> Bool {
+		let publicKeyNonRecoverable = FFI.PublicKey.Wrapped(raw: publicKey.raw)
+		let signatureNonRecoverable = FFI.ECDSAWithKeyRecovery.nonRecoverable(signature)
+		return FFI.ECDSA.isValid(
+			signature: signatureNonRecoverable,
+			publicKey: publicKeyNonRecoverable,
+			message: message,
+			options: options
+		)
 	}
 }
 
