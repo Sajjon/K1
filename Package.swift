@@ -1,6 +1,7 @@
 // swift-tools-version:6.2.1
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
+import CompilerPluginSupport
 import PackageDescription
 
 let development = false
@@ -21,9 +22,30 @@ let package = Package(
 			]
 		),
 	],
-	dependencies: [],
+	dependencies: [
+		.package(
+			url: "https://github.com/swiftlang/swift-syntax.git",
+			revision: "603.0.0-prerelease-2025-12-17"
+		),
+	],
 	targets: [
-		// Target `libsecp256k1` https://github.com/bitcoin-core/secp256k1
+		// Macro target(s)
+		.target(
+			name: "K1Macros",
+			dependencies: [
+				"K1MacrosImpl",
+			]
+		),
+		.macro(
+			name: "K1MacrosImpl",
+			dependencies: [
+				.product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
+				.product(name: "SwiftSyntax", package: "swift-syntax"),
+				.product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+				.product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+			],
+			path: "Sources/K1MacrosImpl"
+		),
 		.target(
 			name: "secp256k1",
 			exclude: [
@@ -54,6 +76,7 @@ let package = Package(
 				"libsecp256k1/SECURITY.md",
 			],
 			cSettings: [
+				.headerSearchPath("libsecp256k1/include"),
 				// Basic config values that are universal and require no dependencies.
 				// https://github.com/bitcoin-core/secp256k1/blob/master/src/basic-config.h#L12-L13
 				.define("ECMULT_WINDOW_SIZE", to: "15"),
@@ -65,12 +88,16 @@ let package = Package(
 				.define("ENABLE_MODULE_RECOVERY"),
 				.define("ENABLE_MODULE_SCHNORRSIG"),
 				.define("ENABLE_MODULE_EXTRAKEYS"),
+			],
+			swiftSettings: [
+				.enableExperimentalFeature("SafeInteropWrappers"),
 			]
 		),
 		.target(
 			name: "K1",
 			dependencies: [
 				"secp256k1",
+				"K1Macros",
 			],
 			exclude: [
 				"K1/Keys/Keys.swift.gyb",
@@ -79,6 +106,7 @@ let package = Package(
 			],
 			swiftSettings: [
 				.define("CRYPTO_IN_SWIFTPM_FORCE_BUILD_API"),
+				.enableExperimentalFeature("SafeInteropWrappers"),
 			]
 		),
 		.testTarget(
@@ -103,7 +131,6 @@ if development {
 			.unsafeFlags([
 				"-Xfrontend", "-warn-concurrency",
 				"-Xfrontend", "-enable-actor-data-race-checks",
-				"-enable-library-evolution",
 			])
 		)
 	}

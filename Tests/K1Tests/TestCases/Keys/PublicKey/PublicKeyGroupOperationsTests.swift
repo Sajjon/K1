@@ -63,7 +63,7 @@ final class PublicKeyGroupOperationsTests: XCTestCase {
 		]
 		
 		let expectedGenerator = try K1.Schnorr.PublicKey(rawRepresentation: generatorPoint)
-		let actualGeneratorRaw = try FFI.PublicKey.serialize(FFI.PublicKey.Wrapped.g, format: .uncompressed)
+		let actualGeneratorRaw = FFI.PublicKey.serialize(FFI.PublicKey.Wrapped.g, format: .uncompressed)
 		let actualGenerator = try K1.Schnorr.PublicKey(rawRepresentation: actualGeneratorRaw.dropFirst()) // Drop the 0x04 prefix
 		
 		XCTAssertEqual(expectedGenerator.rawRepresentation, actualGenerator.rawRepresentation)
@@ -84,11 +84,11 @@ final class PublicKeyGroupOperationsTests: XCTestCase {
 		let priv5 = try FFI.PrivateKey.Wrapped(scalar: 5)
 		let priv6 = try FFI.PrivateKey.Wrapped(scalar: 6)
 
-		XCTAssertTrue(try gx2.compare(to: priv2.publicKey))
-		XCTAssertTrue(try gx3.compare(to: priv3.publicKey))
-		XCTAssertTrue(try gx4.compare(to: priv4.publicKey))
-		XCTAssertTrue(try gx5.compare(to: priv5.publicKey))
-		XCTAssertTrue(try gx6.compare(to: priv6.publicKey))
+		XCTAssertTrue(gx2.isEqual(to: priv2.publicKey))
+		XCTAssertTrue(gx3.isEqual(to: priv3.publicKey))
+		XCTAssertTrue(gx4.isEqual(to: priv4.publicKey))
+		XCTAssertTrue(gx5.isEqual(to: priv5.publicKey))
+		XCTAssertTrue(gx6.isEqual(to: priv6.publicKey))
 	}
 
 	func testBasicAddition() throws {
@@ -98,14 +98,14 @@ final class PublicKeyGroupOperationsTests: XCTestCase {
 		
 		// Test that we can add two points
 		let sum = try a + b
-		let sumCompressed = try FFI.PublicKey.serialize(sum, format: .compressed)
+		let sumCompressed = FFI.PublicKey.serialize(sum, format: .compressed)
 		
 		// Verify the result is a valid point (33 bytes for compressed)
 		XCTAssertEqual(sumCompressed.count, 33)
 		
 		// Verify the result is different from both inputs
-		XCTAssertFalse(try sum.compare(to: a))
-		XCTAssertFalse(try sum.compare(to: b))
+		XCTAssertFalse(sum.isEqual(to: a))
+		XCTAssertFalse(sum.isEqual(to: b))
 	}
 
 	func testNegation() throws {
@@ -115,10 +115,10 @@ final class PublicKeyGroupOperationsTests: XCTestCase {
 		let negNegA = try negA.negate()
 		
 		// Test that -(-a) = a
-		XCTAssertTrue(try negNegA.compare(to: a))
-		
+		XCTAssertTrue(negNegA.isEqual(to: a))
+
 		// Test that a != -a (unless a is the point at infinity, which gx2 is not)
-		XCTAssertFalse(try a.compare(to: negA))
+		XCTAssertFalse(a.isEqual(to: negA))
 	}
 	
 	func testSubtraction() throws {
@@ -129,12 +129,12 @@ final class PublicKeyGroupOperationsTests: XCTestCase {
 		
 		// Test that g5 - g3 = g2
 		let g5MinusG3 = try g5 - g3
-		XCTAssertTrue(try g5MinusG3.compare(to: g2), "g5 - g3 should equal g2")
-		
+		XCTAssertTrue(g5MinusG3.isEqual(to: g2), "g5 - g3 should equal g2")
+
 		// Test that g3 - g2 = g
 		let g3MinusG2 = try g3 - g2
-		XCTAssertTrue(try g3MinusG2.compare(to: FFI.PublicKey.Wrapped.g), "g3 - g2 should equal g")
-		
+		XCTAssertTrue(g3MinusG2.isEqual(to: FFI.PublicKey.Wrapped.g), "g3 - g2 should equal g")
+
 		// Test that g2 - g2 throws error (point at infinity)
 		XCTAssertThrowsError(try g2 - g2) { error in
 			if let ffiError = error as? FFI.Error {
@@ -152,12 +152,12 @@ final class PublicKeyGroupOperationsTests: XCTestCase {
 		
 		// Test sum([g, g2, g3]) = g6
 		let sum = try FFI.PublicKey.Wrapped.sum(keys: [g, g2, g3])
-		XCTAssertTrue(try sum.compare(to: g6), "sum([g, g2, g3]) should equal g6")
-		
+		XCTAssertTrue(sum.isEqual(to: g6), "sum([g, g2, g3]) should equal g6")
+
 		// Test sum with single key
 		let sumSingle = try FFI.PublicKey.Wrapped.sum(keys: [g3])
-		XCTAssertTrue(try sumSingle.compare(to: g3), "sum([g3]) should equal g3")
-		
+		XCTAssertTrue(sumSingle.isEqual(to: g3), "sum([g3]) should equal g3")
+
 		// Test that empty array throws error
 		XCTAssertThrowsError(try FFI.PublicKey.Wrapped.sum(keys: [])) { error in
 			if let k1Error = error as? K1.Error {
@@ -171,7 +171,7 @@ final class PublicKeyGroupOperationsTests: XCTestCase {
 		let g = FFI.PublicKey.Wrapped.g
 		let gx2 = FFI.PublicKey.Wrapped.gx2
 		let gPlusG = try g + g
-		XCTAssertTrue(try gPlusG.compare(to: gx2), "g + g should equal gx2 (2*G) on secp256k1")
+		XCTAssertTrue(gPlusG.isEqual(to: gx2), "g + g should equal gx2 (2*G) on secp256k1")
 	}
 
 	func testGroupAdditionWithG2G3G4() throws {
@@ -182,11 +182,11 @@ final class PublicKeyGroupOperationsTests: XCTestCase {
 
 		// g2 + g3 (combine) should equal g5 (scalar multiplication)
 		let g2PlusG3 = try g2 + g3
-		XCTAssertTrue(try g2PlusG3.compare(to: g5), "g2 + g3 (combine) should equal g5 (scalar multiplication)")
+		XCTAssertTrue(g2PlusG3.isEqual(to: g5), "g2 + g3 (combine) should equal g5 (scalar multiplication)")
 
 		// Also test that sum([g2, g3]) == g2 + g3
 		let sum1 = try FFI.PublicKey.Wrapped.sum(keys: [g2, g3])
-		XCTAssertTrue(try sum1.compare(to: g2PlusG3))
+		XCTAssertTrue(sum1.isEqual(to: g2PlusG3))
 	}
 	
 	func testGroupNegationWithG2G3G4() throws {
@@ -194,15 +194,15 @@ final class PublicKeyGroupOperationsTests: XCTestCase {
 
 		// Test: -g2 should be different from g2
 		let negG2 = try FFI.PublicKey.Wrapped.gx2.negate()
-		XCTAssertFalse(try negG2.compare(to: FFI.PublicKey.Wrapped.gx2))
-		
+		XCTAssertFalse(negG2.isEqual(to: FFI.PublicKey.Wrapped.gx2))
+
 		// Test: -g3 should be different from g3
 		let negG3 = try FFI.PublicKey.Wrapped.gx3.negate()
-		XCTAssertFalse(try negG3.compare(to: FFI.PublicKey.Wrapped.gx3))
-		
+		XCTAssertFalse(negG3.isEqual(to: FFI.PublicKey.Wrapped.gx3))
+
 		// Test: -g4 should be different from g4
 		let negG4 = try FFI.PublicKey.Wrapped.gx4.negate()
-		XCTAssertFalse(try negG4.compare(to: FFI.PublicKey.Wrapped.gx4))
+		XCTAssertFalse(negG4.isEqual(to: FFI.PublicKey.Wrapped.gx4))
 		
 		// Test: g2 + (-g2) = 0 (point at infinity)
 		// This should throw an error because the point at infinity cannot be represented as a valid public key
@@ -223,22 +223,31 @@ final class PublicKeyGroupOperationsTests: XCTestCase {
 		
 		let schnorrSum = try schnorrG2 + schnorrG3
 		// g2 + g3 should equal g5
-		XCTAssertEqual(schnorrSum.compressedRepresentation, try FFI.PublicKey.serialize(FFI.PublicKey.Wrapped.gx5, format: .compressed))
-		
+		XCTAssertEqual(
+			schnorrSum.compressedRepresentation,
+			FFI.PublicKey.serialize(FFI.PublicKey.Wrapped.gx5, format: .compressed)
+		)
+
 		// Test ECDSA public keys
 		let ecdsaG2 = try K1.ECDSA.PublicKey(compressedRepresentation: FFI.PublicKey.serialize(FFI.PublicKey.Wrapped.gx2, format: .compressed))
 		let ecdsaG3 = try K1.ECDSA.PublicKey(compressedRepresentation: FFI.PublicKey.serialize(FFI.PublicKey.Wrapped.gx3, format: .compressed))
 		
 		let ecdsaSum = try ecdsaG2 + ecdsaG3
 		// g2 + g3 should equal g5
-		XCTAssertEqual(ecdsaSum.compressedRepresentation, try FFI.PublicKey.serialize(FFI.PublicKey.Wrapped.gx5, format: .compressed))
-		
+		XCTAssertEqual(
+			ecdsaSum.compressedRepresentation,
+			FFI.PublicKey.serialize(FFI.PublicKey.Wrapped.gx5, format: .compressed)
+		)
+
 		// Test KeyAgreement public keys
 		let keyAgreementG2 = try K1.KeyAgreement.PublicKey(compressedRepresentation: FFI.PublicKey.serialize(FFI.PublicKey.Wrapped.gx2, format: .compressed))
 		let keyAgreementG3 = try K1.KeyAgreement.PublicKey(compressedRepresentation: FFI.PublicKey.serialize(FFI.PublicKey.Wrapped.gx3, format: .compressed))
 		
 		let keyAgreementSum = try keyAgreementG2 + keyAgreementG3
 		// g2 + g3 should equal g5
-		XCTAssertEqual(keyAgreementSum.compressedRepresentation, try FFI.PublicKey.serialize(FFI.PublicKey.Wrapped.gx5, format: .compressed))
+		XCTAssertEqual(
+			keyAgreementSum.compressedRepresentation,
+			FFI.PublicKey.serialize(FFI.PublicKey.Wrapped.gx5, format: .compressed)
+		)
 	}
 } 

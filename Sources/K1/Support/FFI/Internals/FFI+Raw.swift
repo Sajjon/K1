@@ -1,5 +1,5 @@
 import Foundation
-import secp256k1
+import Secp256k1
 
 // MARK: - Raw
 enum Raw {}
@@ -7,14 +7,14 @@ enum Raw {}
 extension Raw {
 	static func recoverableSignature(
 		_ rawRepresentation: some DataProtocol
-	) throws -> secp256k1_ecdsa_recoverable_signature {
+	) throws -> ECDSARecoverableSignatureRaw {
 		let expected = K1.ECDSAWithKeyRecovery.Signature.Compact.byteCount
 		guard
 			rawRepresentation.count == expected
 		else {
 			throw K1.Error.incorrectParameterSize
 		}
-		var raw = secp256k1_ecdsa_recoverable_signature()
+		var raw = ECDSARecoverableSignatureRaw()
 		withUnsafeMutableBytes(of: &raw.data) { pointer in
 			pointer.copyBytes(
 				from: rawRepresentation.prefix(pointer.count)
@@ -23,16 +23,34 @@ extension Raw {
 		return raw
 	}
 
+	@available(macOS 26.0, iOS 26.0, tvOS 26.0, watchOS 26.0, *)
+	static func nonRecoverableSignature(
+		compactBytes array: InlineArray<64, UInt8>
+	) throws -> ECDSASignatureRaw {
+		var raw = ECDSASignatureRaw()
+		// FIXME: Declare a `parseEcdsaSignatureCompact` taking an InlineArray<64, UInt8> and use it directly
+		try array.span.withUnsafeBufferPointer { compactBytes in
+			try FFI.call(ifFailThrow: .ecdsaSignatureParseCompact) { context in
+				parseEcdsaSignatureCompact(
+					context: context,
+					outputSignature: &raw,
+					inputBytes: compactBytes
+				)
+			}
+		}
+		return raw
+	}
+
 	static func nonRecoverableSignature(
 		compactBytes: [UInt8]
-	) throws -> secp256k1_ecdsa_signature {
-		var raw = secp256k1_ecdsa_signature()
+	) throws -> ECDSASignatureRaw {
+		var raw = ECDSASignatureRaw()
 
 		try FFI.call(ifFailThrow: .ecdsaSignatureParseCompact) { context in
-			secp256k1_ecdsa_signature_parse_compact(
-				context,
-				&raw,
-				compactBytes
+			parseEcdsaSignatureCompact(
+				context: context,
+				outputSignature: &raw,
+				inputBytes: compactBytes
 			)
 		}
 
@@ -40,17 +58,12 @@ extension Raw {
 	}
 
 	static func nonRecoverableSignature(
-		derBytes: [UInt8]
-	) throws -> secp256k1_ecdsa_signature {
-		var raw = secp256k1_ecdsa_signature()
+		derBytes: Span<UInt8>
+	) throws -> ECDSASignatureRaw {
+		var raw = ECDSASignatureRaw()
 
 		try FFI.call(ifFailThrow: .ecdsaSignatureParseDER) { context in
-			secp256k1_ecdsa_signature_parse_der(
-				context,
-				&raw,
-				derBytes,
-				derBytes.count
-			)
+			parseEcdsaSignatureDER(context: context, outputSignature: &raw, input: derBytes)
 		}
 
 		return raw

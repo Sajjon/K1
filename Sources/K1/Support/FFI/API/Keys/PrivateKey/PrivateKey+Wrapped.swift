@@ -1,5 +1,5 @@
 import Foundation
-import secp256k1
+import Secp256k1
 
 // MARK: - FFI.PrivateKey
 extension FFI {
@@ -21,16 +21,15 @@ extension FFI {
 				self.secureBytes = secureBytes
 				var secureBytes = secureBytes
 				self.publicKey = try secureBytes.withUnsafeMutableBytes { seckey in
-					var raw = secp256k1_pubkey()
+					var raw = PublicKeyRaw()
 
 					try FFI.call(ifFailThrow: .publicKeyCreate) { context in
-						secp256k1_ec_pubkey_create(
-							context,
-							&raw,
-							seckey.baseAddress!
+						createPublicKey(
+							context: context,
+							outputPublicKey: &raw,
+							privateKeyBytes: seckey.baseAddress!
 						)
 					}
-
 					return FFI.PublicKey.Wrapped(raw: raw)
 				}
 			}

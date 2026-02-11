@@ -1,5 +1,5 @@
 import Foundation
-import secp256k1
+import Secp256k1
 
 // MARK: Deserialize
 extension FFI.ECDSA {
@@ -14,8 +14,26 @@ extension FFI.ECDSA {
 		)
 	}
 
+	/// Compact aka `IEEE P1363` aka `R||S`.
+	@available(macOS 26.0, iOS 26.0, tvOS 26.0, watchOS 26.0, *)
+	static func from(
+		compactBytes array64: InlineArray<64, UInt8>
+	) throws -> Wrapped {
+		try Wrapped(
+			raw: Raw.nonRecoverableSignature(compactBytes: array64)
+		)
+	}
+
 	static func from(
 		derRepresentation: [UInt8]
+	) throws -> Wrapped {
+		try withSpanFromArray(derRepresentation) { span in
+			try Self.from(derRepresentation: span)
+		}
+	}
+
+	static func from(
+		derRepresentation: Span<UInt8>
 	) throws -> Wrapped {
 		try Wrapped(
 			raw: Raw.nonRecoverableSignature(derBytes: derRepresentation)
@@ -28,11 +46,11 @@ extension FFI.ECDSA {
 	static func compact(_ wrapped: Wrapped) throws -> Data {
 		var out = [UInt8](repeating: 0, count: Self.byteCount)
 		var rawSignature = wrapped.raw
-		try FFI.call(ifFailThrow: .ecdsaSignatureSerializeCompact) { context in
-			secp256k1_ecdsa_signature_serialize_compact(
-				context,
-				&out,
-				&rawSignature
+		FFI.call { context in
+			serializeEcdsaSignatureCompact(
+				context: context,
+				outputBytes: &out,
+				signature: &rawSignature
 			)
 		}
 		return Data(out)
@@ -45,11 +63,11 @@ extension FFI.ECDSA {
 		var derSignature = [UInt8](repeating: 0, count: derMaxLength)
 		var rawSignature = wrapped.raw
 		try FFI.call(ifFailThrow: .ecdsaSignatureSerializeDER) { context in
-			secp256k1_ecdsa_signature_serialize_der(
-				context,
-				&derSignature,
-				&derMaxLength,
-				&rawSignature
+			serializeEcdsaSignatureDER(
+				context: context,
+				outputBytes: &derSignature,
+				outputByteCount: &derMaxLength,
+				signature: &rawSignature
 			)
 		}
 		return Data(derSignature.prefix(derMaxLength))
@@ -83,22 +101,22 @@ extension FFI.ECDSA {
 			throw K1.Error.incorrectParameterSize
 		}
 		var compact = [UInt8](nonRecoverableCompact)
-		var recoverable = secp256k1_ecdsa_recoverable_signature()
+		var recovered = ECDSARecoverableSignatureRaw()
 		try FFI.call(ifFailThrow: .recoverableSignatureParseCompact) { context in
-			secp256k1_ecdsa_recoverable_signature_parse_compact(
-				context,
-				&recoverable,
-				&compact,
-				recoveryID
+			parseRecoverableECDSASignatureFromCompactBytes(
+				context: context,
+				outputRecoveredSignature: &recovered,
+				compactBytes: &compact,
+				recoveryID: recoveryID
 			)
 		}
-		var publicKeyRaw = secp256k1_pubkey()
+		var publicKeyRaw = PublicKeyRaw()
 		try FFI.call(ifFailThrow: .recover) { context in
-			secp256k1_ecdsa_recover(
-				context,
-				&publicKeyRaw,
-				&recoverable,
-				message
+			recoverPublicKeyFromECDSASignature(
+				context: context,
+				publicKey: &publicKeyRaw,
+				signature: &recovered,
+				hashedMessage: message
 			)
 		}
 		return FFI.PublicKey.Wrapped(raw: publicKeyRaw)
@@ -112,25 +130,25 @@ extension FFI.ECDSA {
 		publicKey: FFI.PublicKey.Wrapped,
 		message: [UInt8],
 		options: K1.ECDSA.ValidationOptions = .default
-	) throws -> Bool {
-		try FFI.toC { ffi -> Bool in
+	) -> Bool {
+		FFI.toC { ffi -> Bool in
 			var publicKeyRaw = publicKey.raw
 			var maybeMalleable = signature.raw
-			var normalized = secp256k1_ecdsa_signature()
+			var normalized = ECDSASignatureRaw()
 
-			let codeForSignatureWasMalleable = 1
-			let signatureWasMalleableResult = ffi.callWithResultCode { context in
-				secp256k1_ecdsa_signature_normalize(context, &normalized, &maybeMalleable)
-			}
-			let signatureWasMalleable = signatureWasMalleableResult == codeForSignatureWasMalleable
-			let isSignatureValid = ffi.validate { context in
-				secp256k1_ecdsa_verify(
-					context,
-					&normalized,
-					message,
-					&publicKeyRaw
+			let signatureWasMalleable = ffi.call { context in
+				normalizeEcdsaSignature(context: context, outputSignature: &normalized, inputSignature: &maybeMalleable)
+			} == .wasntNormalized
+
+			let isSignatureValid = ffi.call { context in
+				verifyEcdsaSignature(
+					context: context,
+					signature: &normalized,
+					messageHash: message,
+					publicKey: &publicKeyRaw
 				)
-			}
+			} == .signatureValid
+
 			let acceptMalleableSignatures = options.malleabilityStrictness == .accepted
 			switch (isSignatureValid, signatureWasMalleable, acceptMalleableSignatures) {
 			case (true, false, _):

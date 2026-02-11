@@ -1,5 +1,5 @@
 import Foundation
-import secp256k1
+import Secp256k1
 
 // MARK: - FFI.Schnorr
 extension FFI {
@@ -11,29 +11,28 @@ extension FFI.Schnorr {
 	static func isValid(
 		signature: FFI.Schnorr.Wrapped,
 		publicKey: FFI.PublicKey.Wrapped,
-		message: [UInt8]
-	) throws -> Bool {
-		try FFI.toC { ffi -> Bool in
-			var publicKeyX = secp256k1_xonly_pubkey()
+		message: Span<UInt8>
+	) -> Bool {
+		FFI.toC { ffi -> Bool in
+			var publicKeyX = PublicKeyXOnlyRaw()
 			var publicKeyRaw = publicKey.raw
-			try FFI.call(ifFailThrow: .xonlyPublicKeyFromPublicKey) { context in
-				secp256k1_xonly_pubkey_from_pubkey(
-					context,
-					&publicKeyX,
-					nil,
-					&publicKeyRaw
+			ffi.call { context in
+				_ = xOnlyPublicKeyFromPublicKey(
+					context: context,
+					outputXOnlyPublicKey: &publicKeyX,
+					parity: nil,
+					publicKey: &publicKeyRaw
 				)
 			}
 
-			return ffi.validate { context in
-				secp256k1_schnorrsig_verify(
-					context,
-					signature.bytes,
-					message,
-					message.count,
-					&publicKeyX
+			return ffi.call { context in
+				verifySchnorrSignature(
+					context: context,
+					signatureBytes: signature.bytes,
+					msg: message,
+					xOnlyPublicKey: &publicKeyX
 				)
-			}
+			} == .success
 		}
 	}
 }
@@ -53,27 +52,27 @@ extension FFI.Schnorr {
 
 		var signatureOut = [UInt8](repeating: 0, count: FFI.Schnorr.Wrapped.byteCount)
 
-		var keyPair = secp256k1_keypair()
+		var keyPair = KeypairRaw()
 
 		try FFI.call(
 			ifFailThrow: .keypairCreate
 		) { context in
-			secp256k1_keypair_create(
-				context,
-				&keyPair,
-				privateKey.secureBytes.backing.bytes
+			keypairFromPrivateKey(
+				context: context,
+				outputKeyPair: &keyPair,
+				privateKeyBytes: privateKey.secureBytes.backing.bytes
 			)
 		}
 
 		try FFI.call(
 			ifFailThrow: .schnorrSign
 		) { context in
-			secp256k1_schnorrsig_sign32(
-				context,
-				&signatureOut,
-				message,
-				&keyPair,
-				options.auxiliaryRandomData.bytes
+			schnorrSign(
+				context: context,
+				outputSignatureBytes: &signatureOut,
+				message: message,
+				keypair: &keyPair,
+				auxiliaryRandomData: options.auxiliaryRandomData.bytes
 			)
 		}
 

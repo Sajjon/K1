@@ -1,11 +1,11 @@
 import Foundation
-import secp256k1
+import Secp256k1
 
 // MARK: - FFI.ECDSAWithKeyRecovery.Wrapped
 extension FFI.ECDSAWithKeyRecovery {
 	struct Wrapped: @unchecked Sendable, ContiguousBytes, WrappedECDSASignature {
 		// swiftlint:disable:next nesting
-		typealias Raw = secp256k1_ecdsa_recoverable_signature
+		typealias Raw = ECDSARecoverableSignatureRaw
 		let raw: Raw
 		init(raw: Raw) {
 			self.raw = raw
@@ -13,11 +13,20 @@ extension FFI.ECDSAWithKeyRecovery {
 	}
 }
 
+typealias ECDSAFunctionPointer<Raw> = (
+	OpaquePointer,
+	UnsafeMutablePointer<Raw>,
+	UnsafePointer<UInt8>,
+	UnsafePointer<UInt8>,
+	secp256k1_nonce_function?,
+	UnsafeRawPointer?
+) -> ResultRaw
+
 // MARK: Sign
 extension FFI.ECDSAWithKeyRecovery.Wrapped {
 	// swiftlint:disable:next line_length
-	static func sign() -> (OpaquePointer, UnsafeMutablePointer<Raw>, UnsafePointer<UInt8>, UnsafePointer<UInt8>, secp256k1_nonce_function?, UnsafeRawPointer?) -> Int32 {
-		secp256k1_ecdsa_sign_recoverable
+	static func sign() -> ECDSAFunctionPointer<Raw> {
+		ecdsaSignRecoverable(context:outputSignature:hashedMessageBytes: privateKeyBytes:nonceFunctionPointer:arbitraryNonceData:)
 	}
 }
 

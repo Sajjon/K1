@@ -64,10 +64,10 @@ extension K1.ECDSAWithKeyRecovery.Signature {
 	/// Compact aka `IEEE P1363` aka `R||S` and `V` (`RecoveryID`).
 	public func compact() throws -> Compact {
 		// swiftlint:disable:next identifier_name
-		let (rs, recid) = try FFI.ECDSAWithKeyRecovery.serializeCompact(
+		let (rs, recid) = FFI.ECDSAWithKeyRecovery.serializeCompact(
 			wrapped
 		)
-		return try .init(
+		return try Compact(
 			compact: Data(rs),
 			recoveryID: .init(recid: recid)
 		)
@@ -199,8 +199,8 @@ extension K1.ECDSAWithKeyRecovery.Signature {
 // MARK: Conversion
 extension K1.ECDSAWithKeyRecovery.Signature {
 	/// Converts this recoverable ECDSA signature to a non-recoverable version.
-	public func nonRecoverable() throws -> K1.ECDSA.Signature {
-		try K1.ECDSA.Signature(
+	public func nonRecoverable() -> K1.ECDSA.Signature {
+		K1.ECDSA.Signature(
 			wrapped: FFI.ECDSAWithKeyRecovery.nonRecoverable(self.wrapped)
 		)
 	}

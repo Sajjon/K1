@@ -40,6 +40,22 @@ extension K1.ECDSA.Signature {
 			wrapped: FFI.ECDSA.from(compactBytes: [UInt8](rawRepresentation))
 		)
 	}
+
+	/// Creates a `secp256k1` ECDSA signature from the raw representation.
+	///
+	/// Accepts 64 bytes on format: `R || S`, as defined in [rfc4754][rfc]. In
+	/// `libsecp256k1` this representation is called "compact".
+	///
+	/// - Parameter rawRepresentation: A raw representation of the ECDSA signature as an
+	/// 	`InlineArray<64, UInt8>`
+	///
+	/// [rfc]: https://tools.ietf.org/html/rfc4754
+	@available(macOS 26.0, iOS 26.0, tvOS 26.0, watchOS 26.0, *)
+	public init(rawRepresentation array64: InlineArray<64, UInt8>) throws {
+		try self.init(
+			wrapped: FFI.ECDSA.from(compactBytes: array64)
+		)
+	}
 }
 
 // MARK: ContiguousBytes

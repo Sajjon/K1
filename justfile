@@ -3,12 +3,12 @@ ROOT_DIR := justfile_directory()
 default: testdebug
 
 testdebug: 
-  swift test
+  swift test --enable-experimental-prebuilts
 
 test: clean testdebug clean testprod
 
 testprod:
-	swift test -c release -Xswiftc -enable-testing
+	swift test -c release -Xswiftc -enable-testing --enable-experimental-prebuilts
 
 rmsubmod:
 	rm -rf "$(ROOT_DIR)Sources/secp256k1/libsecp256k1"
@@ -31,6 +31,11 @@ bootstrap:
 	./scripts/bootstrap
 
 dev: bootstrap init
+
+synthesize-interface:
+	mkdir -p "{{ROOT_DIR}}/.build/clang-module-cache"
+	CLANG_MODULE_CACHE_PATH="{{ROOT_DIR}}/.build/clang-module-cache" xcrun swift-synthesize-interface -I Sources/secp256k1/include -module-name Secp256k1 -target arm64-apple-macos15 -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.sdk
+
 
 format:
 	swiftformat --config .swiftformat "{{ROOT_DIR}}"
