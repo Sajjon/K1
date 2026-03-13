@@ -43,7 +43,7 @@ extension FFI.ECDSA {
 
 // MARK: Serialize
 extension FFI.ECDSA {
-	static func compact(_ wrapped: Wrapped) throws -> Data {
+	static func compact(_ wrapped: Wrapped) -> Data {
 		var out = [UInt8](repeating: 0, count: Self.byteCount)
 		var rawSignature = wrapped.raw
 		FFI.call { context in
@@ -84,7 +84,7 @@ extension FFI.ECDSA {
 		guard message.count == Curve.Field.byteCount else {
 			throw K1.Error.incorrectParameterSize
 		}
-		let nonRecoverableCompact = try FFI.ECDSA.compact(wrapped)
+		let nonRecoverableCompact = FFI.ECDSA.compact(wrapped)
 		return try Self.recoverPublicKey(
 			nonRecoverableCompact: nonRecoverableCompact,
 			recoveryID: recoveryID,

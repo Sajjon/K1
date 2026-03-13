@@ -1,6 +1,9 @@
 import Foundation
 @testable import K1
 import XCTest
+import K1Macros
+import Secp256k1
+
 
 // MARK: - ECDASignaturePublicKeyRecoveryTests
 /// Test vectors:

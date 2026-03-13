@@ -108,11 +108,11 @@ final class PublicKeyGroupOperationsTests: XCTestCase {
 		XCTAssertFalse(sum.isEqual(to: b))
 	}
 
-	func testNegation() throws {
+	func testNegation() {
 		// Test that negation works correctly
 		let a = FFI.PublicKey.Wrapped.gx2
-		let negA = try a.negate()
-		let negNegA = try negA.negate()
+		let negA = a.negate()
+		let negNegA = negA.negate()
 		
 		// Test that -(-a) = a
 		XCTAssertTrue(negNegA.isEqual(to: a))
@@ -193,15 +193,15 @@ final class PublicKeyGroupOperationsTests: XCTestCase {
 		// Test negation operations
 
 		// Test: -g2 should be different from g2
-		let negG2 = try FFI.PublicKey.Wrapped.gx2.negate()
+		let negG2 = FFI.PublicKey.Wrapped.gx2.negate()
 		XCTAssertFalse(negG2.isEqual(to: FFI.PublicKey.Wrapped.gx2))
 
 		// Test: -g3 should be different from g3
-		let negG3 = try FFI.PublicKey.Wrapped.gx3.negate()
+		let negG3 = FFI.PublicKey.Wrapped.gx3.negate()
 		XCTAssertFalse(negG3.isEqual(to: FFI.PublicKey.Wrapped.gx3))
 
 		// Test: -g4 should be different from g4
-		let negG4 = try FFI.PublicKey.Wrapped.gx4.negate()
+		let negG4 = FFI.PublicKey.Wrapped.gx4.negate()
 		XCTAssertFalse(negG4.isEqual(to: FFI.PublicKey.Wrapped.gx4))
 		
 		// Test: g2 + (-g2) = 0 (point at infinity)

@@ -26,7 +26,14 @@ typealias ECDSAFunctionPointer<Raw> = (
 extension FFI.ECDSAWithKeyRecovery.Wrapped {
 	// swiftlint:disable:next line_length
 	static func sign() -> ECDSAFunctionPointer<Raw> {
-		ecdsaSignRecoverable(context:outputSignature:hashedMessageBytes: privateKeyBytes:nonceFunctionPointer:arbitraryNonceData:)
+		ecdsaSignRecoverable(
+			context:
+			outputSignature:
+			hashedMessageBytes:
+			privateKeyBytes:
+			nonceFunctionPointer:
+			arbitraryNonceData:
+		)
 	}
 }
 

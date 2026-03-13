@@ -1,4 +1,5 @@
 import Foundation
+import K1Macros
 import Secp256k1
 
 // MARK: - Raw
@@ -22,27 +23,14 @@ extension Raw {
 		}
 		return raw
 	}
+}
 
-	@available(macOS 26.0, iOS 26.0, tvOS 26.0, watchOS 26.0, *)
-	static func nonRecoverableSignature(
-		compactBytes array: InlineArray<64, UInt8>
-	) throws -> ECDSASignatureRaw {
-		var raw = ECDSASignatureRaw()
-		// FIXME: Declare a `parseEcdsaSignatureCompact` taking an InlineArray<64, UInt8> and use it directly
-		try array.span.withUnsafeBufferPointer { compactBytes in
-			try FFI.call(ifFailThrow: .ecdsaSignatureParseCompact) { context in
-				parseEcdsaSignatureCompact(
-					context: context,
-					outputSignature: &raw,
-					inputBytes: compactBytes
-				)
-			}
-		}
-		return raw
-	}
+// MARK: NonRecoverable Compact
+extension Raw {
 
-	static func nonRecoverableSignature(
-		compactBytes: [UInt8]
+	@declareSafeApi(byteCount: 64)
+	static func __nonRecoverableSignature(
+		compactBytes: UnsafePointer<UInt8>
 	) throws -> ECDSASignatureRaw {
 		var raw = ECDSASignatureRaw()
 
@@ -56,7 +44,10 @@ extension Raw {
 
 		return raw
 	}
+}
 
+// MARK: NonRecoverable DER
+extension Raw {
 	static func nonRecoverableSignature(
 		derBytes: Span<UInt8>
 	) throws -> ECDSASignatureRaw {

@@ -61,7 +61,7 @@ extension FFI.PublicKey.Wrapped {
 	}
 
 	/// Negates a public key (point) on the secp256k1 curve
-	func negate() throws -> Self {
+	func negate() -> Self {
 		var result = self.raw
 		FFI.call { context in
 			negatePublicKey(context: context, publicKey: &result)

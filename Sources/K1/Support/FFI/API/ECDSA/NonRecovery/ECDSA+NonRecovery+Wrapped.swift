@@ -17,7 +17,14 @@ extension FFI.ECDSA {
 extension FFI.ECDSA.Wrapped {
 	// swiftlint:disable:next line_length
 	static func sign() -> ECDSAFunctionPointer<Raw> {
-		ecdsaSignNonRecoverable(context:outputSignature:hashedMessageBytes: privateKeyBytes:nonceFunctionPointer:arbitraryNonceData:)
+		ecdsaSignNonRecoverable(
+			context:
+			outputSignature:
+			hashedMessageBytes:
+			privateKeyBytes:
+			nonceFunctionPointer:
+			arbitraryNonceData:
+		)
 	}
 }
 

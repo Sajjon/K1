@@ -143,8 +143,8 @@ extension K1._PublicKeyImplementation {
 	}
 
 	/// Negates a public key (point) on the secp256k1 curve
-	func negate() throws -> Self {
-		try Self(wrapped: wrapped.negate())
+	func negate() -> Self {
+		Self(wrapped: wrapped.negate())
 	}
 
 	/// Combines multiple public keys (points) on the secp256k1 curve

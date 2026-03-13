@@ -219,7 +219,7 @@ extension K1.KeyAgreement {
 
 		/// Negates a public key (point) on the secp256k1 curve
 		public func negate() throws -> Self {
-			try Self(impl: impl.negate())
+			Self(impl: impl.negate())
 		}
 
 		/// Combines multiple public keys (points) on the secp256k1 curve
@@ -445,7 +445,7 @@ extension K1.Schnorr {
 
 		/// Negates a public key (point) on the secp256k1 curve
 		public func negate() throws -> Self {
-			try Self(impl: impl.negate())
+			Self(impl: impl.negate())
 		}
 
 		/// Combines multiple public keys (points) on the secp256k1 curve
@@ -671,7 +671,7 @@ extension K1.ECDSA {
 
 		/// Negates a public key (point) on the secp256k1 curve
 		public func negate() throws -> Self {
-			try Self(impl: impl.negate())
+			Self(impl: impl.negate())
 		}
 
 		/// Combines multiple public keys (points) on the secp256k1 curve
@@ -897,7 +897,7 @@ extension K1.ECDSAWithKeyRecovery {
 
 		/// Negates a public key (point) on the secp256k1 curve
 		public func negate() throws -> Self {
-			try Self(impl: impl.negate())
+			Self(impl: impl.negate())
 		}
 
 		/// Combines multiple public keys (points) on the secp256k1 curve

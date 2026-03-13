@@ -76,11 +76,7 @@ extension K1.ECDSA.Signature {
 	/// Returns 64 bytes on format: `R || S`, as defined in [rfc4754][rfc]. In
 	/// `libsecp256k1` this representation is called "compact".
 	public var rawRepresentation: Data {
-		do {
-			return try FFI.ECDSA.compact(wrapped)
-		} catch {
-			fatalError("Should never fail to convert ECDSA signatures to rawRepresentation.")
-		}
+		FFI.ECDSA.compact(wrapped)
 	}
 
 	/// A Distinguished Encoding Rules (DER) encoded representation of a
