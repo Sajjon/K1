@@ -1,64 +1,120 @@
 import CryptoKit
-import secp256k1
+import Secp256k1
+
+/// `secp256k1_context`
+///
+/// In the best of worlds this would not be a typealias
+/// for an `OpaquePointer`, mapping to a Swift class using
+/// apinotes have been attempted without success, seems the
+/// implementation of `secp256k1` prevents it.
+///
+/// An `UnsafePointer<secp256k1_context_create>` would also
+/// have been better, but mapping to it using apinotes also
+/// failed.
+typealias Secp256k1ContextRaw = OpaquePointer
 
 // MARK: - FFI
+
+/// A swift wrapper around an `OpaquePointer` to `secp256k1_context`
+/// created with `secp256k1_context_create`.
+///
+/// In the best of worlds this would not be a typealias
+/// for an `OpaquePointer`, mapping to a Swift class using
+/// apinotes have been attempted without success, seems the
+/// implementation of `secp256k1` prevents it.
+///
+/// An `UnsafePointer<secp256k1_context_create>` would also
+/// have been better, but mapping to it using apinotes also
+/// failed.
 final class FFI {
-	let context: OpaquePointer
-	init() throws {
+	/// The wrapped `secp256k1_context` (`OpaquePointer`).
+	let context: Secp256k1ContextRaw
+
+	/// Creates a new `secp256k1_context` using `secp256k1_context_create` to be used
+	/// for both signing and verification operations.
+	///
+	/// Will crash if `secp256k1_context_create` fails, which it never should.
+	init() {
 		guard
-			/* "Create a secp256k1 context object." */
-			let context = secp256k1_context_create(Context.sign.rawValue | Context.verify.rawValue)
+			// Create secp256k1 context object
+			let context = createContext(flags: Context.sign.rawValue | Context.verify.rawValue)
 		else {
-			throw K1.Error.underlyingLibsecp256k1Error(.failedToCreateContextForSecp256k1)
+			fatalError(
+				"""
+				Failed to create context, did you run out of memory? 
+
+				`secp256k1_context_create` call failed. Which under most circumstances should never ever happen.
+
+				Please report a bug at:
+				https://github.com/Sajjon/K1/issues/new
+
+				And provide OS and Swift version details.
+				"""
+			)
 		}
 
 		self.context = context
 	}
 
 	deinit {
-		secp256k1_context_destroy(context)
+		destroyContext(context)
 	}
 }
 
+// MARK: Helper Methods
 extension FFI {
-	static func toC<T>(
-		_ closure: (FFI) throws -> T
-	) throws -> T {
-		let ffi = try FFI()
-		return try closure(ffi)
-	}
-
-	/// Returns `true` iff result code is `1`
-	func validate(
-		_ method: (OpaquePointer) -> Int32
-	) -> Bool {
-		method(context) == 1
-	}
-
-	func callWithResultCode(
-		_ method: (OpaquePointer) -> Int32
-	) -> Int {
-		let result = method(context)
-		return Int(result)
-	}
-
 	func call(
 		ifFailThrow error: FFI.Error,
-		_ method: (OpaquePointer) -> Int32
+		_ method: (Secp256k1ContextRaw) -> ResultRaw
 	) throws {
-		let result = callWithResultCode(method)
-		let successCode = 1
-		guard result == successCode else {
+		guard method(context) == ResultRaw.success else {
 			throw K1.Error.underlyingLibsecp256k1Error(error)
 		}
 	}
 
+	func call<R>(
+		_ method: (OpaquePointer) throws -> R
+	) rethrows -> R {
+		try method(context)
+	}
+
+	func callGetResult(
+		_ method: (OpaquePointer) -> ResultRaw
+	) -> ResultRaw {
+		method(context)
+	}
+}
+
+// MARK: - Static
+extension FFI {
+	static func toC<R>(
+		_ body: (FFI) throws -> R
+	) rethrows -> R {
+		try body(FFI())
+	}
+
+	static func call<R>(
+		_ method: @escaping (OpaquePointer) throws -> R
+	) rethrows -> R {
+		try method(FFI().context)
+	}
+
+	static func callGetResult(
+		_ method: (OpaquePointer) -> ResultRaw
+	) -> ResultRaw {
+		FFI().callGetResult(method)
+	}
+
 	static func call(
 		ifFailThrow error: FFI.Error,
-		_ method: (OpaquePointer) -> Int32
+		_ method: (OpaquePointer) -> ResultRaw
 	) throws {
-		try toC { ffi in
-			try ffi.call(ifFailThrow: error, method)
-		}
+		try FFI().call(ifFailThrow: error, method)
+	}
+
+	static func call(
+		_ method: @escaping (OpaquePointer) -> Int32
+	) {
+		_ = method(FFI().context)
 	}
 }

@@ -1,10 +1,3 @@
-//
-//  ecdh_variants.h
-//  
-//
-//  Created by Alexander Cyon on 2022-01-31.
-//
-
 #ifndef ecdh_variants_h
 #define ecdh_variants_h
 
@@ -21,7 +14,7 @@
  *           y32:        pointer to a 32-byte y coordinate
  *           data:       arbitrary data pointer that is passed through
  */
-int ecdh_unsafe_whole_point(unsigned char *output, const unsigned char *x32, const unsigned char *y32, void *data);
+int ecdh_hash_function_unsafe_whole_point(unsigned char *output, const unsigned char *x32, const unsigned char *y32, void *data);
 
 /** The ASN1 X9.63 ECDH variant which returns only the X component of ECDH secret (unhashed).
  *
@@ -34,6 +27,11 @@ int ecdh_unsafe_whole_point(unsigned char *output, const unsigned char *x32, con
  *           y32:        pointer to a 32-byte y coordinate
  *           data:       arbitrary data pointer that is passed through
  */
-int ecdh_asn1_x963(unsigned char *output, const unsigned char *x32, const unsigned char *y32, void *data);
+int ecdh_hash_function_asn1_x963(unsigned char *output, const unsigned char *x32, const unsigned char *y32, void *data);
+
+int _ecdh_hash_function_asn1_x963_impl(
+	unsigned char *output,
+	const unsigned char *x32
+);
 
 #endif /* ecdh_variants_h */

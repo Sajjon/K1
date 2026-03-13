@@ -1,0 +1,5 @@
+module Secp256k1 {
+  umbrella header "k1_umbrella.h"
+  export *
+  module * { export * }
+}

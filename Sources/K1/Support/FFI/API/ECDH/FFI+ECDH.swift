@@ -1,5 +1,5 @@
 import Foundation
-import secp256k1
+import Secp256k1
 
 // MARK: - FFI.ECDH
 extension FFI {
@@ -34,8 +34,8 @@ extension FFI.ECDH {
 		func hashfp() -> ((@convention(c) (UnsafeMutablePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafeMutableRawPointer?) -> Int32)?) {
 			switch self {
 			case .libsecp256kDefault: return secp256k1_ecdh_hash_function_default
-			case .ansiX963: return ecdh_asn1_x963
-			case .noHashWholePoint: return ecdh_unsafe_whole_point
+			case .ansiX963: return ecdh_hash_function_asn1_x963
+			case .noHashWholePoint: return ecdh_hash_function_unsafe_whole_point
 			}
 		}
 
@@ -73,23 +73,23 @@ extension FFI.ECDH {
 		) { context in
 			if var arbitraryData {
 				arbitraryData.withUnsafeMutableBytes { ptr in
-					secp256k1_ecdh(
-						context,
-						&sharedPublicPointBytes, // output
-						&publicKeyRaw, // pubkey
-						privateKey.secureBytes.backing.bytes, // seckey
-						hashFp.hashfp(), // hashfp
-						ptr.baseAddress // properly formed pointer
+					ecdh(
+						context: context,
+						outputSharedPointBytes: &sharedPublicPointBytes,
+						publicKey: &publicKeyRaw,
+						privateKeyBytes: privateKey.secureBytes.backing.bytes,
+						hashFunction: hashFp.hashfp(),
+						arbitraryData: ptr.baseAddress
 					)
 				}
 			} else {
-				secp256k1_ecdh(
-					context,
-					&sharedPublicPointBytes,
-					&publicKeyRaw,
-					privateKey.secureBytes.backing.bytes,
-					hashFp.hashfp(),
-					nil // No arbitrary data
+				ecdh(
+					context: context,
+					outputSharedPointBytes: &sharedPublicPointBytes,
+					publicKey: &publicKeyRaw,
+					privateKeyBytes: privateKey.secureBytes.backing.bytes,
+					hashFunction: hashFp.hashfp(),
+					arbitraryData: nil // No arbitrary data
 				)
 			}
 		}

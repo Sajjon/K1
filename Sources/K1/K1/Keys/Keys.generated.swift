@@ -17,13 +17,16 @@ extension K1.KeyAgreement {
 		let publicKeyImpl: K1._PublicKeyImplementation
 
 		/// The corresponding public key.
-		public var publicKey: PublicKey {
-			try! .init(rawRepresentation: publicKeyImpl.rawRepresentation)
-		}
+		public let publicKey: PublicKey
 
 		init(impl: Impl) {
 			self.impl = impl
 			self.publicKeyImpl = impl.publicKey
+			do {
+				self.publicKey = try PublicKey(rawRepresentation: impl.publicKey.rawRepresentation)
+			} catch {
+				fatalError("Should never fail to instantiate a PublicKey from a PrivateKey, error: \(error)")
+			}
 		}
 
 		/// Creates a random `secp256k1` private key for key agreement.
@@ -216,7 +219,7 @@ extension K1.KeyAgreement {
 
 		/// Negates a public key (point) on the secp256k1 curve
 		public func negate() throws -> Self {
-			try Self(impl: impl.negate())
+			Self(impl: impl.negate())
 		}
 
 		/// Combines multiple public keys (points) on the secp256k1 curve
@@ -239,13 +242,16 @@ extension K1.Schnorr {
 		let publicKeyImpl: K1._PublicKeyImplementation
 
 		/// The corresponding public key.
-		public var publicKey: PublicKey {
-			try! .init(rawRepresentation: publicKeyImpl.rawRepresentation)
-		}
+		public let publicKey: PublicKey
 
 		init(impl: Impl) {
 			self.impl = impl
 			self.publicKeyImpl = impl.publicKey
+			do {
+				self.publicKey = try PublicKey(rawRepresentation: impl.publicKey.rawRepresentation)
+			} catch {
+				fatalError("Should never fail to instantiate a PublicKey from a PrivateKey, error: \(error)")
+			}
 		}
 
 		/// Creates a random `secp256k1` private key for signing.
@@ -439,7 +445,7 @@ extension K1.Schnorr {
 
 		/// Negates a public key (point) on the secp256k1 curve
 		public func negate() throws -> Self {
-			try Self(impl: impl.negate())
+			Self(impl: impl.negate())
 		}
 
 		/// Combines multiple public keys (points) on the secp256k1 curve
@@ -462,13 +468,16 @@ extension K1.ECDSA {
 		let publicKeyImpl: K1._PublicKeyImplementation
 
 		/// The corresponding public key.
-		public var publicKey: PublicKey {
-			try! .init(rawRepresentation: publicKeyImpl.rawRepresentation)
-		}
+		public let publicKey: PublicKey
 
 		init(impl: Impl) {
 			self.impl = impl
 			self.publicKeyImpl = impl.publicKey
+			do {
+				self.publicKey = try PublicKey(rawRepresentation: impl.publicKey.rawRepresentation)
+			} catch {
+				fatalError("Should never fail to instantiate a PublicKey from a PrivateKey, error: \(error)")
+			}
 		}
 
 		/// Creates a random `secp256k1` private key for signing.
@@ -662,7 +671,7 @@ extension K1.ECDSA {
 
 		/// Negates a public key (point) on the secp256k1 curve
 		public func negate() throws -> Self {
-			try Self(impl: impl.negate())
+			Self(impl: impl.negate())
 		}
 
 		/// Combines multiple public keys (points) on the secp256k1 curve
@@ -685,13 +694,16 @@ extension K1.ECDSAWithKeyRecovery {
 		let publicKeyImpl: K1._PublicKeyImplementation
 
 		/// The corresponding public key.
-		public var publicKey: PublicKey {
-			try! .init(rawRepresentation: publicKeyImpl.rawRepresentation)
-		}
+		public let publicKey: PublicKey
 
 		init(impl: Impl) {
 			self.impl = impl
 			self.publicKeyImpl = impl.publicKey
+			do {
+				self.publicKey = try PublicKey(rawRepresentation: impl.publicKey.rawRepresentation)
+			} catch {
+				fatalError("Should never fail to instantiate a PublicKey from a PrivateKey, error: \(error)")
+			}
 		}
 
 		/// Creates a random `secp256k1` private key for signing.
@@ -885,7 +897,7 @@ extension K1.ECDSAWithKeyRecovery {
 
 		/// Negates a public key (point) on the secp256k1 curve
 		public func negate() throws -> Self {
-			try Self(impl: impl.negate())
+			Self(impl: impl.negate())
 		}
 
 		/// Combines multiple public keys (points) on the secp256k1 curve
@@ -896,28 +908,13 @@ extension K1.ECDSAWithKeyRecovery {
 	}
 }
 
-// MARK: - K1.KeyAgreement.PrivateKey + _K1PrivateKeyProtocol
 extension K1.KeyAgreement.PrivateKey: _K1PrivateKeyProtocol {}
-
-// MARK: - K1.KeyAgreement.PublicKey + _K1PublicKeyProtocol
 extension K1.KeyAgreement.PublicKey: _K1PublicKeyProtocol {}
-
-// MARK: - K1.Schnorr.PrivateKey + _K1PrivateKeyProtocol
 extension K1.Schnorr.PrivateKey: _K1PrivateKeyProtocol {}
-
-// MARK: - K1.Schnorr.PublicKey + _K1PublicKeyProtocol
 extension K1.Schnorr.PublicKey: _K1PublicKeyProtocol {}
-
-// MARK: - K1.ECDSA.PrivateKey + _K1PrivateKeyProtocol
 extension K1.ECDSA.PrivateKey: _K1PrivateKeyProtocol {}
-
-// MARK: - K1.ECDSA.PublicKey + _K1PublicKeyProtocol
 extension K1.ECDSA.PublicKey: _K1PublicKeyProtocol {}
-
-// MARK: - K1.ECDSAWithKeyRecovery.PrivateKey + _K1PrivateKeyProtocol
 extension K1.ECDSAWithKeyRecovery.PrivateKey: _K1PrivateKeyProtocol {}
-
-// MARK: - K1.ECDSAWithKeyRecovery.PublicKey + _K1PublicKeyProtocol
 extension K1.ECDSAWithKeyRecovery.PublicKey: _K1PublicKeyProtocol {}
 
 // swiftlint:enable all

@@ -1,5 +1,5 @@
 import Foundation
-import secp256k1
+import Secp256k1
 
 // MARK: - FFI.ECDSA
 extension FFI {
@@ -7,25 +7,25 @@ extension FFI {
 	public enum ECDSA {}
 }
 
-// MARK: - RawECDSASignature
-protocol RawECDSASignature {
+// MARK: - EmptyInitializable
+protocol EmptyInitializable {
 	init()
 }
 
-// MARK: - secp256k1_ecdsa_recoverable_signature + RawECDSASignature
-extension secp256k1_ecdsa_recoverable_signature: RawECDSASignature {}
+// MARK: - ECDSARecoverableSignatureRaw + EmptyInitializable
+extension ECDSARecoverableSignatureRaw: EmptyInitializable {}
 
-// MARK: - secp256k1_ecdsa_signature + RawECDSASignature
-extension secp256k1_ecdsa_signature: RawECDSASignature {}
+// MARK: - ECDSASignatureRaw + EmptyInitializable
+extension ECDSASignatureRaw: EmptyInitializable {}
 
 // MARK: - WrappedECDSASignature
 protocol WrappedECDSASignature {
-	associatedtype Raw: RawECDSASignature
+	associatedtype Raw: EmptyInitializable
 	init(raw: Raw)
 	var raw: Raw { get }
 
 	// swiftlint:disable:next line_length
-	static func sign() -> (OpaquePointer, UnsafeMutablePointer<Raw>, UnsafePointer<UInt8>, UnsafePointer<UInt8>, secp256k1_nonce_function?, UnsafeRawPointer?) -> Int32
+	static func sign() -> ECDSAFunctionPointer<Raw>
 }
 
 // MARK: ECDSA Shared
@@ -70,7 +70,7 @@ extension K1.ECDSA.SigningOptions {
 
 extension K1.ECDSA.SigningOptions.NonceFunction {
 	// swiftlint:disable:next line_length
-	fileprivate func function() -> (@convention(c) (UnsafeMutablePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafePointer<UInt8>?, UnsafeMutableRawPointer?, UInt32) -> Int32)? {
+	fileprivate func function() -> secp256k1_nonce_function? {
 		switch self {
 		case .deterministic:
 			return secp256k1_nonce_function_rfc6979
